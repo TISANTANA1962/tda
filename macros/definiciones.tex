@@ -1,0 +1,556 @@
+% ======================
+% =========GRAFOS=======
+% ======================
+\tikzset{
+grafo style/.style={
+% node distance = 2cm,
+nodo/.style={circle,
+    draw=BrickRed,
+    fill=BrickRed!5,
+    inner sep = 2pt,
+  },
+arista/.style={very thin, gray},
+arco/.style={-{Latex[length=6pt]}, very thin, gray},
+baseline = 0,
+font={\footnotesize},
+compConexa/.style={draw = red, ultra thick, dashed, rounded corners},
+},
+}
+% Genera un vértice inline
+\newcommand{\inlinegraph}[1]{
+  \begin{tikzpicture}[grafo style, baseline=-3pt]
+    \node[nodo] at (0,0) {$#1$};
+  \end{tikzpicture}
+}
+
+% ======================
+% =========CODIGO=======
+% ======================
+%
+
+\def\true{\textit{\red{true}}\xspace}
+\def\false{\textit{\red{false}}\xspace}
+
+\definecolor{pythonbg}{RGB}{230, 240, 240}
+\definecolor{pythonfg}{RGB}{40, 44, 52}
+
+\lstset{
+  basicstyle={\ttfamily\small},
+  commentstyle={\color{red}\textit},
+  backgroundcolor=\color{pythonbg},
+  numbers=left,
+  numberstyle=\tiny\color{red},
+  numbersep=2pt,
+  breaklines=false,
+  showstringspaces=false,
+  showspaces=false,
+  keywordstyle=\color{violet}\textit,
+  stringstyle=\color{blue}\textit,
+  xleftmargin=0pt,
+  xrightmargin=0pt,
+  rulesep=0pt,
+  fontadjust=true,
+}
+
+\tcbset{
+  % listing engine=listings,
+  breakable,
+  colback=pythonbg,
+  colframe=pythonbg,
+  left=6pt,
+  right=0pt,
+  top=0pt,
+  bottom=0pt,
+  % width=\textwidth,
+}
+
+\newcommand{\codigoPython}[1]{
+  \begin{tcolorbox}
+    \lstinputlisting[language=python]{./codigos-\guia/#1}
+  \end{tcolorbox}
+}
+
+\newcommand{\codigoCpp}[1]{
+  \begin{tcolorbox}
+    \lstinputlisting[language=c++]{./codigos-\guia/#1}
+  \end{tcolorbox}
+}
+
+% pgfplots
+\pgfplotsset{every axis legend/.style={
+      cells = {anchor=center},
+      draw=black,
+      fill=white,
+      shape=rectangle,
+    },
+  every axis/.style={
+    }
+}
+
+% Definiciones y nuevos comandos:def
+% =============
+% Conjuntos
+\DeclareMathOperator{\partes}{\mathcal P}
+\DeclareMathOperator{\relacion}{\,\mathcal{R}\,}
+\DeclareMathOperator{\norelacion}{\,\cancel{\relacion}\,}
+\DeclareMathOperator{\universo}{\mathcal U}
+\DeclareMathOperator{\reales}{\mathbb R}
+\DeclareMathOperator{\naturales}{\mathbb N}
+\DeclareMathOperator{\enteros}{\mathbb Z}
+\DeclareMathOperator{\racionales}{\mathbb Q}
+\DeclareMathOperator{\irracionales}{\mathbb I}
+\DeclareMathOperator{\complejos}{\mathbb C}
+\DeclareMathOperator{\accion}{\xspace\red{\cdot}\xspace}
+\DeclareMathOperator{\columna}{\text{Col}}
+\DeclareMathOperator{\fila}{\text{Fila}}
+\DeclareMathOperator{\K}{\mathbb K} % cuerpo K
+\DeclareMathOperator{\vacio}{\varnothing}
+\DeclareMathOperator{\union}{\cup}
+\DeclareMathOperator{\inter}{\,\cap\,}
+\DeclareMathOperator{\sumaDirecta}{\oplus}
+\DeclareMathOperator{\diferencia}{\ \setminus \ }
+\DeclareMathOperator{\y}{\land}
+\DeclareMathOperator{\nucleo}{\text{Nu}}
+\DeclareMathOperator{\imagen}{\text{Im}}
+\DeclareMathOperator{\dimension}{\text{dim}}
+\DeclareMathOperator{\rango}{\text{rg}}
+\DeclareMathOperator{\traza}{\text{tr}}
+\DeclareMathOperator{\normaBullet}{\Vert\cdot\Vert}
+\newcommand{\norma}[1]{\left\Vert #1 \right\Vert}
+\DeclareMathOperator{\condicion}{\text{cond}}
+\DeclareMathOperator{\multiGeo}{\text{mg}}
+\DeclareMathOperator{\multiAri}{\text{ma}}
+
+\DeclareMathOperator*{\Land}{\scalerel*{\land}{\textstyle\sum}}
+\DeclareMathOperator*{\Lor}{\scalerel*{\lor}{\textstyle\sum}}
+\newcommand{\conjuncion}[2]{\Land\limits_{\mathclap{\substack{#1}}}^{#2}}
+\newcommand{\disyuncion}[2]{\Lor\limits_{\mathclap{\substack{#1}}}^{#2}}
+
+\def\o{\lor}
+\def\neg{\sim}
+
+\DeclareMathOperator{\equivalente}{\leftrightsquigarrow}
+\def\entonces{\implies}
+\def\noEntonces{\centernot\Rightarrow}
+
+\def\sisolosi{\iff} % largo
+\def\sii{\Leftrightarrow} % corto
+
+\def\clase{\overline}
+\def\ord{\text{ord}}
+
+\def\existe{\,\exists\,}
+\def\noexiste{\,\nexists\,}
+\def\paratodo{\ \, \forall}
+\def\distinto{\neq}
+\def\en{\in}
+\def\talque{\;/\;}
+
+% =====
+\def\qvq{\text{ quiero ver que }}
+
+\newcommand\fechaEjercicio[1]{
+  {\tiny [\violet{#1}]}
+}
+
+%funciones
+\DeclareMathOperator{\dom}{Dom}
+\DeclareMathOperator{\cod}{Cod}
+\def\F{\mathcal F}
+\def\comp{\circ}
+\def\inv{^{-1}}
+\def\infinito{\infty}
+
+% Llaves, paréntesis, contenedores
+\newcommand{\llave}[2]{ \left\{ \begin{array}{#1} #2 \end{array}\right. }
+\newcommand{\llaveInv}[2]{ \left\} \begin{array}{#1} #2 \end{array}\right. }
+\newcommand{\llaves}[2]{ \left\{ \begin{array}{#1} #2 \end{array} \right\} }
+
+\newcommand{\matriz}[2]{\left( \begin{array}{#1} #2 \end{array} \right)}
+\newcommand{\bloque}[2]{\left[ \begin{array}{#1} #2 \end{array} \right]}
+\newcommand{\triangulacion}[1]{\ensuremath{\begin{array}{c} #1 \end{array}}}
+\newcommand{\deter}[2]{\left| \begin{array}{#1} #2 \end{array} \right|}
+\newcommand{\lista}[2][(1)]{\begin{enumerate}[\bf #1]\setlength\itemsep{-0.6ex} #2 \end{enumerate}}
+\newcommand{\listal}[2][-0.6ex]{\begin{enumerate}[\bf(a)]\setlength\itemsep{#1} #2 \end{enumerate}}
+
+% naturales
+\newcommand{\limite}[2]{\lim\limits_{#1 \to #2}}
+\newcommand{\sumatoria}[2]{\sum\limits_{\mathclap{\substack{#1}}}^{#2}}
+\newcommand{\barrow}[2]{\big|_#1^#2}
+\newcommand{\productoria}[2]{\prod\limits_{#1}^{#2}}
+\DeclareMathOperator*{\maximo}{\text{máx}}
+\DeclareMathOperator*{\minimo}{\text{mín}}
+\DeclareMathOperator*{\infimo}{\text{ínf}}
+\DeclareMathOperator*{\supremo}{\text{sup}}
+\newcommand{\kmasuno}[1]{\underbrace{#1}_{k+1\text{-ésimo}}}
+\newcommand{\HI}[1]{\underbrace{#1}_{\text{HI}}}
+
+% % enteros
+\def\divideA{\, \big| \,}
+\def\noDivide{\centernot\divideA}
+\def\congruente{\, \equiv \,}
+\def\noCongruente{\, \not\equiv \,}
+\newcommand{\congruencia}[3]{#1 \equiv #2 \;(#3)}
+\newcommand{\noCongruencia}[3]{#1 \not\equiv #2 \;(#3)}
+\newcommand{\conga}[1]{\stackrel{\mathclap{(#1)}}{\congruente}}
+\newcommand{\divset}[2]{\mathcal{D}(#1) = \set{#2}}
+\newcommand{\divsetP}[2]{\mathcal{D_+}(#1) = \set{#2}}
+\newcommand{\ub}[2]{ \underbrace{\textstyle #1}_{\mathclap{\substack{#2}}}}
+\newcommand{\ob}[2]{ \overbrace{\textstyle #1}^{\mathclap{\substack{#2}}}}
+\newcommand{\ua}[2]{\underset{\everymath{\textstyle}\mathclap{\substack{\downarrow \\  #2}}}{#1}}
+\newcommand{\oa}[2]{\overset{\everymath{\textstyle}\mathclap{\substack{#2 \\ \uparrow }}}{#1}}
+\def\cop{\, \perp \, }
+\def\nocop{\, \not\perp \, }
+
+% complejos
+\DeclareMathOperator{\re}{Re}
+\DeclareMathOperator{\im}{Im}
+\DeclareMathOperator{\argumento}{arg}
+\newcommand{\conj}[1]{\overline{#1}}
+
+% Polinomios
+\DeclareMathOperator{\cp}{cp}
+\DeclareMathOperator{\gr}{gr}
+\DeclareMathOperator{\mult}{mult}
+\newcommand{\divPol}[2]{\polylongdiv[style=D]{#1}{#2}}
+\newcommand{\mcd}[2]{\polylonggcd{#1}{#2}}
+\newcommand{\integral}[2]{\int\limits_{#1}^{#2}}
+
+% Teorema maestro:
+\newcommand{\colorLog}[2]{\log_{\blue{#1}}(\magenta{#2})}
+
+%%% Emoticones
+\def\fueguito{{\color{orange}{\faIcon{fire}}}}
+\def\brain{\rosa{\faIcon{brain}}}
+\def\poo{\marron{\faIcon{poo}}\xspace}
+\def\angry{\faIcon[regular]{angry}\xspace}
+\def\atencion{\faIcon{exclamation-triangle}\xspace}
+\def\grimace{\faIcon[regular]{grimace}\xspace}
+\def\meh{\faIcon[regular]{meh}\xspace}
+\def\mehBlank{\faIcon[regular]{meh-blank}\xspace}
+\def\rollingEyes{\faIcon[regular]{meh-rolling-eyes}\xspace}
+\def\surprise{\faIcon[regular]{surprise}\xspace}
+\def\magic{\href{https://www.youtube.com/watch?v=4u20AEDYhcw}{\faIcon{magic}}\xspace}
+\def\python{\texttt{Python} \faIcon{python}\xspace}
+\def\click{{\tiny click click \faIcon{mouse}}}
+\def\calculator{\faIcon{calculator}}
+
+% =====
+% Miscelanea
+% =====
+\def\ot{\leftarrow}
+\newcommand{\estabien}{{\color{blue} Consultado, está bien. \checkmark}}
+\newcommand{\hacer}{
+  {\color{red!80!black}{\tiny\faIcon{flushed}... hay que hacerlo! \faIcon{sad-cry}}}\par
+  {\color{black!70!white}
+    \tiny Si querés mandá la solución $\to$ \href{\dirTelegram}{\blue{al grupo de Telegram}  \small\telegram},
+    o  mejor aún si querés subirlo en \LaTeX $\to$ \href{\dirRepo}{una \textit{pull request} al \small \github}.
+  }\par
+}
+
+\newcommand{\consulta}[1]{
+  \parrafoDestacado[{\huge\red{\faQuestion}}]{
+    {\Large \red{#1}}
+  }
+}
+
+\newcommand{\Hacer}{{\color{black!30!red}\Large Hacer!}}
+\def\Tilde{\quad\checkmark}
+\def\ytext{\text{\ \, y\ \, }}
+\def\otext{\quad\text{o}\quad}
+\newcommand{\cajaResultado}[1]{\fcolorbox{orange}{white}{\ensuremath{\displaystyle#1}}}
+
+% Estrellita para hacer llamadas de atención, viene en divertidos colores
+% para coleccionar.
+\newcommand{\llamada}[1]{
+  \begingroup% Scope para la variable colortemp
+  \ifcase \numexpr#1 mod 6\relax
+    \def\colortemp{cyan}
+  \or
+    \def\colortemp{magenta}
+  \or
+    \def\colortemp{OliveGreen}
+  \or
+    \def\colortemp{YellowOrange}
+  \or
+    \def\colortemp{Cerulean}
+  \or
+    \def\colortemp{Violet}
+  \or
+    \def\colortemp{Purple}
+  \fi
+  \textcolor{\colortemp}{\text{{\tiny \faIcon{star}}}^{\scriptscriptstyle#1}}
+  \endgroup
+}
+
+% separadores
+\newcommand{\separador}{
+  \par\noindent\rule{\linewidth}{0.4pt}\par
+}
+\newcommand{\separadorCorto}{
+  \par\noindent\rule{0.5\linewidth}{0.4pt}\par
+}
+
+% Colores
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\green}[1]{\textcolor{OliveGreen}{#1}}
+\newcommand{\blue}[1]{\textcolor{Cerulean}{#1}}
+\newcommand{\cyan}[1]{\textcolor{cyan}{#1}}
+\newcommand{\yellow}[1]{\textcolor{YellowOrange}{#1}}
+\newcommand{\orange}[1]{\textcolor{Orange}{#1}}
+\newcommand{\magenta}[1]{\textcolor{magenta}{#1}}
+\newcommand{\marron}[1]{\textcolor{brown}{#1}}
+\newcommand{\purple}[1]{\textcolor{purple}{#1}}
+\newcommand{\violet}[1]{\textcolor{violet}{#1}}
+\newcommand{\rosa}[1]{\textcolor{pink}{#1}}
+\newcommand{\negro}[1]{\textcolor{black}{#1}}
+\newcommand{\gris}[1]{\textcolor{gray!30!white}{#1}}
+
+\definecolor{shadecolor}{RGB}{240,255,255}
+\newenvironment{sombrita}{\begin{snugshade}}{\end{snugshade}}
+
+% Conjuntos entre llaves y paréntesis
+% te ahorrás escribir los \left y \right, así dejando el código más legible.
+\newcommand{\set}[1] {\left\{ #1 \right\}}
+\newcommand{\ket}[1] {\left\langle #1 \right\rangle}
+\newcommand{\parentesis}[1]{ \left( #1 \right) }
+\newcommand{\intervalo}[1]{\left[ #1\right]}
+
+% Stackrel text. Es para ahorrarse ecribir el \text
+\newcommand{\stacktext}[2]{ \stackrel{\text{#1}}{#2} }
+
+% Dado que muchas veces ponemos cosas sobre un signo '='
+%  acá está el comando para escribir \igual{arriba}[abajo] con texto!
+\NewDocumentCommand{\igual}{m o}{
+  \IfNoValueTF{#2}{
+    \overset{\mathclap{\text{#1}}}=
+  }{
+    \overset{\mathclap{\text{#1}}}{\underset{\mathclap{\text{#2}}}=}
+  }
+}
+% Dado que muchas veces ponemos cosas sobre un signo '='
+%  acá está el comando para escribir \igual{arriba}[abajo] con texto!
+\NewDocumentCommand{\mayorIgual}{m o}{
+  \IfNoValueTF{#2}{
+    \overset{\mathclap{\text{#1}}}\geq
+  }{
+    \overset{\mathclap{\text{#1}}}{\underset{\mathclap{\text{#2}}}\geq}
+  }
+}
+% Dado que muchas veces ponemos cosas sobre un signo '='
+%  acá está el comando para escribir \igual{arriba}[abajo] con texto!
+\NewDocumentCommand{\menorIgual}{m o}{
+  \IfNoValueTF{#2}{
+    \overset{\mathclap{\text{#1}}}\leq
+  }{
+    \overset{\mathclap{\text{#1}}}{\underset{\mathclap{\text{#2}}}\leq}
+  }
+}
+
+\NewDocumentCommand{\menor}{m o}{
+  \IfNoValueTF{#2}{
+    \overset{\mathclap{\text{#1}}}<
+  }{
+    \overset{\mathclap{\text{#1}}}{\underset{\mathclap{\text{#2}}}<}
+  }
+}
+\NewDocumentCommand{\mayor}{m o}{
+  \IfNoValueTF{#2}{
+    \overset{\mathclap{\text{#1}}}>
+  }{
+    \overset{\mathclap{\text{#1}}}{\underset{\mathclap{\text{#2}}}>}
+  }
+}
+
+%=======================================================
+% Comandos con flechas extensibles.
+%=======================================================
+% *Flechita* extensible con texto {arriba} y [abajo] 
+\NewDocumentCommand{\flecha}{m o}{%
+  \IfNoValueTF{#2}{%
+    \xrightarrow[]{\text{#1}}
+  }{
+    \xrightarrow[\text{#2}]{\text{#1}}
+  }
+}
+% *Si solo si* extensible con texto {arriba} y [abajo] 
+\NewDocumentCommand{\Sii}{m o}{%
+  \IfNoValueTF{#2}{%
+    \xLeftrightarrow[]{\text{#1}}
+  }{
+    \xLeftrightarrow[\text{#2}]{\text{#1}}
+  }
+}
+
+% *Si solo si* extensible con texto {arriba} y [abajo] 
+\NewDocumentCommand{\Entonces}{m o}{%
+  \IfNoValueTF{#2}{%
+    \xRightarrow[]{\text{#1}}
+  }{
+    \xRightarrow[\text{#2}]{\text{#1}}
+  }
+}
+
+%=======================================================
+% fin comandos con flechas extensibles.
+
+% como el stackrel pero también se puede poner algo debajo
+\newcommand{\taa}[3]{ % [t]exto [a]rriba y [a]bajo
+  \overset{\mathclap{#1}}{\underset{\mathclap{#2}}{#3}}
+}
+
+%Update time
+\def\update{\tiny
+  {\today\ @ \currenttime}
+}
+\def\updateDos{
+  {\today\ @ \currenttime}
+}
+\newcommand{\parrafoAcotado}[2][0.6]{
+  \begin{center}
+    \parbox{#1\textwidth}{
+      \centering
+      #2
+    }
+  \end{center}
+}
+
+% Párrafo destacado:
+\newcommand{\parrafoDestacado}[2][]{
+  \begin{center}
+    #1\qquad
+    \parbox{0.7\textwidth}{
+      \centering
+      #2
+    }
+    \qquad#1
+  \end{center}
+}
+
+% Contributors
+\newcommand{\aporte}[2]{
+  \href{#1}{#2}
+}
+
+\newenvironment{aportes}{
+  \vspace{10pt}
+  \par
+  \begin{minipage}{0.9\linewidth}
+    \tt\footnotesize
+    Dale las gracias y un poco de amor \rosa{\faIcon{heart}} a los que contribuyeron!
+    Gracias por tu aporte:
+    \vspace{-10pt}
+    \begin{multicols}{3}
+      \begin{itemize}[label={\tiny\yellow{\faIcon{medal}}}]
+        }{
+      \end{itemize}
+    \end{multicols}
+  \end{minipage}
+  \medskip
+}
+
+%=======================================================
+% sección ejercicio con su respectivo formato y contador
+%=======================================================
+
+% --- EJERCICIO NORMAL ---
+\newcounter{ejercicio}
+\renewcommand{\theejercicio}{\arabic{ejercicio}}
+\NewDocumentCommand{\ejercicio}{o}{%
+  \refstepcounter{ejercicio}%
+  \titleformat{\section}[runin]{\bfseries}{\theejercicio}{}{}%
+  \section*{\theejercicio.}%
+
+  \IfNoValueTF{#1}{%
+    \addcontentsline{toc}{subsection}{Ejercicio \theejercicio}% Sin nombre
+  }{%
+    \addcontentsline{toc}{subsection}{Ejercicio \theejercicio: #1}% Con nombre
+  }%
+
+  \label{ej:\theejercicio}%
+}
+
+% --- EJERCICIO EXTRA ---
+\newcounter{ejExtra}[section]
+\renewcommand{\theejExtra}{\arabic{ejExtra}}
+\NewDocumentCommand{\ejExtra}{o}{%
+  \refstepcounter{ejExtra}%
+  \titleformat{\section}[runin]{\bfseries}{\theejExtra}{1em}{}%
+  \section*{\fueguito\theejExtra.}%
+
+  \IfNoValueTF{#1}{%
+    \addcontentsline{toc}{subsection}{\protect\space Extra \theejExtra}%
+  }{%
+    \addcontentsline{toc}{subsection}{\protect\space Extra \theejExtra: #1}%
+  }%
+
+  \label{ejExtra:\theejExtra}%
+}
+
+% Para llamaaaaaar, MACABEOOO
+\newcommand{\refEjercicio}[1]{\textbf{\ref{#1}.}}
+\newcommand{\refEjExtra}[1]{\textbf{\fueguito\ref{#1}.}}
+
+%=======================================================
+% fin sección ejercicio con su respectivo formato y contador
+%=======================================================
+
+\newenvironment{enunciado}[1]{% Toma un parametro obligatorio: \ejExtra o \ejercicio 
+  \par
+  % \noindent
+  \begin{minipage}{\linewidth}
+    \separador % linea sobre el enunciado
+    #1
+    }% contenido
+    {
+    \separadorCorto % linea debajo del enunciado
+    \par
+  \end{minipage}\par
+}
+
+\def\copyPaste{
+  \begin{center}
+    \fcolorbox{green}{white}{
+      \faIcon{linux}
+      Si hacés un \texttt{copy paste} de este código debería funcionar lo más bien
+      \faIcon{linux}
+    }
+  \end{center}
+}
+
+%%% (☞⌐▀͡ ͜ʖ͡▀ )☞ Yo mama
+\def\zanguango{https://www.youtube.com/watch?v=Uzcl2gNL3zg&t=10s}
+\def\neverGonnaGiveYouUp{https://www.youtube.com/watch?v=dQw4w9WgXcQ}
+\def\mindExplosion{https://www.youtube.com/watch?v=9CS7j5I6aOc}
+
+%%% Iconos más usados
+\def\github{{\color{violet!80!black}{\faIcon{github}}}}
+\def\instagram{\faIcon{instagram}}
+\def\tiktok{\faIcon{tiktok}}
+\def\linkedin{\blue{\faIcon{linkedin}}}
+\def\youtube{\color{red!70}{\faIcon{youtube}}}
+\def\telegram{\blue{\faIcon{telegram}}}
+
+% Fin
+\def\fin{
+  \parrafoDestacado{
+    \Large \calligra Fin.
+  }
+}
+\newcommand{\grafoBullet}{
+  \begin{tikzpicture}[
+      scale=0.15,
+      nodo/.style={circle,inner sep=0.1pt, draw, fill=black},
+    ]
+    \node[nodo] (c) at (0, 0) {};
+    \node[nodo] (n1) at (0.5, 0) {};
+    \node[nodo] (n2) at (0.5, 0.5) {};
+    \node[nodo] (n3) at (-0.5, 0.5) {};
+    \node[nodo] (n4) at (-0.5, -0.5) {};
+    \node[nodo] (n5) at (-0.5, -0.5) {};
+    \node[nodo] (n6) at (1, -0.5) {};
+    \node[nodo] (n7) at (1, -1) {};
+    \draw[ultra thin] (c) -- (n1) -- (n2) -- (n3) -- (n4) -- (n5) -- (n6) -- (n7);
+  \end{tikzpicture}
+}
+

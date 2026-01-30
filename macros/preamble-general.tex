@@ -1,0 +1,92 @@
+\documentclass[11pt, a4paper, spanish, twoside]{article}
+% Sacar draft para que aparezcan las imagenes.
+% Opciones: 12pt, 10pt, 11pt, landscape, twocolumn, fleqn, leqno...
+% Opciones de clase: article, report, letter, beamer...
+
+% Paquetes:
+% =========
+\usepackage[headheight=110pt, top = 2cm, bottom = 2cm, left=1cm, right=1cm]{geometry} %modifico márgenes
+\usepackage[T1]{fontenc} % tildes
+\usepackage[utf8]{inputenc} % Para poder escribir con tildes en el editor.
+\usepackage[english]{babel} % Para cortar las palabras en silabas, creo.
+\usepackage[ddmmyy]{datetime}
+\usepackage{amsmath} % Soporte de mathmatics
+\usepackage{bm} % Fuentes negrita en math mode
+\usepackage{mathtools} % Más herramientas para matemáctica
+\usepackage{amssymb} % fuentes de mathmatics
+\usepackage{array} % Para tablas y eso
+\usepackage[dvipsnames,table]{xcolor} % Para colorear el texto: black, blue, brown, cyan, darkgray, gray, green, lightgray, lime, magenta, olive, orange, pink, purple, red, teal, violet, white, yellow.
+\usepackage{color} % Para colorear el texto: black, blue, brown, cyan, darkgray, gray, green, lightgray, lime, magenta, olive, orange, pink, purple, red, teal, violet, white, yellow.
+\usepackage{enumitem} % Cambiar labels y más flexibilidad para el enumerate
+\usepackage{multicol}
+\usepackage{tikz} % para graficar
+\usepackage{forest} % para graficar árboles y grafos
+\usepackage{pgfplots} % scatter plots y más
+\pgfplotsset{compat=1.5} % scatter plots y más
+\usepackage{cancel} % cancelar fórmulas
+\usepackage{titlesec} % para editar titulos y hacer secciones con formato a medida
+\usepackage{ulem}
+\usepackage{centernot} % tacha cosas
+\usepackage{soul} % Para tachar texto en text y math mode
+\usepackage{fontawesome5} % fuentes "extras"
+\usepackage{simpleicons} % fuentes "extras"
+\usepackage{calligra} % Fuente caligráfica
+\usepackage{qrcode} % genera código qr
+\usepackage{xspace}% para control de espacios en macros
+\usepackage{ifthen}
+\usepackage{scalerel} % para hacer reescalar y poder hacer operadores "raros"
+\usepackage{xparse}
+
+\usepackage{listings} % Escribir código
+% \usepackage{framed} % para hacer recuadros y sombrear el codigo
+
+\usepackage{tcolorbox}
+\tcbuselibrary{listings, breakable}
+
+\renewcommand{\ttdefault}{pcr}
+\lstset{
+emph={row_echelon},
+emphstyle={\bfseries},
+breaklines=true,
+basicstyle=\ttfamily,
+columns=fullflexible,
+keepspaces=true,
+showspaces=false,
+showstringspaces=false,
+inputencoding=utf8,
+literate=%
+  {á}{{\'a}}1
+{é}{{\'e}}1
+{í}{{\'i}}1
+{ó}{{\'o}}1
+{ú}{{\'u}}1
+{ñ}{{\~n}}1
+}
+
+\usepackage{fancyhdr} % Encabezados y pie de páginas
+
+% para hacer los graficos tipo grafos
+\usetikzlibrary{shapes,arrows.meta, chains, matrix, calc, trees, positioning, fit}
+\usetikzlibrary{external,decorations.pathreplacing,angles,quotes}
+
+% En general quiero que este paquete sea el último en importarse
+\usepackage{hyperref} % para que haya links navegables en el PDF
+\hypersetup{
+  pdftitle={Apunté Único de Técnica de diseño de algoritmos},
+  pdfauthor={Por los alumnos y exalumnos de TDA},
+  pdfkeywords={técnica de diseño de algoritmos, TDA, resueltos, guías resueltas},
+  colorlinks=true,
+  pdfborder={0 0 0},
+  citecolor=cyan,
+  linkcolor=blue!80!red,
+  filecolor=green,
+  urlcolor=red!10!purple,
+}
+\urlstyle{same}
+
+\setlength{\parindent}{5pt} % Para que no haya indentación en las nuevas líneas.
+
+%% Info SOCIAL
+\def\dirRepo{https://github.com/nad-garraz/tda}
+\def\dirTelegram{https://t.me/+1znt2GV1i8cwMTNh}
+\newcommand{\dirGuia}[1]{\dirRepo/blob/main/#1-guia/#1-sol.pdf}
