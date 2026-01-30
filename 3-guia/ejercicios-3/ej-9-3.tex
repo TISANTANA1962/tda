@@ -1,0 +1,164 @@
+\begin{enunciado}{\ejercicio[Unicidad de Grados]}
+  \textit{Unicidad de Grados}
+
+  Sean $G_2 = K_2 \ytext G_{n+1} = \overline{G_n \union K_1}$ para todo $n \geq 2$. Demostrar por inducción que $G_n$ tiene un único
+  par de vértices de igual grado.
+\end{enunciado}
+
+Dado el grafo definido por recurrencia:
+$$
+  \llave{rcl}{
+    G_2 & = & K_2\\
+    G_{n+1} & = & \overline{G_n \union K_1}
+  }
+$$
+
+Quiero demostrar la siguiente proposición:
+
+\parrafoDestacado{
+  \textit{
+    $p(n) :$ $G_n$ tiene un único par de vértices de igual grado $\paratodo n \en \naturales$.
+  }
+}
+
+\bigskip
+
+\textit{Caso base:}
+
+\parrafoDestacado{
+  \textit{
+    $p(\blue{3}) :$ $G_{\blue{3}}$ tiene un único par de vértices de igual grado.
+  }
+}
+
+\parrafoDestacado[\atencion]{
+  En el ejercicio \refEjercicio{ej:8} se definió al \textit{grafo unión}, el cual particularmente, tiene la misma cantidad de aristas que
+  la suma de las aristas de los grafos (disjuntos) que se están uniendo.
+
+  Cuando se calcula el complemento de un grafo $G(V,E)$,
+  la cantidad de aristas de $|E(\bar{G})| = \frac{|V| \cdot (|V|-1)}{2} - |E|$.
+}
+
+Como sé que por definición:
+$$
+  G_{\blue{3}} \igual{def} ~ \overline{G_2 \union K_1} ~ \flecha{calculo}[aristas] ~ |E(G_{\blue{3}})| = \frac{\blue{3} \cdot (\blue{3} - 1)}{2} - 1 = 2
+$$
+
+$G_{\blue{3}}$ tiene 3 vértices y 2 aristas. Es un grafo conexo obligatoriamente.
+\parrafoDestacado{
+  \textit{¿Cómo puedo armar ese grafo?} Así:
+}
+$$
+  \llave{rcl}{
+    d(v_1) & = & 1 \\
+    d(v_2) & = & 1 \\
+    d(v_{\blue{3}}) & = & 2
+  }
+  \qquad
+  \begin{tikzpicture}[grafo style, baseline = 20]
+    \begin{scope}[xshift = 5cm]
+      \node[nodo] (v3) {$v_{\blue{3}}$};
+      \node[nodo, above left of = v3] (v1) {$v_1$};
+      \node[nodo, above right of = v3] (v2) {$v_2$};
+      \draw[arista, thick, OliveGreen] (v3) to (v1);
+      \draw[arista, thick, OliveGreen] (v3) to (v2);
+    \end{scope}
+
+    \draw[-Latex, thick, black] (2, 0.8) -- ++(1, 0) node[midway, below]{complemento};
+
+    \node[nodo] (v3) {$v_{\blue{3}}$};
+    \node[nodo, above left of = v3] (v1) {$v_1$};
+    \node[nodo, above right of = v3] (v2) {$v_2$};
+    \draw[arista, thick, black] (v1) to node[midway, above] {$K_2$} (v2);
+  \end{tikzpicture}
+$$
+
+{
+    \footnotesize
+    \color{gray!25}(¡Bueh, que larga que la hice! Pero quería pasear por un poco, entrando en calor para el paso inductivo.)
+  }
+
+Ahí queda demostrado que la proposición $p(\blue{3})$ es verdadera.
+
+\bigskip
+
+\bigskip
+
+\textit{Paso inductivo:}
+
+\ul{Asumo} que para algún $\blue{k} \en \naturales$ la proposición
+\parrafoDestacado{
+  $p(\blue{k}) :$
+  $
+    \ub{
+      G_{\blue{k}} ~ \textit{tiene un único par de vértices de igual grado.}
+    }{
+      \text{\purple{hipótesis inductiva}}
+    }
+  $
+}
+es \ul{verdadera}. Entonces quiero mostrar que
+\parrafoDestacado{
+  \textit{
+    $p(\blue{k + 1}) :$ $G_{\blue{k + 1}}$ tiene un único par de vértices de igual grado.
+  }
+}
+también lo sea.
+
+\medskip
+
+Estos podrían ser unos lemitas que no pienso demostrar:
+\parrafoDestacado[$\llamada1$]{
+  \textit{
+    Si en un grafo $G$, el grado de un vértice $v \en V(G)$ es $d_{G}(v)$, ese mismo vértice en $\bar{G}$ tendrá un grado
+    cumpliendo que
+    $d_{\bar{G}}(v) + d_{G}(v) = |V| - 1$.
+    Es prácticamente la definición de grafo complemento.
+  }
+}
+Se desprende fácil de esa última afirmación:
+\parrafoDestacado[$\llamada2$]{
+  \textit  {
+    Si $G$ no es un grafo conexo, entonces $\bar{G}$ sí lo es.
+  }
+}
+
+\bigskip
+
+Recopilando cosas que se vieron hasta acá y con la info de la \purple{hipótesis inductiva}, sé que:
+\begin{itemize}
+  \item Por la definición recursiva de $G_{\blue{k+1}}$ es un \textit{grafo junta}, es decir que su conjugado
+        $\bar{G}_{\blue{k+1}}$ es un \textit{grafo unión}.
+
+  \item $G_{\blue{k}}$ tiene \ul{únicamente} 2 vértices de igual grado (\purple{HI}).
+
+  \item Cuando hago la unión $G_{\blue{k}} \union K_1$ tengo un grafo disconexo con $\blue{k + 1}$ vértices, luego calculo
+        $$
+          G_{\blue{k + 1}} = \overline{G_{\blue{k}} \union K_1}
+        $$
+        el complemento de esa unión y obtengo un grafo conexo ($\llamada2$).
+
+  \item $G_{\blue{k}}$ por definición será un grafo conexo
+        (i.e. $d_{G_{\blue{k}}}(v) \distinto 0 \paratodo v \en G_{\blue{k}}$).
+        \ul{$d_{G_{\blue{k}}}(v) \en [1,\blue{k}-1] \paratodo v \en G_{\blue{k}}$}.
+
+  \item Los grados del grafo $G_{\blue{k+1}}$ se pueden calcular a partir de los grados del grafo $G_{\blue{k}}$ usando $\llamada1$:
+        $$
+          d_{G_{\blue{k+1}}}(v) =
+          \llave{cll}{
+            \blue{k} &\text{si}& v = v_{\blue{k+1}} ~ (\text{el que agrega} ~ K_1) \\
+            \ub{\blue{k+1}}{\scriptscriptstyle|V(G_{\blue{k+1}})|} - 1 - d_{G_{\blue{k}}}(v) & \multicolumn{2}{l}{\text{si no}}
+          }
+        $$
+
+        \parrafoDestacado{
+          \textit{¿Qué está pasando?}
+        }
+
+  \item Los valores de $d_{G_{\blue{k+1}}}(v)$ solo van a repetirse para valores iguales de $d_{G_{\blue{k}}}(v)$
+        dado que es una función biyectiva en $d_{G_{\blue{k}}}(v)$, más aún por \purple{hipótesis inductiva} $d_{G_{\blue{k}}}(v)$
+        tiene solo \ul{dos valores repetidos}, implicando que solo habrá \ul{dos valores iguales para el conjunto $d_{G_{\blue{k+1}}}(v)$}.
+\end{itemize}
+
+Así tengo que $p(\blue{k+1})$ resultó ser verdadera también. Por el principio de inducción $p(n)$ es verdadera $\paratodo n \en \naturales_{\geq 2}$.
+\fin

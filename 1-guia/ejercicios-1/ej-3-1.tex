@@ -1,0 +1,102 @@
+\begin{enunciado}{\ejercicio[IzquierdaDominante]}
+  \textit{IzquierdaDominante}
+
+  Escriba un algoritmo con dividir y conquistar que determine si un arreglo de tamaño potencia de 2 es
+  \textit{más a la izquierda}, donde "más a la izquierda" significa que:
+  \begin{enumerate}[label={\tiny $\blacksquare$}]
+    \item La suma de los elementos de la mitad izquierda superan los de la mitad derecha.
+    \item Cada una de las mitades es a su vez "más a la izquierda".
+  \end{enumerate}
+
+  Por ejemplo, el arreglo $[8,6,7,4,5,1,3,2]$ es "más a la izquierda", pero $[8,4,7,6,5,1,3,2]$ no lo es.
+
+  Intente que su solución aproveche la técnica de modo que la complejidad del algoritmo sea estrictamente menor a $O(n^2)$.
+\end{enunciado}
+
+\parrafoDestacado[\red{\atencion}]{
+  Los casos bordes y yo que sé \textit{son importantes}, pero no hay que obsesionarse con eso. Hay que hacer un algoritmo que tenga sentido,
+  que haga lo que tiene que hacer. Los detalles quedarán para la implementación en la compu, pero \red{la papa} de la materia no está ahí,
+  sino que en el \red{pseudocódigo} así se aprender a pensar \brain  algorítmicamente.
+}
+
+En presudocódigo:
+
+Recibo un arreglo de $A[1 .. n]$. Luego parto a la mitad el arreglo y voy a comparar las 2 mitades. Pero si algo aprendí de \textit{mergeSort}
+es que me conviene comparar las cosas cuando ya se dividieron hasta el último momento.
+\begin{tcolorbox}
+  \begin{lstlisting}[
+      mathescape=true,
+      emph={[1]funcion, return, ret, retorno},
+      emph={[2]si, sino, if, else, true},
+      emph={[3]sumoYComparo, izquierdaDominante},
+      emphstyle={[1]\color{violet}\it},
+      emphstyle={[2]\color{red}\it},
+      emphstyle={[3]\color{OliveGreen}\it},
+      morecomment={[l]{//}},
+      commentstyle={\color{gray}\it\footnotesize}
+  ]
+    funcion izquierdaDominante(A[1..n])
+        si |A| = 1
+            ret true
+
+        m $\ot$ n/2
+        izq $\ot$ A[1..m]
+        der $\ot$ A[m+1..n]
+
+        // Si está todo bien, analizo la "izquierdominancia" de izq y luego de der
+        ret sumoYComparo(izq,der) $\land$ izquierdaDominante(izq) $\land$ izquierdaDominante(der))
+
+    funcion sumoYComparo(A[1..n], B[1..m])  // --> max(O(n), O(m))
+        sumaA $\ot$ $\Sigma$A[i] // O(n)
+        sumaB $\ot$ $\Sigma$B[i] // O(m)
+
+        ret sumaA > sumaB
+    \end{lstlisting}
+\end{tcolorbox}
+
+% \lstset{
+%   emph={[1]leftiano},
+%   emphstyle={[1]\color{OliveGreen}\it}
+% }
+% \begin{center}
+%   \begin{minipage}{.8\textwidth}
+%     \codigoCpp{ej-3/codigo1-2.cpp}
+%   \end{minipage}
+% \end{center}
+
+Respecto a la complejidad:
+
+Tengo 2 subproblemas por recursión. El tamaño del subproblema se divide entre 2. Puedo escribir al \textit{costo o running time}
+del algoritmo:
+$$
+  T(n) =
+  \llave{ccl}{
+    1 & si & n = 1 ~\lor~ \vacio\\
+    2 \cdot T(\frac{n}{2}) + n & si & n > 1
+  }
+$$
+Esta función tiene el mismo aspecto que \textit{mergeSort} \refEjercicio{ej:1}. La recursión genera un árbol de $\log_2(n)$ niveles y el costo
+de cada nivel es exactamente $n$. Por lo tanto:
+$$
+  T(n) \en \Theta(n\log(n))
+$$
+
+Para el cálculo con  \hyperlink{teoria-1:teorema-maestro}{Teorema maestro \click}:
+Caso 2
+$$
+  \begin{array}{c}
+    f(n) = n \entonces (n^{\colorLog{b}{a}} (\log(n))^k)
+    \Entonces{$\magenta{a} = 2, \, \blue{b} = 2$}[$k = 0$]
+    f(n) = n
+    \entonces
+    \cajaResultado{
+      T(n) \en
+      \Theta
+      \big(
+      n \log(n)
+      \big)
+    }
+  \end{array}
+$$
+
+\fin

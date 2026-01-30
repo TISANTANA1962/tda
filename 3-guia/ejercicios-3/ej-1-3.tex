@@ -1,0 +1,115 @@
+\begin{enunciado}{\ejercicio[Equilibrio Digrafo]}
+  \textit{Equilibrio Digrafo}
+
+  Demostrar, usando inducción en la cantidad de aristas, que todo digrafo $D$ satisface
+  $$
+    \sumatoria{v \en V(D)}{} d_{in}(v) =
+    \sumatoria{v \en V(D)}{} d_{out}(v) =
+    |E(D)|.
+  $$
+\end{enunciado}
+
+\parrafoDestacado{
+  Voy a intercambiar \textit{arcos} y \textit{aristas}, indistintamente, todo el tiempo como disléxico que soy. Se entiende igual.
+}
+
+Inducción en las \textit{aristas} del digrafo (grafo dirigido) $D(V,E)$, con $|V| = n \ytext |E| = m$:
+
+Quiero probar que la siguiente proposición $p(m)$ es verdadera:
+\begin{center}
+  $p(m)$ : Un digrafo $D$, cumple que
+  $
+    \sumatoria{v \en V}{} d_{in}(v) =
+    \sumatoria{v \en V}{} d_{out}(v) =
+    m.
+  $
+\end{center}
+
+\textit{Caso base:}
+
+Quiero probar que cuando $E = \vacio$, lo que implica que $m = 0$,  $p(0)$ es verdadera:
+\begin{center}
+  $p(\blue{m = 0})$ :  Un digrafo $D$, cumple que
+  $
+    \sumatoria{v}{} d_{in}(v) =
+    \sumatoria{v}{} d_{out}(v) =
+    \blue{0}
+  $
+\end{center}
+Si no hay ningún nodo de los $n$, \textit{conectado, unido, adyacente} a ningún otro nodo, los grados $d_{in},\, d_{out}$ son todos 0.
+Por lo tanto la proposición $p(0)$ resultó verdadera.
+
+\medskip
+
+\textit{Paso inductivo}:
+
+Supongo que para algún $\blue{k} \en \naturales$ con $\blue{m = k}$ la proposición:
+\begin{center}
+  $p(\blue{k})$ :
+  $
+    \ub{
+      \text{
+        Un digrafo $D$, cumple que
+        $
+          \sumatoria{v}{} d_{in}(v) =
+          \sumatoria{v}{} d_{out}(v) =
+          \blue{k}.
+        $
+      }
+    }{
+      \text{\purple{hipótesis inductiva}}
+    }
+  $
+\end{center}
+\ul{es verdadera}, entonces quiero ver que la proposición
+\begin{center}
+  $p(\blue{k + 1})$ :
+  Un digrafo $D' = (V, E')$, cumple que
+  $
+    \sumatoria{v \en V(D')}{} d_{in}(v) =
+    \sumatoria{v \en V(D')}{} d_{out}(v) =
+    \blue{k + 1}.
+  $
+\end{center}
+\ul{también lo sea.}
+
+El digrafo $D'$ tiene \ul{un arco $e$ más en el digrafo $D$} de la \purple{hipótesis inductiva}. Por lo tanto
+puedo decir que al haber un arco más habrá un incremento en una unidad en la suma total de los \textit{grados} ($d$),
+dado que el arco $e$ debe tener la \textit{cola} y la \textit{cabeza} en algunos nodos $v_t$ y $v_h \en V$:
+
+Escribriendo la sumatoria de la \purple{hipótesis inductiva} abierta:
+$$
+  \llave{l}{
+    \sumatoria{\scriptscriptstyle v \en V(D)}{} d_{in}(v) =
+    d_{in}(v_1) + \ldots  + d_{in}(v_n) = \blue{k}    \\
+    \sumatoria{\scriptscriptstyle v \en V(D)}{} d_{out}(v) =
+    d_{out}(v_1) + \ldots  + d_{out}(v_n) = \blue{k}
+  }
+$$
+Voy a escribir la expresión de la sumatoria de los grados del digrafo $D'$, acomodar para que aparezca la
+\purple{hipótesis inductiva}.
+$$
+  \llave{rcl}{
+    \begin{array}{rcl}
+      \sumatoria{\scriptscriptstyle v \en V(D')}{} d_{in}(v)
+       & =                   &
+      d_{in}(v_1) + \cdots + \magenta{d'_{in}(v_h)} + \cdots + d_{in}(v_n)                        \\
+       & \igual{\red{!!}}    &
+      d_{in}(v_1) + \cdots + \magenta{1 + d_{in}(v_h)} + \cdots + d_{in}(v_n)                     \\
+       & =                   &
+      \magenta{1} + d_{in}(v_1) + \cdots + \magenta{d_{in}(v_h)} + \cdots + d_{in}(v_n)           \\
+       & \igual{\red{!}}     & \magenta{1} +\sumatoria{\scriptscriptstyle v \en V(D)}{} d_{in}(v) \\
+       & \igual{\purple{HI}} & \magenta{1} + \blue{k}                                             \\ \\
+      \sumatoria{\scriptscriptstyle v \en V(D')}{} d_{out}(v)
+       & =                   &
+      d_{out}(v_1) + \cdots + \magenta{d'_{out}(v_t)} + \cdots + d_{out}(v_n)
+      \igual{\purple{HI}}[idem] \magenta{1} + \blue{k}
+    \end{array}
+  }
+$$
+
+La proposición  $p(\blue{k + 1})$ resultó ser verdadera.
+
+Por lo tanto queda demostrada la proposición $p(m) \paratodo m \en \naturales$ por principio de inducción en los arcos del digrafo.
+
+\fin

@@ -1,0 +1,281 @@
+        \lstset{
+          mathescape=true,
+          emph={[1]funcion, return, ret, retorno},
+          emph={[2]para, for,each, si, sino, if, else, true, false, not, o, y, mientras},
+          emph={[3]astroTrade, max},
+          emphstyle={[1]\color{violet}\it},
+          emphstyle={[2]\color{red}\it},
+          emphstyle={[3]\color{OliveGreen}\it},
+          morecomment={[l]{//}},
+          commentstyle={\color{gray}\it\footnotesize}
+        }
+\def\at{\textit{\green{astroTrade}}}
+
+\begin{enunciado}{\ejercicio[AstroTrade]}
+  \textit{AstroTrade}
+
+  Astro Void se dedica a la compra de asteroides. Sea $p \en N^n$ tal que $p_i$ es el precio de un asteroide
+  el $i-$ésimo día en una secuencia de $n$ días. Astro Void quiere comprar y vender asteroides durante
+  esos $n$ días de manera tal de obtener la mayor ganancia neta posible. Debido a las dificultades
+  que existen en el transporte y almacenamiento de asteroides, Astro Void puede comprar a lo
+  sumo un asteroide cada día, puede vender a lo sumo un asteroide cada día y comienza sin
+  asteroides. Además, el Ente Regulador Asteroidal impide que Astro Void venda un asteroide
+  que no haya comprado. Queremos encontrar la máxima ganancia neta que puede obtener Astro
+  Void respetando las restricciones indicadas. Por ejemplo, si $p = (3, 2, 5, 6)$ el resultado es 6 y si
+  $p = (3, 6, 10)$ el resultado es 7.
+  Notar que en una solución óptima, Astro Void debe terminar sin asteroides.
+
+  \begin{enumerate}[label=$\alph*)$]
+    \item\label{ej-13:item-a} Convencerse de que la máxima ganancia neta (m.g.n), si Astro Void tiene $c$ asteroides
+          al fin del día $j$, es:
+          \begin{enumerate}[label=\tiny$\blacksquare$]
+            \item indefinido (i.e., $-\infinito$) si $c < 0$ o $c > j$, o
+            \item el máximo entre:
+                  \begin{itemize}
+                    \item la m.g.n. de finalizar el día $j-1$ con $c-1$ asteroides y comprar uno en el día $j$,
+                    \item la m.g.n. de finalizar el día $j-1$ con $c-1$ asteroides y vender uno en el día $j$,
+                    \item la m.g.n. de finalizar el día $j-1$ con $c$ asteroides y no operar el día $j$.
+                  \end{itemize}
+
+          \end{enumerate}
+    \item Escribir matemáticamente la formulación recursiva enunciada en \ref{ej-13:item-a}. Dar los valores de los
+          casos base en función de la restricción de que comienza sin asteroides.
+
+    \item Indicar qué dat es la respuesta al problema con esa formulación recursiva.
+
+    \item Diseñar un algoritmo de PD \textit{top-down} que resuelva el problema y explicar su complejidad temporal y espacial auxiliar.
+
+    \item (Opcional) Diseñar un algoritmo de PD \textit{bottom-up}, reduciendo la complejidad espacial.
+
+    \item (Opcional) Formalmente, el problema consiste en determinar el máximo $g = \sumatoria{i=1}{n} x_i p_i$ para
+          un vector $x = (x_1,\ldots,x_n)$ tal que: $x_i \en \set{-1, 0 , 1}$ para todo $1 \leq i \leq n$ y $\sumatoria{i=1}{j} x_i \leq 0$
+          para todo $1 \leq j \leq n$. Demostrar que la formulación recursiva es correcta. \textbf{Ayuda}: Primero
+          demostrar qu existe una solución óptima en la que Astro Void se queda sin asteroides en el día $n$. Luego, demostrar por inducción
+          que la función recursiva respeta la semántica, i.e., que computa la m.g.n. al final del día $j$ cuando Astro Void posee $c$ asteroides.
+  \end{enumerate}
+\end{enunciado}
+
+\begin{enumerate}[label=$\alph*)$]
+  \item ¿Qué significa $c < 0$?:
+
+        Sería que vendí más \textit{asteroides} de los que tenía. Lo cual no es posible, \textit{thus} $-\infinito, \red{\perp}$.
+
+        ¿Qué significa $c > j$?:
+
+        Sería que compré más \textit{asteroides} de lo permitido, dado que \ul{solo} puedo comprar uno por día, \textit{thus} $-\infinito, \red{\perp}$.
+
+        \medskip
+
+        Las condiciones que siguen son acciones \textit{coherentes} con las restricciones de la compra y venta del enunciado. Y son
+        las posibles variantes como siempre de hacer \textit{fuerza bruta} contemplando todas los \textit{multiversos}:
+        \begin{itemize}
+          \item El \textit{penúltimo} día tengo $c-1$ asteroides entonces compro uno el último día, así garantizando que $c_j \not< 0$
+          \item El \textit{penúltimo} día tengo $c+1$ asteroides entonces vendo uno el último día, así garantizando que entre platita.
+          \item El \textit{penúltimo} día tengo $c$ asteroides entonces no hago nada
+        \end{itemize}
+
+  \item En la siguiente función $j$ representa los días y $c$ la cantidad de asteroides que tengo en el día $j$. La función
+        la llamaría inicialmente con $\at(0,1)$, notando que la rama al vender, sin tener ningún asteroide, moriría instantáneamente porque $c < 0$ y
+        tampoco podría comprar más de un asteroide porque caería en $c > j$.
+
+        Llegado al día $n+1$ tengo caso base terminando la ejecución de llamados recursivos.
+
+        $j$: Días, va de $[1..n]$
+        $c$: asteroides, va de $[0..n]$
+        $$
+          \at(c,j) =
+          \llave{ccl}{
+            0 & \text{si} & j > n \\
+            -\infinito & \text{si} & c > j ~ \lor ~ c < 0  \\
+            \maximo
+            \matriz{c}{
+              -p_j + \at(c+1, j+1), \\
+              p_j + \at(c-1, j+1), \\
+              \at(c, j+1)
+            }
+            & \multicolumn{2}{l}{\text{si no}}
+          }
+        $$
+
+  \item No entiendo la consigna. ¿La m.g.n? Pero eso no es un dato. No sé. \red{Consultar}
+
+  \item Acá aparece una nueva terminología: \textit{Complejidad auxiliar}. ¿Por qué?\textit{... just why?}.
+
+        En el siguiente algoritmo se usa la misma estructura que en todos los ejercicio que se vienen usando de \textit{top-down}. Hay que tener
+        cuidado con no \textit{intentar acceder} con índices negativos, la ubicación de la guarda de estructura de \magenta{memoization}
+        es importante, fijate que \textit{atajo} el caso de $c<0$ antes de intentar evaluar la matriz con un $c<0$, así salvando al mundo y
+        quizás a la galaxia de una explosión de proporciones inimaginables, gracias, de nada.
+
+        \begin{tcolorbox}
+          \begin{lstlisting}
+M[0..n,1..n] $\ot$ $-\infinito$ // Inicializo en $-\infinito$ la matriz de $(n+1)\times n$
+funcion astroTrade(c,j)
+    si j>n
+        ret 0
+    si c>j o c<0
+        ret $-\infinito$
+    si M[c,j] $\distinto$ $-\infinito$ 
+        ret M[c,j]
+    sino
+        M[c,j] $\ot$ max(-p[j]+astroTrade(c+1,j+1),p[j]+astroTrade(c-1,j+1),astroTrade(c,j+1))
+    ret M[c,j] \end{lstlisting}
+        \end{tcolorbox}
+
+        Este algoritmo tiene una complejidad temporal o running time de:
+        $$
+          T(n) = c \cdot n \cdot O(1) \en O(c \cdot n).
+        $$
+        Notable mejora del algoritmo de \textit{backtracking} que es en el \textit{worst case} $O(3^n)$.
+
+        La complejidad espacial está dada por los posibles valores que podrían tomar los estados:
+        $$
+          S(n) = c \cdot n \en O(c \cdot n) \en O(n^2)
+        $$
+
+  \item \textit{Bottom-up} y encima me piden que baje la complejidad. Bancá la parada cdth, lo hago como puedo y después optimizo si me quedan
+        ganas.
+
+        \begin{enumerate}[label=\faIcon{code}$_\arabic*)$]
+          \item Reconstruir la solución de atrás para adelante. Arrancando por los casos base.
+          \item Ver relación entre un estado y el siguiente. ¿Cómo depende entre sí?
+          \item Si tengo cosas como $i-1$ e $i+1$ voy a agrandar la estructura para evitar errores de bordes.
+          \item Según como llene ubico qué elemento de la matriz representa mi solución.
+        \end{enumerate}
+
+        Por la forma en que armé la función recursiva voy a "\textit{ir para atrás en los días}" para llegar al valor buscado,
+        voy a devolver el valor de $M[1,0]$, empezar el día 1 con 0 asteroides.
+
+        Cada \orange{nuevo elemento} depende de \red{2 o 3 elementos anteriores ya calculados} según casos bordes
+        (obviamente también de los precios de compra y venta, pero eso no importa para entender el armado).
+        El $-\infinito$ es el valor neutro a usar para
+        descartar comparaciones que sé que no aportan nada. En la matriz hay un bosquejo de como debería ser el llenado.
+
+        El elemento \texttt{M[1,0]} es el valor buscado.
+        $$
+          \begin{tikzpicture}[
+              rect/.style={
+                  rectangle, draw=gray, text=black,
+                  minimum width=45pt, minimum height=45pt,
+                  outer sep=0pt, inner sep=1pt, font={\small},
+                  text height=1.5ex, text depth=0.5ex
+                },
+              arista_roja/.style={-latex, red, bend left=10pt, line width=1pt},
+              arista_verde/.style={-latex, OliveGreen, line width=2pt},
+              recuadro_rojo/.style={rectangle, line width=1pt, draw=red, minimum width=45pt, minimum height=45pt},
+              recuadro_naranja/.style={rectangle, line width=1.5pt, draw=orange, minimum width=45pt, minimum height=45pt},
+              llenado/.style={-Latex, gray, thick, dashed},
+              coordenadas/.style={fill=lightgray, opacity=.12, ultra thin},
+              scale=0.5,
+            ]
+
+            \matrix (A) [
+            matrix of nodes,
+            nodes={rect, execute at begin node=$, execute at end node=$},
+            column sep=1pt,
+            row sep=1pt,
+            ] {
+            \texttt{M[1,0]}      & -\infty & -\infty & \cdots & -\infty & -\infty \\
+            {}     & {}       & \ddots & {}     & {}      & {}      \\
+            {}     & {}      & {}       & {} & {}      & {}      \\
+            \vdots & {}      & \texttt{M[d,a]}      & \ddots & {}      & \vdots  \\
+            {}     & \texttt{sell}      & \texttt{skip}      &\texttt{buy}     & {}       & -\infty \\
+            0      & 0       & 0       & \cdots & 0       & 0       \\
+            };
+
+            \foreach \i in {1,...,6} {
+                \draw[coordenadas] (A-5-\i.north west) rectangle (A-5-\i.south east);
+                \draw[coordenadas] (A-\i-2.north west) rectangle (A-\i-2.south east);
+                \draw[coordenadas] (A-\i-3.north west) rectangle (A-\i-3.south east);
+                \draw[coordenadas] (A-\i-4.north west) rectangle (A-\i-4.south east);
+              }
+
+            \node[recuadro_naranja] (optimo) at (A-4-3) {};
+            \node[recuadro_rojo] (sell) at (A-5-2) {};
+            \node[recuadro_rojo] (skip) at (A-5-3) {};
+            \node[recuadro_rojo] (buy) at (A-5-4) {};
+
+            \node[rectangle,line width=2pt,fill=OliveGreen!10,draw=OliveGreen,text=OliveGreen,rounded corners] (minimo) at (A-4-4.north east) {$\minimo$};
+
+            \draw[arista_roja, bend left=10pt] (sell.east) to (minimo.south);
+            \draw[arista_roja, bend right=10pt] (buy.east) to (minimo.south);
+            \draw[arista_roja] (skip.east) to (minimo.south);
+            \draw[arista_verde] (minimo.west) to (optimo.east);
+
+            \node[left=.3cm of A-4-1] (d) {\texttt{d}};
+            \node[left=0cm of A-5-1] (d-1) {\texttt{d-1}};
+            \node[above=0cm of A-1-2] (a-1) {\texttt{a-1}};
+            \node[above=0cm of A-1-3] (a) {\texttt{a}};
+            \node[above=0cm of A-1-4] (a+1) {\texttt{a+1}};
+
+            \draw[llenado] (A.south west) -- (A.north west) node[midway, left]{$\substack{\text{días}\\ \texttt{d} \en [1, n+1]}$};
+            \draw[llenado] (A.south west) -- (A.south east) node[midway, below]{asteroides $\texttt{a}\en [0, n+1]$};
+          \end{tikzpicture}
+        $$
+
+        \begin{tcolorbox}
+          \begin{lstlisting}
+M[1..n+1,0..n+1] $\ot$ $-\infinito$     // Inicializo en $-\infinito$ la matriz de $(n+1)\times (n+2)$
+M[n+1, 0..n+1] $\ot$ 0         // Inicializo la última fila con ceros
+funcion astroTrade(c,j)
+    para d $\ot$ n..1 
+        para a $\ot$ 0..n
+            sell,buy $\ot-\infinito$ // valores neutros al max por si los índices explotan
+            si a-1$\geq$0  // Si en "d" tengo "a" y vendo entonces en "d+1" tengo "a-1" y más platita.
+                sell $\ot$ M[d+1,a-1]+p[d]
+            si a+1$\leq$n  // Si en "d" tengo "a" y compro entonces en "d+1" tengo "a+1" y menos platita.
+                buy $\ot$ M[d+1,a+1]-p[d]
+            skip $\ot$ M[d+1,a] // no hago nada
+
+            $\red{\texttt{M[d,a]}}\ot$ max(skip,sell,buy)
+    ret M[1,0]    \end{lstlisting}
+        \end{tcolorbox}
+
+        Este algoritmo es el que va, el más \textit{común, mecánico, intuitivo y que funciona}, peeeeeero
+        no cumple la complejidad espacial $S(n)$ que pide el enunciado. Para eso hay que notar que siempre que lleno $\ub{\orange{\text{una nueva
+                fila}}}{\texttt{d}}$ de la matriz \texttt{M} \ul{nunca vuelvo a usar} $\ub{\red{\text{la fila usada}}}{\texttt{d+1}}$, y ahí me pregunto:
+        \parrafoDestacado{
+          \textit{
+            ¿Vale la pena tener guardada en memoria está fila usada la cual de nada me sirve ahora?
+          }$\to$ No.
+        }
+
+        Lo que me viene a la cabeza es esa variante de fibonacci en el
+        \hyperlink{ejercicio-9:fiboEficiente}{ejercicio \refEjercicio{ej:9} que va pisando cada cálculo que va haciendo y termina usando solo 3 variables, \click}.
+        Quiero hacer algo así modificando el algoritmo \textit{bottom-up} anterior para bajar la complejidad a $S(n) \en O(n)$:
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion astroTrade(n,p)
+    new[0..n+1] $\ot -\infinito$
+    old[0..n+1] $\ot$ 0 // inicializo con casos base
+    d $\ot$ n
+    mientras d $\geq$ 1
+        para a $\ot$ 0..n
+            sell,buy $\ot-\infinito$ 
+            si a-1$\geq$0
+                sell $\ot$ old[a-1]+p[d]
+            si a+1$\leq$n
+                buy $\ot$ old[a+1]-p[d]
+            skip $\ot$ old[a]
+            new[a] $\ot$ max(sell, buy, skip)
+        old $\ot$ new // old apunta a new. Con alguna implementación que no haga copias, ponele.
+        new[0..n+1] $\ot -\infinito$ // reseteo new
+        d $\ot$ d-1
+    ret new[0]\end{lstlisting}
+        \end{tcolorbox}
+
+        La complejidad temporal queda cuadrática porque tengo 2 loops anidados:
+        $$
+          \cajaResultado{
+            T(n) \en O(n^2)
+          }
+        $$
+        Y la complejidad espacial ya no es cuádrática sino que lineal como se pedía:
+        $$
+          \cajaResultado{
+            S(n) \en O(n)
+          }
+        $$
+
+  \item \Hacer
+
+\end{enumerate}

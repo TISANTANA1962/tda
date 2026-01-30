@@ -1,0 +1,215 @@
+\begin{enunciado}{\ejercicio[UniónVsJunta]}
+  \textit{UniónVsJunta}
+
+  \textit{La unión disjunta}
+  $G \union H$ de dos grafos $G$ y $H$ con $V(G) \inter V(H) = \vacio$ es el
+  grafo con $V(G \union H) = V(G) \union V(H)$ y $E(G \union H) = E(G) \union E(H)$. Es decir, $G \union H$
+  se obtiene de dos grafos disjuntos uniendo $G$ con $H$ sin agregar aristas.
+  Por otra parte, la \textit{junta}
+  $G + H$ de $G$ y $H$ es el grafo que se obtiene de $G \union H$ agregando todas las aristas \textit{vw} posibles
+  entre un vértice $v \en V(G)$ y otro vértice $w \en V(H)$.
+  Decimos que $G$ es un \textit{grafo unión} (resp. \textit{junta})
+  si existen $G_1$ y $G_2$ con $V(G_1) \inter V(G_2) = \vacio$ tales que $G = G_1 \union G_2$ (resp. $G = G_1 + G_2$).
+
+  \begin{enumerate}[label=\alph*)]
+    \item Demostrar en forma directa que $G$ es un grafo unión si y solo si $G$ es disconexo.
+
+    \item Demostrar en forma directa que $G$ es un grafo junta si y solo si $\overline{G}$ es un grafo únion.
+
+    \item Concluir que $G$ es un grafo junta si y solo si $\overline{G}$ es disconexo.
+  \end{enumerate}
+\end{enunciado}
+
+{\color{gray!20}Poné un punto y a parte en el enunciado, loco \rollingEyes.}
+
+Traduzco para mi cerebro:
+\begin{enumerate}[label=\faIcon{atom}$_\arabic*)$]
+  \item \textit{Unión disjunta}:
+
+        \tikzset{
+          grafo local/.style={
+              node distance = 1cm,
+              nodo/.style={circle,
+                  draw=violet,
+                  fill=violet!5!white,
+                  inner sep = 2pt,
+                  thick,
+                  baseline=0,
+                },
+              junta/.style={red, dashed, thin},
+              every node/.style={font={\tiny}},
+            },
+        }
+        $$
+          \begin{tikzpicture} [grafo local, baseline=-10]
+            \node[nodo] (v1) {$v_1$};
+            \node[nodo, right of = v1] (v2) {$v_2$};
+            \node[nodo, below of = v2] (v3) {$v_3$};
+            \draw[] (v1) to (v2);
+            \draw[] (v2) to (v3);
+            \node[draw = Cerulean, dotted, fit=(v1)(v3), inner sep = 15pt, rounded corners=20pt,label={$G_1$}] (G1) {};
+          \end{tikzpicture}
+          \union
+          \begin{tikzpicture} [grafo local, baseline=-10]
+            \node[nodo] (v4) {$v_4$};
+            \node[nodo, below right of = v4] (v5) {$v_5$};
+            \draw[] (v4) to (v5);
+            \node[draw = Cerulean, dotted, fit=(v4)(v5), inner sep = 15pt, rounded corners=20pt,label={$G_2$}] (G2) {};
+          \end{tikzpicture}
+          \entonces
+          \begin{tikzpicture} [grafo local, baseline=-10]
+            \node[nodo] (v1) {$v_1$};
+            \node[nodo, right of = v1] (v2) {$v_2$};
+            \node[nodo, below of = v2] (v3) {$v_3$};
+            \node[nodo, below left of = v1] (v4) {$v_4$};
+            \node[nodo, below right of = v4] (v5) {$v_5$};
+            \draw[] (v1) to (v2);
+            \draw[] (v2) to (v3);
+            \draw[] (v4) to (v5);
+            \node[draw = Cerulean, dotted, fit=(v4)(v1)(v3), inner sep = 15pt, rounded corners=20pt,label={$G_1 \union G_2$}] (G1UG2) {};
+          \end{tikzpicture}
+        $$
+
+  \item \textit{Junta}
+        $$
+          \begin{tikzpicture} [grafo local, baseline=-10]
+            \node[nodo] (v1) {$v_1$};
+            \node[nodo, right of = v1] (v2) {$v_2$};
+            \node[nodo, below of = v2] (v3) {$v_3$};
+            \draw[] (v1) to (v2);
+            \draw[] (v2) to (v3);
+            \node[draw = Cerulean, dotted, fit=(v1)(v3), inner sep = 15pt, rounded corners=20pt,label={$G_1$}] (G1) {};
+          \end{tikzpicture}
+          +
+          \begin{tikzpicture} [grafo local, baseline=-10]
+            \node[nodo] (v4) {$v_4$};
+            \node[nodo, below right of = v4] (v5) {$v_5$};
+            \draw[] (v4) to (v5);
+            \node[draw = Cerulean, dotted, fit=(v4)(v5), inner sep = 15pt, rounded corners=20pt,label={$G_2$}] (G2) {};
+          \end{tikzpicture}
+          \entonces
+          \begin{tikzpicture} [grafo local, baseline=-10]
+            \node[nodo] (v1) {$v_1$};
+            \node[nodo, right of = v1] (v2) {$v_2$};
+            \node[nodo, below of = v2] (v3) {$v_3$};
+            \node[nodo, below left of = v1] (v4) {$v_4$};
+            \node[nodo, below right of = v4] (v5) {$v_5$};
+            \draw[] (v1) to (v2);
+            \draw[] (v2) to (v3);
+            \draw[] (v4) to (v5);
+            \draw[] (v1) to (v2);
+            \foreach \x in {v1,v2,v3}{
+                \draw[junta] (v4) to (\x);
+                \draw[junta] (v5) to (\x);
+              }
+
+            \node[draw = Cerulean, dotted, fit=(v4)(v1)(v3), inner sep = 15pt, rounded corners=20pt,label={$G_1 + G_2$}] (G1+G2) {};
+          \end{tikzpicture}
+        $$
+
+  \item Un \textit{Grafo unión} $G_{\union}$:
+
+        Será aquel que pueda \textit{"desarmar"}
+        encontrando 2 grafos disjuntos $G_1$ y $G_2$ que al hacer la únión ($\union$) me den $G_{\union}$.
+
+  \item Un \textit{Grafo junta} $G_+$:
+
+        Será aquel que pueda \textit{"desarmar"}
+        encontrando 2 grafos disjuntos $G_1$ y $G_2$ que al hacer la junta (+) me den $G_+$.
+\end{enumerate}
+
+\begin{enumerate}[label=\alph*)]
+  \item
+        $$
+          G_{\union} ~ \textit{es un grafo unión} ~
+          \sisolosi
+          G_{\union} ~\textit{es disconexo}
+        $$
+        \begin{itemize}
+          \item[$(\Leftarrow)$]
+                Si $G_{\union}$ es disconexo, entonces tiene por lo menos 2 componentes conexas, $C_1$ y $C_2$, componentes que
+                cumplen por definición que no tienen ni \textit{vértices} ni \textit{aristas} en común.
+
+                La unión $(\union)$ de
+                la componentes $C_1 \union C_2$ genera un \textit{grafo unión} igual a $G_{\union}$. Fin.
+
+          \item[$(\Rightarrow)$]
+                Si $G_{\union}$ es un \textit{grafo unión}, este fue generado con dos grafos $G_1$ y $G_2$
+                de vértices disjuntos $V(G_1)$ y $V(G_2)$ y otros conjuntos de aristas $E(G_1)$ y $E(G_2)$ también disjuntos.
+
+                Dado que no existen aristas en $G_{\union}$ que vayan de algún $v \en (V(G_{\union}) \inter V(G_1))$
+                a algún $w \en (V(G_{\union}) \inter V(G_2))$, el grafo $G_{\union}$ \ul{no puede ser conexo}, ya que en un grafo
+                conexo puede ir de cualquier vértices a cualquier otro. Fin.
+
+        \end{itemize}
+
+  \item\label{ej-8:item-b}
+        $$
+          G_+ ~ \textit{es un grafo junta} ~
+          \sisolosi
+          \bar{G}_+ ~\textit{es un grafo unión}
+        $$
+        \begin{itemize}
+          \item[$(\Leftarrow)$]
+                Si $\bar{G}_+(V,E)$ es un grafo unión, entonces $\bar{G}_+$ se puede separar en dos grafos disjuntos $\bar{G}_1$ y $\bar{G}_2$.
+
+                Al calcular el complemento de $\bar{\bar{G}}_+ = G_+(V,\bar{E})$
+                obtengo un nuevo grafo con \textit{aristas} $\bar{E} \inter E = \vacio$,
+                por lo tanto conectando todos los vértices de $V(\bar{G}_1)$ con todos los vértices de $V(\bar{G}_2)$.
+
+                Es decir que existen 2 grafos $G_1$ y $G_2$ tales que tienen los \textit{mismos vértices que
+                  los anteriores}:
+                $$
+                  \llave{c}{
+                    V(G_1) = V(\bar{G}_1),\\
+                    V(G_2) = V(\bar{G}_2) \\
+                    V(G_1) \inter V(G_2) = \vacio\\
+                  }
+                $$
+                Si a los grafos $G_1(V,E')$ y $G_2(V, E^{''})$ les agrego las aristas uniendo todos los vértices de $V(G_1)$ y $V(G_2)$:
+                $$
+                  G_+(V, \bar{E}) ~ \text{con} ~
+                  \llave{c}{
+                    V = \set{V(G_1) \union V(G_2)}\\
+                    \ytext\\
+                    \bar{E} = \Big\{
+                    E(G_1) \union E(G_2)  \union
+                    \ub{
+                      \set{
+                        (v,w) \paratodo v \en V(G_1) \ytext \paratodo w \en V(G_2)
+                      }
+                    }{
+                      \text{\red{aristas que agrega la junta (+)}}
+                    }
+                    \Big\}
+                  }
+                $$
+                Este último conjunto de \red{aristas junta} son las que aparecen al calcular el complemento. Entre los vértices
+                de $G_1$ y $G_2$.
+
+                Mostrando así que puedo construir a $G_+$ con 2 conjuntos disjuntos agregando las aristas que conectan las dos componentes
+                entre cada par de vértices.
+
+                Por lo tanto si el complemento de $G_+$ es un \textit{grafo unión}, entonces $G_+$ es un \textit{grafo junta}. Fin.
+
+          \item[$(\Rightarrow)$]
+                Si $G_+$ es un grafo junta, quiere decir que existen 2 grafos $G_1$ y $G_2$ \ul{disjuntos} a los que al agregarles el conjunto
+                de aristas, $E_+$, que une todo par de vértices $vw$ con $v \en G_1$ y $w \en G_2$ forman $G_+$.
+
+                El complemento de $G_+$, $\bar{G}_+$ no tiene ninguna arista de $E_+$, por lo tanto $\bar{G}_+$ tiene por lo menos
+                2 grafos disjuntos $C_1$ y $C_2$.
+
+                Por lo tanto calculando el complemento de un \textit{grafo junta} se obtienen 2 grafos disjuntos que forman un \textit{grafo unión}. Fin.
+
+        \end{itemize}
+
+  \item De la demostración del ítem \ref{ej-8:item-b} se puede concluir eso,
+        ya que es necesario para hacer la junta tener 2 grupos de nodos disconexos entre sí.
+
+        Al tener un grafo disconexo y calcular el complemento, (entre otras cositas) se agregan
+        las aristas necesarias para cumplir con la definición de grafo junta.
+\end{enumerate}
+
+{\color{gray!15} ¿Son estas demostraciones elegantes? No creo. ¿Me importa? mmm, naah.}
+
+\fin

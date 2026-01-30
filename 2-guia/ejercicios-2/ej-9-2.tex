@@ -1,0 +1,181 @@
+\lstset{
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]para, cada, si, sino, if, else, true, false, mientras, not, y, o},
+  emph={[3]meto, saco, ejercito, max, fibo},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+}
+\begin{enunciado}{\ejercicio[KingArmy]}
+  \textit{KingArmy}
+
+  El rey Cambyses está interesado en armar ejércitos en una serie de días consecutivos. Más aún,
+  le interesa que el número de personas de su ejército en el dia $d_i$ sea equivalente a la suma del
+  número de personas del ejército que formó el dia $d_{i-1}$ e $d_{i-2}$.
+  La excepción para esto es en 0 ($d_0$)  y 1 ($d_1$), en cuyo caso la cantidad de personas en esos días va a ser siempre 1.
+  Para él es muy complicado determinar este número, entonces nos pidió que lo ayudemos.
+  Dado un dia $n\ (d_n)$, tenemos que devolver el número de personas de su ejército.
+  Pensar un algoritmo $O(n)$ para resolver este problema y demostrar su correctitud y complejidad.
+\end{enunciado}
+
+En el mundo de la programación dinámica primero hay que hacer \textit{fuerza bruta}, después guardas cositas, porque
+en la \textit{fuerza bruta} uno \magenta{repite y repite muchos subproblemas} y en vez de recalcularlos y así agregar complejidad
+temporal ahora los guardamos, haciendo un \textit{trade} entre complejidad espacial y temporal.
+y los usamos cuando sea necesario.
+
+Este ejercicio es literalmente $Fibonacci$. Un algoritmo de \textit{backtracking, fuerza bruta}:
+$$
+  \textit{\green{ejercito}}(i) =
+  \llave{ccl}{
+    1 & \text{si} & i \leq 1 \\
+    \textit{\green{ejercito}}(i-1) + \textit{\green{ejercito}}(i-2) & \multicolumn{2}{l}{\text{si no}}
+  }
+$$
+La complejidad temporal $T(n) \en O(2^n)$. Listo ya cumplimos con lo necesario para poder, recién ahora, empezar con la programación dinámica.
+¿Por qué recién ahora? Porque observamos que tenemos $2^n$ llamados recursivos cuando la función de Fibonacci te devuelve como mucho 1 valor
+cada vez que la evaluás onda, imaginate si querés calcular \green{\textit{ejercito}}($n = 6$):
+$$
+  \llave{rcl}{
+    \textit{\green{ejercito}}(0) & = & 1 \\
+    \textit{\green{ejercito}}(1) & = & 1 \\
+    \textit{\green{ejercito}}(2) & = & 2 \\
+    \textit{\green{ejercito}}(3) & = & 3 \\
+    \textit{\green{ejercito}}(4) & = & 5 \\
+    \textit{\green{ejercito}}(5) & = & 8 \\
+    \textit{\green{ejercito}}(6) & = & 13
+  }
+$$
+Hice solo $7 = n + 1$ cálculos y no $2^n =64$: \textit{Algo raro debe haber}. Sí, \magenta{\ul{Superposición de Problemas}} o dicho de otra manera
+\magenta{estoy haciendo llamadas recursivas repetidas al re pedo}.
+
+La función \textit{\green{ejercito}} se puede escribir usando la técnica de \blue{memoization}:
+$$
+  \textit{\green{ejercito}}(i) =
+  \llave{ccl}{
+    \textit{\blue{memo}}[i] & \text{si} & \textit{\blue{memo}}[i] \distinto 0 \\
+    1 & \text{si} & i \leq 1 \\
+    \textit{\blue{memo}}[i] \ot \textit{\green{ejercito}}(i-1) + \textit{\green{ejercito}}(i-2) & \multicolumn{2}{l}{\text{si no}}
+  }
+$$
+
+Este árbol muestra en color:
+\begin{itemize}
+  \item En \red{rojo} son los llamados a \textit{\green{ejercito}} que tienen adentro más llamados recursivos.
+  \item En \blue{azul} son los llamados a \textit{\green{ejercito}} que devuelven un valor de \textit{\blue{memo}}.
+  \item En \orange{naranja} son los llamados a \textit{\green{ejercito}} que caen en la guarda de los casos base.
+  \item En {\color{gray!30} gris translúcido} son los llamados que nunca se hicieron debido a la técnica de \blue{memoization}
+\end{itemize}
+
+\forestset{
+  binary tree/.style={
+      for tree={
+          baseline=0,
+          scale=1,
+          line width=0.4pt,
+          minimum size=1pt,
+          rectangle, draw,
+          math content,
+          s sep=.3cm, l sep=0pt,
+          edge={line width=0.5pt},
+        },
+      important/.style={draw=##1,line width=1pt, edge={##1,line width=0.5pt}},
+      transparente/.style={draw=gray!30, line width=1pt, edge={gray!30,line width=0.5pt}, color=gray!30},
+    }
+}
+$$
+  \begin{forest}
+    binary tree,
+    [f(6),important=red
+    [f(5),important=red
+    [f(4),important=red
+    [f(3),important=red
+    [f(2),important=red
+    [f(1),important=orange]
+    [f(0),important=orange]
+    ]
+    [f(1),important=Cerulean]
+    ]
+    [f(2), important=Cerulean
+    [f(1), transparente]
+    [f(0), transparente]
+    ]
+    ]
+    [f(3), important=Cerulean
+    [f(2), transparente
+      [f(1), transparente]
+      [f(0), transparente]
+    ]
+    [f(1), transparente]
+    ]
+    ]
+    [f(4), important=Cerulean
+    [f(3), transparente
+      [f(2), transparente
+          [f(1), transparente]
+          [f(0), transparente]
+      ]
+      [f(1), transparente]
+    ]
+    [f(2), transparente
+      [f(1), transparente]
+      [f(0), transparente]
+    ]
+    ]
+    ]
+  \end{forest}
+$$
+
+La función se puede escribir en pseudocógido más bonito para pasar a la compu así:
+\begin{tcolorbox}
+  \begin{lstlisting}
+  funcion ejercito(i, memo)
+    si memo[i] not null
+        ret memo[i]
+    si n=1 o n=0
+        ret 1
+    sino
+        memo[i] <- ejercito(n-1) + ejercito(n-2)
+        ret memo[i] \end{lstlisting}
+\end{tcolorbox}
+
+\parrafoDestacado[\atencion]{
+  La complejidad de un algoritmo usando \textit{programación dinámica} lo calculás haciendo:
+  $$
+    T(n) = \orange{\texttt{cantidad\_de\_estados}} \times \magenta{\texttt{costo\_de\_estados}}
+  $$
+}
+
+El estado lo calculás viendo como son \textit{las variables de estado}, las variables que te construyen el estado. En este caso
+hay una sola variable: $i$, que tiene una complejidad $i \en O(n)$.
+
+¿Cuánto cuesta calcular cada subproblema en \textit{\green{ejercito}}? Es constante: $O(1)$. Por lo tanto la complejidad temporal del algoritmo
+usando \textit{programación dinámica}:
+$$
+  \cajaResultado{
+    T(n) \en O(1) \cdot O(n) \en O(n)
+  }
+$$
+Si bien el \textit{running time} bajó mucho, la complejidad espacial, la memoria usada en la estructura de \blue{memoization} aumentó:
+$$
+  \cajaResultado{
+    S(n) \en O(n)
+  }
+$$
+Ahí está el trade entre el tiempo y el espacio.
+
+\hypertarget{ejercicio-9:fiboEficiente}{Y todavía tenés la versión aún más eficiente de este algoritmo}:
+\begin{tcolorbox}
+  \begin{lstlisting}
+ejercito(n)
+    ult, penult $\ot$ 1
+    mientras n>1
+        actual $\ot$ ult+penult 
+        penult $\ot$ ult
+        ult $\ot$ actual
+        n $\ot$ n-1
+    ret ult \end{lstlisting}
+\end{tcolorbox}
+Con una complejidad espacial constante.

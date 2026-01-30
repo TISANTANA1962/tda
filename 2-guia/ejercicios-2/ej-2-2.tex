@@ -1,0 +1,355 @@
+\lstset{
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]para, cada, si, sino, if, else, true, false, mientras, not, y, o},
+  emph={[3]magiCuadrados, poda, next, getNext, indices, mark},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+}
+{\small
+  \begin{enunciado}{\ejercicio[MagiCuadrados]}
+    \textbf{\textit{MagiCuadrados}}
+
+    Un \textit{cuadrado mágico de orden $n$}, es un cuadrado con los números $\set{1,\ldots, n^2}$, tal que todas sus
+    filas, columnas y las dos diagonales suman lo mismo (ver figura). El número que suma cada fila
+    es llamado \textit{número mágico}.
+    $$
+      \begin{array}{|c|c|c|}
+        \hline
+        2 & 7 & 6 \\\hline
+        9 & 5 & 1 \\\hline
+        4 & 3 & 8 \\\hline
+      \end{array}
+    $$
+    Existen muchos métodos para generar cuadrados mágicos. El objetivo de este ejercicio es contar
+    cuántos cuadrados mágicos de orden $n$ existen.
+
+    \begin{enumerate}[label=$\alph*$)]
+      \item ¿Cuántos cuadrados habría que generar para encontrar todos los cuadrados mágicos si se
+            utiliza una solución de fuerza bruta?
+
+      \item
+            Enunciar un algoritmo que use \textit{backtracking} para resolver este problema que se base
+            en las siguientes ideas:
+            \begin{enumerate}[label=\tiny$\blacksquare$]
+
+              \item La solución parcial tiene los valores de las primeras $i-1$ filas establecidos, al igual que
+                    los valores de las primeras $j$ columnas de la fila $i$.
+
+              \item Para establecer el valor de la posición $(i, j+1)$ (o $(i+1, \red{1})$ si $j=n$ e $i \distinto n$) se consideran
+                    todos los valores que aún no se encuentran en el cuadrado. Para cada valor posible, se
+                    establece dicho valor en la posición y se cuentan todos los cuadrados mágicos con esta
+                    nueva solución parcial.
+
+            \end{enumerate}
+
+            Mostrar los primeros dos niveles del árbol de \textit{backtracking} para $n=3$.
+
+      \item Demostrar que el árbol de \textit{backtracking} tiene $O((n^2)!)$ nodos en peor caso.
+
+      \item Considere la siguiente poda al árbol de \textit{backtracking}: al momento de elegir el valor de una nueva
+            posición, verificar que la suma parcial de la fila no supere el número mágico.
+            Verificar también que la suma parcial de los valores de las columnas no supere el número mágico.
+            Introducir estas podas al algoritmo e implementarlo en la computadora. ¿Puede mejorar
+            estas podas?
+
+      \item Demostrar que el número mágico de un cuadrado mágico de orden $n$ es siempre $(n^3 + n)/2$.
+            Adaptar la poda del algoritmo del ítem anterior para que tenga en cuenta esta nueva
+            información. Modificar la implementación y comparar los tiempos obtenidos para calcular
+            la cantidad de cuadrados mágicos.
+    \end{enumerate}
+  \end{enunciado}
+}
+
+\begin{enumerate}[label=$\alph*$)]
+\item puff, un montón! Con un poco más de precisión, puedo poner en cada uno de los $n^2$ elementos de la matriz un número del 1 al $n^2$ sin repetir:
+$$
+  n^2!=
+  n^2 \cdot
+  (n^2 - 1) \cdot
+  (n^2 - 2) \cdots
+  (n^2 - (n^2 - 1))
+  =
+  \productoria{j = 0}{n^2 - 1} n^2 - j
+$$
+Una vez generados esos cuadrados me pongo a mirar cuales cumplen las condiciones para ser \textit{cuadrados mágicos}.
+
+\item El enunciado está bien escrito. Enfoca el ejercicio con la información clave para armar el llamado recursivo. Nos dice entre otras
+cosas como elegir el siguiente cuadrado para rellenar.
+
+Voy a hacer distintas versiones de resolución por las que pasé a lo largo de esta materia. Sobre gustos no hay nada escrito así que
+mientras estén bien (cosa que no sé) valen. Hay que tener cuidado que cumplan la complejidad requerida en cada instancia.
+
+Una forma, con $C = \set{1,\ldots,n^2}$, cada llamado recursivo toma un elemento de $C$ y lo quita, de forma que en la próxima llamada
+agarre un número distinto. El caso base se da cuando $C = \vacio$:
+$$
+  \green{magiCuadrados}(C,i,j,n) =
+  \llave{cll}{
+    1 & \text{si} & C = \vacio \\
+    \sumatoria{c_i \en C}{} \green{magiCuadrados}(C-\set{c_i}, \green{getNext}(i,j,n),n) & \multicolumn{2}{l}{\text{si no}}
+  }
+$$
+Donde $\green{getNext}(i,j,n)$:
+$$
+  \green{getNext}(i,j,n)=
+  \llave{rcl}{
+    (i+1, 1) & \text{si} & j = n \\
+    (i, j+1) & \multicolumn{2}{l}{\text{si no}}
+  }
+$$
+Un pseudocódigo de esa función:
+Calcula los cuadrados que se pueden armar sin ninguna poda. Toma y elimina un elemento de un conjunto $C$ y luego
+hace un llamado recursivo, completando la matriz con un elemento distinto en cada posición.
+
+El caso base lo tengo cuando usé todo el conjunto. Voy llenando la matriz por filas.
+\begin{tcolorbox}
+  \begin{lstlisting}
+funcion magiCuadrados(C, i, j)
+    si C = $\vacio$ 
+        ret 1
+    suma $\ot$ 0
+    para cada c en C
+        suma $\ot$ suma+magiCuadrados(C-$\set{\texttt{c}}$,getNext(i,j,n))
+    ret suma\end{lstlisting}
+\end{tcolorbox}
+El premio a lo más cómodo para lidiar con matrices es usar la función  \textit{\green{indices}} que te mapea:
+$$
+  \ub{
+    \matriz{ccc}{
+      1 & \cdots & n\\
+      \vdots & \ddots & \vdots\\
+      n^2-(n-1) & \cdots & n^2
+    }
+  }{
+    \text{posiciones}
+  }
+  \to
+  \ub{
+    \matriz{ccc}{
+      (1,1) & \cdots & (1,n)\\
+      \vdots & \ddots & \vdots\\
+      (n,1) & \cdots & (n,n)
+    }
+  }{
+    \text{índices}
+  }
+$$
+Por lo tanto pasás un solo valor a la función y tenés la funcionalidad de 2, ¡Una ganga!. Cambio el caso base.
+Cuando la posición sea mayor a $n^2$ es que completé el cuadrado.
+
+\begin{minipage}{0.55\textwidth}
+  \begin{tcolorbox}
+    \begin{lstlisting}
+funcion magiCuadrados(C, pos, n)
+    si pos > n^2
+        ret 1
+    suma $\ot$ 0
+    (i,j) $\ot$ indices(pos)
+    para cada c en C
+        suma $\ot$ suma+magiCuadrados(C-$\set{\texttt{c}}$,pos+1, n)
+    ret suma\end{lstlisting}
+  \end{tcolorbox}
+\end{minipage}
+\begin{minipage}{0.41\textwidth}
+\begin{tcolorbox}
+  \begin{lstlisting}
+funcion indices(pos, n)
+    pos $\ot$ pos - 1
+    return (pos/n, pos%n) // 0 indexed 
+  //return ((pos/n)+1, (pos%n)+1) // 1 indexed \end{lstlisting}
+          \end{tcolorbox}
+        \end{minipage}
+
+        Y por último cómo puedo hacer para no pasar ese conjunto \texttt{C} por copia: Voy a ir marcando elementos en un bitarray.
+        \textit{Esto es común cuando ves recorridos en grafos, no es lo más intuitivo imho}.
+        Optimizar estas boludeces no debería ser foco de este ejercicio, pero está bueno para lo que viene.
+        \begin{tcolorbox}
+          \begin{lstlisting}
+ funcion magiCuadrados(pos, marcados, n)
+    si posicion > n^2
+        ret 1
+    suma $\ot$ 0
+    (i,j) $\ot$ indices(pos, n)
+    para cada c $\ot$ 1 .. n^2
+        si c not marcados[c]
+            marcados[c] $\ot$ true
+            A[i,j] $\ot$ c
+            suma $\ot$ suma+magiCuadrados(pos+1, marcados, n)
+            A[i,j] $\ot$ 0               // Backtrack. Restauro la matriz
+            marcados[c] $\ot$ false        // Desmarco
+    ret suma \end{lstlisting}
+\end{tcolorbox}
+
+% Macro para matriz 3x3
+\newcommand{\drawmatrix}[2]{
+  \begin{tabular}{|c|c|c|}
+    \hline
+    #1 & #2 & 0 \\
+    \hline
+    0  & 0  & 0 \\
+    \hline
+    0  & 0  & 0 \\
+    \hline
+  \end{tabular}
+}
+\forestset{
+  binary tree/.style={
+      for tree={
+          scale=0.15,
+          line width=0.1cm,
+          minimum size=1cm,
+          math content,
+          s sep=.3cm, l sep=0.3cm,
+          edge={line width=0.1pt},
+        },
+    }
+}
+$$
+  \begin{forest}
+    binary tree,
+    [
+        \drawmatrix{0}{0}
+        [\drawmatrix{1}{0}
+          [\drawmatrix{1}{2}]
+          [\cdots, no edge ]
+          [\drawmatrix{1}{9}]
+        ]
+        [\drawmatrix{2}{0}
+          [\drawmatrix{2}{1}]
+          [\drawmatrix{2}{3}]
+          [\cdots, no edge]
+          [\drawmatrix{2}{9}]
+        ]
+        [\drawmatrix{3}{0}
+          [\drawmatrix{3}{1}]
+          [\cdots, no edge ]
+          [\drawmatrix{3}{9}]
+        ]
+        [\drawmatrix{4}{0}
+          [\drawmatrix{4}{1}]
+          [\cdots, no edge ]
+          [\drawmatrix{4}{9}]
+        ]
+        [\drawmatrix{5}{0}
+          [\drawmatrix{5}{1}]
+          [\cdots, no edge ]
+          [\drawmatrix{5}{9}]
+        ]
+        [\drawmatrix{6}{0}
+          [\drawmatrix{6}{1}]
+          [\cdots, no edge ]
+          [\drawmatrix{6}{9}]
+        ]
+        [\drawmatrix{7}{0}
+          [\drawmatrix{7}{1}]
+          [\cdots, no edge ]
+          [\drawmatrix{7}{9}]
+        ]
+        [\drawmatrix{8}{0}
+          [\drawmatrix{8}{1}]
+          [\cdots, no edge ]
+          [\drawmatrix{8}{7}]
+          [\drawmatrix{8}{9}]
+        ]
+        [\drawmatrix{9}{0}
+          [\drawmatrix{9}{1}]
+          [\cdots, no edge ]
+          [\drawmatrix{9}{7}]
+          [\drawmatrix{9}{8}]
+        ]
+      ]
+  \end{forest}
+$$
+
+\item
+La función de costo $T(n^2)$ debería ser algo así, dado que tengo para elegir $n^2$ elementos del conjunto $C_{n^2} = \set{1,2,\ldots,n^2-1, n^2}$
+y en cada llamado recursivo, el \textit{cardinal} de $C_{n^2}$ disminuye en 1. La función de costo $T(n^2)$ sería algo así:
+$$
+  T(n^2) =
+  \llave{ccl}{
+    1 & \text{si} & i = j = n\\
+    n^2T(n^2-1) + 1 & \text{si} & sino
+  }
+$$
+Esa ecuación recursiva, sucesión o como se diga tiene como solución a $T(n^2) \en O((n^2)!)$, solución que puede comprobarse como válida reemplazando:
+$$
+  \llave{rcl}{
+    T(n^2) & = & (n^2)!\\
+    T(n^2 - 1) & = & (n^2-1)!
+  }
+  \Entonces{reemplazando}
+  \ub{(n^2)!}{\en O((n^2)!)} = \ub{\ob{n^2 \cdot (n^2 - 1)!}{(n^2)!} + 1}{\en O(n^2)!)}
+$$
+También puedo pensar que estoy en un árbol que tiene costo por \textit{subproblema} de $O(1)$, por lo que la complejidad será contar
+la cantidad de nodos que hay en árbol:
+$$
+  \begin{array}{|ccc|}
+    \cline{1-3}
+    \text{estos niveles}  & \text{tendrán} & \text{esta cantidad de subproblemas} \\ \hline
+    \text{root = nivel 0} & \to            & \binom{n^2}{0} = 1                   \\
+    \text{nivel 1}        & \to            & \binom{n^2}{1} = n^2                 \\
+    \text{nivel 2}        & \to            & \binom{n^2-1}{1} = n^2 - 1           \\
+    \vdots                & \vdots         & \vdots                               \\
+    \text{nivel } n^2-2   & \to            & \binom{n^2-(n^2 - 2)}{1} = 2         \\
+    \text{nivel } n^2-1   & \to            & \binom{n^2-(n^2 - 1)}{1} = 1         \\ \hline
+  \end{array}
+$$
+El producto de toda esa 3era columna es $(n^2)!$
+
+\item En este inciso me piden que tenga un registro de los cuadrados $A$ que fui armando (ver último ítem del ejercicio \refEjercicio{ej:1}),
+porque tengo que sumar sobre valores usados en esa rama en particular.
+Así que tengo que tener un registro de los valores que fui poniendo en cada lugar de la matriz.
+\textit{Esto lo destaco, porque antes no importaba eso, solo contar las distintas matrices que se podían formar}.
+Así que uso una implementación pasando la matriz por referencia para que no explote la memoria con la complejidad espacial.
+
+\textit{Esto se ve mucho mejor cuando se hace \ul{programación dinámica}}.
+
+Si el número mágico es $\violet{M}$, lo que busco con la poda es cortar las llamadas para no tener resultado que sé que no sirven retornando
+un cero.
+
+\begin{tcolorbox}
+  \begin{lstlisting}
+funcion magiCuadrados(pos,marcados,n,A,M) // Paso A y marcados por referencia. M: número mágico.
+    if pos > n^2
+        ret 1
+    suma $\ot$ 0
+    (i,j) $\ot$ indices(pos, n)
+    para cada c $\ot$ 1 .. n^2 
+        si not marcados[c] y si poda(c,i,j,n,A,M) // puedo usar c?
+            marcados[c] $\ot$ true
+            A[i][j] $\ot$ c
+            suma $\ot$ suma + magiCuadrados(pos+1,marcados,n,A,M)
+            A[i][j] $\ot$ 0                 // Restauro A
+            marcados[c] $\ot$ false          // Restauro marcados
+    ret suma \end{lstlisting}
+\end{tcolorbox}
+\begin{tcolorbox}
+  \begin{lstlisting}
+funcion poda(c,i,j,n,A,M)
+    si j=n // Se terminó la fila
+        si c+$\sum_{col}$A[i,col]=M
+         ret true
+    si i=n // Se terminó la columna
+        si c+$\sum_{fil}$A[fil,j]=M
+         ret true
+    sino
+        si c+$\sum_{col}$A[i,col]<M // fila a medias
+         ret true
+        si c+$\sum_{fil}$A[fil,j]<M // columna a medias
+         ret true
+    ret false\end{lstlisting}
+\end{tcolorbox}
+
+El hecho de que eso tenga un loop de $n^2$ iteraciones por llamado recursivo, hace que cada subproblema cueste por lo menos $O(n^2)$.
+Parecería que hace que explote todo por los aires, pero dentro de todo las operaciones en el arreglo \texttt{marcados} son $O(1)$.
+Usar el conjunto $C$ tendría una complejidad adicional. Con suerte \faIcon{pray} las podas, si agarran casos cerca de la raíz,
+el árbol de recursiones se achica de forma apreciable.
+
+\ul{Podas adicionales habría que controlar las diagonales.}
+
+\item
+\hacer
+\end{enumerate}

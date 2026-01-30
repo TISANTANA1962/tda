@@ -1,0 +1,200 @@
+\setcounter{ejercicio}{4}
+\begin{enunciado}{\ejercicio}
+  La población de gatos en un depósito tiene la propiedad de que el número de gatos en un año es
+  igual a la suma del número de gatos de los dos años anteriores. Si en el primer año (empezando
+  a contar desde 1) había un solo gato, y en el segundo dos (suponiendo ello posible!), probar que
+  el número de gatos en el año $n$ es:
+  $$
+    \textstyle
+    \sqrt{\frac{1}{5}} \times
+    \parentesis{
+      \parentesis{
+        \frac{1 + \sqrt{5}}{2}
+      }^{n+1} -
+      \parentesis{
+        \frac{1 - \sqrt{5}}{2}
+      }^{n+1}
+    }
+  $$
+\end{enunciado}
+
+La cantidad de gatos del año $n$, $G_n$ es la suma de los gatos de los dos años anteriores:
+$$
+  \llave{l}{
+    G_1 = 1\\
+    G_2 = 2
+  }
+  \ytext
+  G_n \igual{def} G_{n - 1} + G_{n - 2}
+$$
+Esto es fibonacci y esos números son el número de oro:
+$$
+  \llave{rcl}{
+    \varphi & = & \frac{1 + \sqrt{5}}{2} \\
+    -\frac{1}{\varphi} & = & \frac{1 - \sqrt{5}}{2}
+  }
+  \flecha{mágicas}[propiedades]
+  \llamada1
+  \llave{rcl}{
+    \varphi + \frac{1}{\varphi} & = & \sqrt{5}\\
+    \varphi - \frac{1}{\varphi} & = & 1\\
+    \varphi^n & = & \varphi^{n-1} + \varphi^{n-2}\\
+    (\frac{-1}{\varphi})^n & = & (\frac{-1}{\varphi})^{n-1} + (\frac{-1}{\varphi})^{n-2}
+  }
+$$
+
+Quiero probar que la proposición es verdadera:
+$$
+  \textstyle
+  p(n) : G_n =
+  \sqrt{\frac{1}{5}} \cdot
+  \parentesis{
+    \varphi^{n+1} -
+    \parentesis{
+      -\frac{1}{\varphi}
+    }^{n+1}
+  }
+$$
+Esto se puede probar por inducción:
+
+\textit{Caso base:}
+$$
+  \textstyle
+  p(\blue{1}) :
+  G_{\blue{1}} =
+  \frac{1}{\sqrt{5}} \cdot
+  \parentesis{
+    \varphi^2 -
+    \parentesis{
+      -\frac{1}{\varphi}
+    }^2
+  } =
+  \frac{1}{\sqrt{5}} \cdot
+  (
+  \varphi - \frac{1}{\varphi}
+  )
+  \cdot
+  (
+  \varphi + \frac{1}{\varphi}
+  )
+  \igual{$\llamada1$}
+  1
+$$
+Por lo que la proposición $p(\blue{1})$ resultó verdadera. Ahora pruebo el segundo caso base:
+$$
+  \textstyle
+  p(\blue{2}) :
+  G_{\blue{2}} =
+  \frac{1}{\sqrt{5}} \cdot
+  (
+  \varphi^3 - ( -\frac{1}{\varphi} )^3
+  )
+$$
+Cuentas feas del \textit{número de oro} usando mucho la propiedad de recursividad de potencias de $\varphi$ y $-\frac{1}{\varphi}$:
+$$
+  \begin{array}{rcl}
+    \frac{1}{\sqrt{5}} \cdot ( \varphi^3 - (\frac{-1}{\varphi})^3)
+     & \igual{\red{!!}}[$\llamada1$]            &
+    \frac{1}{\sqrt{5}} \cdot (2\varphi + 1 - (\frac{-2}{\varphi} + 1)) \\
+     & =                                        &
+    \frac{1}{\sqrt{5}} \cdot
+    (\frac{2\varphi^2 + 2}{\varphi})                                   \\
+     & \igual{$\llamada1$}                      &
+    \frac{1}{\sqrt{5}} \cdot
+    (\frac{2(\varphi + 1) + 2}{\varphi})                               \\
+     & =                                        &
+    \frac{1}{\sqrt{5}} \cdot
+    (\frac{2\varphi + 4}{\varphi})                                     \\
+     & \igual{\red{!}}                          &
+    \frac{1}{\sqrt{5}} \cdot
+    (\frac{5 + \sqrt{5}}{\varphi})                                     \\
+     & =                                        &
+    \frac{\sqrt{5} + 1}{\varphi}                                       \\
+     & \igual{\href{\mindExplosion}{\surprise}} &
+    \frac{\sqrt{5} + 1}{\frac{1 + \sqrt{5}}{2}} = 2                    \\
+  \end{array}
+$$
+Por lo tanto la proposición $p(\blue{2})$ es verdadera también.
+
+\medskip
+
+\textit{Paso inductivo:}
+
+Asumo que para algún $k \en \naturales$ las proposiciones:
+$$
+  \textstyle
+  p(\blue{k}) :
+  \ub{
+    G_{\blue{k}} =
+    \sqrt{\frac{1}{5}} \cdot
+    (
+    \varphi^{k+1} - (-\frac{1}{\varphi})^{k+1}
+    )
+  }{
+    \text{\purple{hipótesis inductiva}}
+  }
+  \ytext
+  p(\blue{k+1}) :
+  \ub{
+    G_{\blue{k+1}} =
+    \sqrt{\frac{1}{5}} \cdot
+    (
+    \varphi^{k+2} - (-\frac{1}{\varphi})^{k+2}
+    )
+  }
+  {
+    \text{\purple{hipótesis inductiva}}
+  }
+$$
+son verdaderas, por lo tanto quiero probar que la proposición:
+$$
+  \textstyle
+  p(\blue{k+2}) : G_{\blue{k+2}} =
+  \sqrt{\frac{1}{5}} \cdot
+  (
+  \varphi^{k+3} -
+  (-\frac{1}{\varphi}
+  )^{k+3}
+  )
+$$
+también sea verdadera.
+
+Usando la definción de $G_n$ y las hipótesis inductivas, sale enseguida:
+$$
+  \begin{array}{rcl}
+    G_{k+2}
+     & \igual{def}         &
+    G_{\blue{k+1}} + G_{\blue{k}} \\
+     & =                   &
+    \sqrt{\frac{1}{5}} \cdot
+    \parentesis{
+      \varphi^{k+1} - (-\frac{1}{\varphi})^{k+1}
+      +
+      \varphi^{k+2} - (-\frac{1}{\varphi})^{k+2}
+    }                             \\
+     & =                   &
+    \sqrt{\frac{1}{5}} \cdot
+    \parentesis{
+      \parentesis{
+        \varphi^{k+2} + \varphi^{k+1}
+      }
+      -
+      \parentesis{
+        (-\frac{1}{\varphi})^{k+2} + (-\frac{1}{\varphi})^{k+1}
+      }
+    }                             \\
+     & \igual{$\llamada1$} &
+    \sqrt{\frac{1}{5}} \cdot
+    \parentesis{
+      \varphi^{k+3}  - (-\frac{1}{\varphi})^{k+3}
+    }
+  \end{array}
+$$
+De manera que la proposición $p(k+1)$ resultó también verdadera.
+
+\bigskip
+
+Dado que $p(1),\, p(2),\, p(k),\, p(k+1) \ytext p(k+2)$ son todas verdaderas, por principio de inducción,
+$p(n)$ también los será para todo $n \en \naturales$.
+
+\fin

@@ -1,0 +1,316 @@
+\lstset{
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]en, para, cada, si, sino, if, else, true, false, mientras, not, y, o},
+  emph={[3]operacionesSeq, max, min},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+}
+
+\def\oS{\green{\textit{operacionesSeq}}\xspace}
+\def\oper{\green{\textit{operar}}\xspace}
+\def\rP{\textit{rP}\xspace}
+
+\begin{enunciado}{\ejercicio[OperacionesSeq]}
+
+  \textit{OperacionesSeq}
+
+  Sea $v = (v_1, v_2,\ldots, v_n)$ un vector de números naturales, y sea $w \en \naturales$.
+  Se desea intercalar entre los elementos de $v$ las operaciones $+$ (suma), $\times$ (multiplicación) y
+  $\uparrow$ (potenciación) de tal manera que al evaluar la expresión obtenida el resultado sea $w$.
+  Para evaluar la expresión se opera de izquierda a derecha ignorando la precedencia de los operadores.
+  Por ejemplo, si $v = (3, 1, 5, 2, 1)$, y las operaciones elegidas son $+, \times, \uparrow$ y $\times$ (en ese orden),
+  la expresión obtenida es $3 + 1 \times 5 \uparrow 2 \times 1$, que se evalúa como $(((3 + 1) \times 5) \uparrow 2) \times 1 = 400$.
+  \begin{enumerate}[label=$\alph*)$]
+    \item\label{ej-18:item-a} Escribir una formulación recursiva que sea la base de un algoritmo de PD que, dados $v$ y $w$,
+          encuentre una secuencia de operaciones como la deseada, en caso de que tal secuencia exista.
+          Explicar su semántica e indicar cuáles serían los parámetros para resolver el problema.
+
+    \item Diseñar un algoritmo basado en PD con la formulación de \ref{ej-18:item-a} y dar su complejidad temporal
+          y espacial auxiliar. Comparar cómo resultaría un enfoque \textit{top-down} con uno \textit{bottom-up}.
+
+    \item (Opcional) Formalizar el problema y demostrar que la función recursiva es correcta.
+  \end{enumerate}
+\end{enunciado}
+
+\begin{enumerate}[label=$\alph*)$]
+  \item ¿Tengo que dar la secuencia? Voy a elegir que no, solo con encontrar que existe tal secuencia soy feliz y además
+        porque dar la secuencia es más laburo. \gris{(En realidad no se me ocurre como escribirlo).}
+
+        Quiero hacer todas las combinaciones, \textit{fuerzo-bruteo} para encontrar una posible combinación.
+
+        \begin{itemize}
+          \item $i$ es la iteración. $i \en [1,n]$
+
+          \item \rP es el \textit{resultado parcial}, un acumulador de las operaciones realizadas en cada iteración.
+
+          \item El caso base es una proposición que chequea si el resultado de la combinación números-operaciones es $w$.
+
+          \item La función combina los valores del arreglo $v$ con los operadores $\set{+, \times, \uparrow}$ y
+                devuelve \true en caso de existir una combinación que al usar todos los elementos de $v$ equivalga al valor $w$.
+                Devuelve \false en caso contrario.
+        \end{itemize}
+        $$
+          \oS(i,\rP) =
+          \llave{ccl}{
+            \rP = w & \text{si} & i = n\\
+            \disyuncion{\dagger}{+,\times,\uparrow} \oS(i+1, \rP \dagger v[i+1]) & \text{si} & i < n
+          }
+        $$
+        Llamo a la función con $\oS(1, v[1])$, para obtener el resultado buscado.
+        Cada llamada tiene 3 llamados recursivos, lo que daría un árbol que triplica su tamaño en cada iteración, teniendo
+        una complejidad de $O(3^n)$. Lo podo un poco ya que \ul{ las operaciones que se usan en números naturales
+          siempre dan algo mayor}:
+        $$
+          \oS(i,\rP) =
+          \llave{ccl}{
+            \rP = w & \text{si} & i = n\\
+            \false & \text{si} & \rP > w\\
+            \disyuncion{\dagger}{+,\times,\uparrow} \oS(i+1, \rP \dagger v[i+1]) & \multicolumn{2}{l}{\text{si no}}
+          }
+        $$
+
+        {\tiny
+            Podría la sucesión de operadores que resulta en éxito pasando una referencia a un arreglo como parámetro un arreglo de
+            $C[1..n-1]$ que vaya acumulando las operaciones usadas:
+            $$
+              \oS(i,\rP, C) =
+              \llave{ccl}{
+                \rP = w & \text{si} & i = n\\
+                \false & \text{si} & \rP > w\\
+                \disyuncion{\dagger}{+,\times,\uparrow} \oS(i+1, \rP \dagger v[i+1], C[i] = \dagger) & \multicolumn{2}{l}{\text{si no}}
+              }
+            $$
+            Muy lindo, pero esto no sirve para \textit{programación dinámica}, porque al meter una variable de estado que es un arreglo está complicado
+            para que sea un índice de una matriz. Yo quiero que a partir de las variables de estados la función me retorne algún valor que pueda
+            poner en la matriz y así ser feliz.
+          }
+
+  \item ¿Tiene sentido hacer un algoritmo de \textit{programación dinámica}? Sí, pues tengo muchas más llamadas recursivas que estados
+        para calcular.
+        $$
+          \Omega(3^n) \gg O(n \cdot \rP)
+        $$
+
+        \parrafoDestacado{
+          Voy de atrás para adelante. Partiendo del \true en $i=n$ reconstruyo el camino de \true.
+        }
+        \begin{itemize}
+          \item $i$ varía entre 1 y $n$.
+          \item El índice raro es el \rP. Varía entre $v_1$ y $w$.
+          \item Casos base son todos \false, excepto en la columna $w$.
+          \item El \textit{outer loop} es $i$ y lo lleno de $n \to 1$
+          \item El \textit{inner loop} no importa, pero lo lleno de $v_1 \to w$. Esta es la dirección que usaría
+                para una baja en la complejidad espacial (mismo truco ya usadísimo).
+        \end{itemize}
+        $$
+          \begin{tikzpicture}[
+              rect/.style={
+                  rectangle, draw=gray, text=black,
+                  minimum width=45pt, minimum height=45pt,
+                  outer sep=0pt, inner sep=1pt, font={\small},
+                  text height=1.5ex, text depth=0.5ex
+                },
+              arista_roja/.style={-latex, red, bend left=10pt, line width=1pt},
+              arista_verde/.style={-latex, OliveGreen, line width=1.5pt},
+              recuadro_rojo/.style={rectangle, line width=1pt, draw=red, minimum width=45pt, minimum height=45pt},
+              recuadro_naranja/.style={rectangle, line width=1.5pt, draw=orange, minimum width=45pt, minimum height=45pt},
+              llenado/.style={-Latex, gray, thick, dashed},
+              coordenadas/.style={fill=lightgray, opacity=.12, ultra thin},
+              scale=0.5,
+            ]
+
+            \matrix (A) [
+            matrix of nodes,
+            nodes={rect, execute at begin node=$, execute at end node=$},
+            column sep=1pt, row sep=1pt,
+            ] {
+            M[1,v[1]] & {} & {} & {} & {} & {} & {}& {}     & {} \\
+            {} & {} & {} & {} & {} & {} & {}   & {}& {}\\
+            {} & {} & {} & {} & {} & {} & {}   & {}& {}\\
+            {} & {} & {} & {} & {} & {} & {}   & {}& {}\\
+            {} & {} & {} & {} & {} & {} & {}   & {}& {}\\
+            \false & \false & \false & \false& \false & \false & \false & \false & \true \\
+            };
+
+            \foreach \i in {1,...,9} {
+                \draw[coordenadas] (A-4-\i.north west) rectangle (A-4-\i.south east);
+                \ifnum \i<7
+                  \draw[coordenadas] (A-\i-4.north west) rectangle (A-\i-4.south east);
+                  \draw[coordenadas] (A-\i-6.north west) rectangle (A-\i-6.south east);
+                  \draw[coordenadas] (A-\i-8.north west) rectangle (A-\i-8.south east);
+                \fi
+              }
+
+            \node[recuadro_naranja] (optimo) at (A-3-2) {$M[i,\rP]$};
+            \node[recuadro_rojo] (mas) at (A-4-4) {\texttt{+}};
+            \node[recuadro_rojo] (por) at (A-4-6) {\texttt{$\times$}};
+            \node[recuadro_rojo] (potencia) at (A-4-8) {\texttt{$\uparrow$}};
+            \node[rectangle, line width=1.5pt, fill=OliveGreen!10, draw=OliveGreen, text=OliveGreen, rounded corners] (maximo) at (A-3-4.north west) {\LARGE$\lor$};
+
+            \node[above of=A-1-2] {\tiny \rP};
+            \node[above of=A-1-4] {\tiny $\rP + v[i+1]$};
+            \node[above of=A-1-6] {\tiny $\rP \times v[i+1]$};
+            \node[above of=A-1-8] {\tiny $\rP \uparrow v[i+1]$};
+            \node[right=0.3cm of A-3-9] {$i$};
+            \node[right=0.3cm of A-4-9] {$i+1$};
+            \node[right=0.3cm of A-6-9] {$n$};
+
+            \node[above of=A-1-9] {$w$};
+
+            \draw[arista_roja, bend left=10pt] (mas.north) to (maximo.south);
+            \draw[arista_roja, bend right=10pt] (por.north) to (maximo.south);
+            \draw[arista_roja, bend right=10pt] (potencia.north) to (maximo.east);
+            \draw[arista_verde] (maximo.west) to (optimo.east);
+
+            \draw[llenado] (A.south west) -- (A.north west) node[midway, left]{$\substack{\text{elemento}\\i\text{-ésimo}\\\texttt{i} \en [1,n]}$};
+            \draw[llenado] (A.south west) -- (A.south east) node[midway, below]{Resultado parcial $\texttt{\rP} \en [v_1,w]$};
+
+          \end{tikzpicture}
+        $$
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion operacionesSeq(n,v[1..n],w) $\to$ bool
+    M[1..n,1..w] $\ot$ false    // inicializo todo false
+    M[n, w] $\ot$ true
+    para i $\ot$ (n-1)..1
+        para rP $\ot$ v[1]..w
+            op$_+$,op$_\times$,op$_\uparrow$ $\ot$ false  // inicializo los operadores
+            si (rP+v[i+1])$\leq$w
+                op$_+$ $\ot$ M[i+1,rP+v[i+1]]
+            si (rP$\times$v[i+1])$\leq$w
+                op$_\times$ $\ot$ M[i+1,rP$\times$v[i+1]]
+            si (rP$\uparrow$v[i+1])$\leq$w
+                op$_\uparrow$ $\ot$ M[i+1,rP$\uparrow$v[i+1]]
+            M[i,rP] $\ot$ (op$_+$ o op$_\times$ o op$_\uparrow$) // Queda el true de haberlo 
+    ret M[1, v[1]] \end{lstlisting}
+        \end{tcolorbox}
+
+        Ese algoritmo tiene una complejidad temporal o \textit{running time} y espacial:
+        $$
+          T(n) \en O(n \cdot w)
+          \ytext
+          S(n) \en O(n \cdot w)
+        $$
+
+        Truco de optimización de siempre. Como solo pido info de la fila anterior, puedo ir \textit{pisando}. \ul{Atención
+          a la dirección de llenado del \textit{inner loop}} que es importante para no pisar data importante.
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion operacionesSeq(n,v[1..n],w) $\to$ bool
+    A[1..w] $\ot$ false                     // inicializo todo false
+    A[w] $\ot$ true                     // inicializo caso exitoso
+    para i $\ot$ (n-1)..1
+        para rP $\ot$ v[1]..w  // Dirección correcta de llenado
+            op$_+$,op$_\times$,op$_\uparrow$ $\ot$ false  // inicializo los operadores
+            si (rP+v[i+1])$\leq$w
+                op$_+$ $\ot$ A[rP+v[i+1]]
+            si (rP$\times$v[i+1])$\leq$w
+                op$_\times$ $\ot$ A[rP$\times$v[i+1]]
+            si (rP$\uparrow$v[i+1])$\leq$w
+                op$_\uparrow$ $\ot$ A[rP$\uparrow$v[i+1]]
+            A[rP] $\ot$ ($+$ o $\times$ o $\uparrow$) // queda el true de haberlo 
+    ret A[v[1]] \end{lstlisting}
+        \end{tcolorbox}
+        Mismo \textit{running time} que el anterior pero mejoró la complejidad espacial:
+        $$
+          \cajaResultado{
+            S(n) \en O(w)
+          }
+        $$
+
+  \item Hago inducción en la cantidad de elementos de $v$:
+
+        Quiero probar la proposición:
+        \parrafoDestacado{
+          \textit{
+            $p(n):$
+            Dada una secuencia $v = \set{v_1,\ldots, v_n}$, un número objetivo $w$ y el conjunto de operadores $O = \set{+,\times,\uparrow}$,
+            la función $\oS(1,v_1) = \true$ en caso de existir una combinación ordenada intercalando los elementos de $v$ y $O$ y \false sino
+            $\paratodo n \en \naturales$.
+          }
+        }
+        \bigskip
+        \textit{Caso base:}
+
+        $p(\blue{1})$ es trivial ya que
+        $\oS(1,v[1]) =
+          \llave{ccl}{
+            \true &\text{si} & v_1 = w\\
+            \false &\multicolumn{2}{l}{\text{si no}}
+          }$
+        \parrafoDestacado{
+          \textit{
+            $p(\blue{2}):$
+            Dada una secuencia $v = \set{v_1, v_2}$, un número objetivo $w$ y el conjunto de operadores $O = \set{+,\times,\uparrow}$,
+            la función $\oS(1,v_1) = \true$ en caso de existir una combinación ordenada intercalando los elementos de $v$ y $O$ y \false sino.
+          }
+        }
+        No hay mucha rosca:
+        $$
+          \oS(1, v_1) =
+          (v_1 + v_2 = w) \lor
+          (v_1 \times v_2 = w) \lor
+          (v_1 \uparrow v_2 = w)
+        $$
+        Eso va a devolver \true si alguna de las operaciones coincide o \false si ninguna.
+        Por lo tanto $p(\blue{1})$ y $p(\blue{2})$ son \ul{verdaderas}.
+        \medskip
+        \textit{Paso inductivo:}
+
+        \ul{Asumo} que para un $\blue{k} \en \naturales$ la proposición:
+        \parrafoDestacado{
+          \textit{
+            $p(\blue{k}):$
+            Dada una secuencia $v = \set{v_1,\ldots, v_{\blue{k}}}$, un número objetivo $w_{\blue{k}}$ y el conjunto de operadores $O = \set{+,\times,\uparrow}$,
+            la función $\oS(1,v_1) = \true$ en caso de existir una combinación ordenada intercalando los elementos de $v$ y $O$ y \false sino.
+          }
+        }
+        es \ul{verdadera}. \ul{Entonces quiero probar} que la proposición:
+
+        \parrafoDestacado{
+          \textit{
+            $p(\blue{k+1}):$
+            Dada una secuencia $v = \set{v_1,\ldots, v_{\blue{k+1}}}$, un número objetivo $w_{\blue{k+1}}$ y el conjunto de operadores $O = \set{+,\times,\uparrow}$,
+            la función $\oS(1,v_1) = \true$ en caso de existir una combinación ordenada intercalando los elementos de $v$ y $O$ y \false sino.
+          }
+        }
+        \ul{también lo sea}.
+
+        Hay 2 cosas que pueden ocurrir, ya sea que exista y devuelva \true o que no exista y devuelva \false.
+
+        \textit{Caso \true:}
+        $$
+          \oS(\blue{k+1}, \rP) = \true
+          \Sii{\red{!!}}
+          \llave{c}{
+            \oS(\blue{k}, \rP - v_{\blue{k+1}}) = \true \\
+            \lor\\
+            \oS(\blue{k}, \rP \div v_{\blue{k+1}}) = \true \\
+            \lor\\
+            \oS(\blue{k}, \sqrt[v_{\blue{k+1}}]{\rP} = \true \\
+          }
+        $$
+        Alguno de los valores:
+        $
+          \llaves{c}{
+            \rP - v_{\blue{k+1}} \\
+            \rP \div v_{\blue{k+1}} \\
+            \sqrt[v_{\blue{k+1}}]{\rP}
+          }
+        $
+        tiene que ser el $w_{\blue{k}}$, el valor objetivo del paso $\blue{k}$.
+        Por \purple{hipótesis inductiva} la función en el paso $\blue{k}$-ésimo funciona 10 puntos así que
+        eso muestra que está todo bien.
+
+        El caso cuando la función retorna \false es análogo. Solo que al usar la \purple{hipótesis inductiva}
+        voy a obtener todos valores \false
+
+        Queda así demostrado que la proposición $p(\blue{k+1})$ es verdadera.
+
+        Por criterio de inducción la proposición $p(n)$ resulta verdadera para todo $n \en \naturales$.
+
+\end{enumerate}

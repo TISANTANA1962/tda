@@ -1,0 +1,97 @@
+\def\pL{\textit{\green{potenciaLogaritmica}}}
+\begin{enunciado}{\ejercicio[PotenciaLogarítmica]}
+  \textit{PotenciaLogarítmica}
+
+  Encuentre un algoritmo para calcular $a^b$ en tiempo logarítmico en $b$. Piense cómo reutilizar los resultados
+  ya calculados. Justifique la complejidad del algoritmo dado.
+\end{enunciado}
+
+Quiero explotar esto:
+$$
+  \llave{ccll}{
+    \text{este no funca}  & \to & a^b = \ob{a \cdot a \cdots a}{b \text{ operaciones}} &\to \Theta(n)\\
+    \text{ esto sí funca} & \to & a^b =
+    \llave{rcl}{
+      (a^2)^{\frac{b}{2}} & \text{si} & b ~ \text{par}\\
+      (a^2)^{\frac{\lfloor b \rfloor}{2}} \cdot a^1 & \text{si} & b ~ \text{impar}
+    } & \to \Theta(\log_2(n))
+  }
+$$
+Un poco más formalizada:
+$$
+  \textstyle
+  \pL(a, b) =
+  \llave{ccl}{
+    a & \text{si} & b = 1 \\
+    \pL(a^2, b/2) & \text{si} & b ~ \text{es par}\\
+    a \cdot \pL(a^2, b/2) & \text{si} & b ~ \text{es impar}
+  }
+$$
+Ejemplo ejemplicante:
+$$
+  \begin{array}{rcl}
+    \pL(\blue{a}, 19) & = & \blue{a} \cdot \pL(\green{a^2}, 9)                                                            \\
+                      & = & \blue{a} \cdot \violet{a^2} \cdot \pL((a^2)^2, 4)                                             \\
+                      & = & \blue{a} \cdot \violet{a^2} \cdot \pL(((a^2)^2)^2, 2)                                         \\
+                      & = & \blue{a} \cdot \violet{a^2} \cdot \pL(\ub{(((a^2)^2)^2)^2}{a^{16}}, 1) \ot ~ \text{caso base} \\
+                      & = & \blue{a} \cdot \violet{a^2} \cdot a^{16}                                                      \\
+                      & = & a^{19}
+  \end{array}
+$$
+Este ejemplo genera un árbol de 4 niveles, $4 < \log_2(19) < 5$, o sea que estaría funcionando lo más bien
+\textit{complejituisticamente hablando}.
+Con la función de costos se puede encontrar la complejidad o \textit{running time} de forma inmediata:
+$$
+  T(b) =
+  \llave{ccl}{
+    1 & \text{si} & b = 1 \\
+    T(b/2) + 1 & \text{si} & b > 1
+  }
+  \flecha{complejidad}[\textit{running time}]
+  \cajaResultado{
+    T(b) \en \Theta(\log_2(b))
+  }
+$$
+\parrafoDestacado{
+  \it
+  La función toma un valor \ul{$a$} (la base) que \ul{siempre es una potencia de $a$ cada vez mayor } y un \ul{$b$} (el exponente).
+  Devuelve el cuadrado (cuadrado + 1) de la base si el exponente es par (impar), valores para usar en el siguiente llamado.
+  El exponente se reduce a la mitad en cada llamado. El caso base es $b=1$.
+  Voy a terminar una vez que el exponente sea 1, lo que corresponde a haberlo dividido entre $2$ un total de $\log_2(b)$ veces.
+}
+
+\begin{tcolorbox}
+  \begin{lstlisting}[
+      mathescape=true,
+      emph={[1]funcion, return, ret, retorno},
+      emph={[2]si, sino, if, else, true, false},
+      emph={[3]potenciaLogaritmica},
+      emphstyle={[1]\color{violet}\it},
+      emphstyle={[2]\color{red}\it},
+      emphstyle={[3]\color{OliveGreen}\it},
+      morecomment={[l]{//}},
+      commentstyle={\color{gray}\it\footnotesize}
+  ] 
+  funcion potenciaLogaritmica(a, b)     // a^b
+    si b = 1
+        ret a                           // devuelvo a, ya que a^1 = a.
+
+    si b es par
+        ret potenciaLogaritmica(a $\cdot$ a, b/2)
+    sino  
+        ret a $\cdot$ potenciaLogaritmica(a $\cdot$ a, b/2) \end{lstlisting}
+\end{tcolorbox}
+
+Usando el \textit{teorema maestro}:
+$$
+  f(b) = \Theta(b^{\log_{\blue{c}} (\magenta{a})} \cdot \log^k(b))
+  \Entonces{$\magenta{a} = 1,\, \blue{c} = 2$}[$k = 0$]
+  \cajaResultado{
+    T = \Theta
+    \big(
+    \log(b)
+    \big)
+  }
+$$
+
+\fin

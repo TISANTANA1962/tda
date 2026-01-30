@@ -1,0 +1,267 @@
+\lstset{
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]en, para, cada, si, sino, if, else, true, false, mientras, not, y, o},
+  emph={[3]pilaCauta, max, min},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+}
+\def\pC{\green{\textit{pilaCauta}}}
+\begin{enunciado}{\ejercicio[PilaCauta]}
+    \textit{PilaCauta}
+
+  Tenemos cajas numeradas de 1 a $N$, todas de iguales dimensiones. Queremos encontrar la máxima cantidad
+  de cajas que pueden apilarse en una única pila cumpliendo que:
+  \begin{enumerate}[label={\tiny $\blacksquare$}]
+    \item Solo puede haber una caja apoyada directamente sobre otra;
+    \item Las cajas de la pila deben estar ordenadas crecientemente por número, de abajo para arriba;
+    \item Cada caja $i$ tiene un peso $w_i$ y un soporte $s_i$, y el peso total de las cajas que
+          están arriba de otra no debe exceder el soporte de esa otra.
+  \end{enumerate}
+
+  Si tenemos los pesos $w = [19,7,5,6,1]$ y los soportes $s = [15,13,7, 8,2]$
+  (la caja 1 tiene peso 19 y soporte 15, la caja 2 tiene peso 7 y soporte 13, etc.), entonces la respuesta es 4.
+  Por ejemplo, pueden apilarse de la forma 1-2-3-5 o 1-2-4-5 (donde la izquierda es más abajo), entre otras opciones.
+  \begin{enumerate}[label=$\alph*)$]
+    \item Pensar la idea de un algoritmo de \textit{backtracking} (no hace falta escribirlo).
+
+    \item Escribir una formulación recursiva que sea la base de un algoritmo de PD. Explicar su semántica e indicar cuáles
+          serían los parámetros para resolver el problema.
+
+    \item Diseñar un algoritmo de PD y dar su complejidad temporal y espacial auxiliar. Comparar cómo resultaría un enfoque
+          \textit{top-down} con uno \textit{bottom-up}.
+
+    \item (Opcional) Formalizar el problema y demostrar que la función recursiva es correcta.
+  \end{enumerate}
+\end{enunciado}
+
+\begin{enumerate}[label=$\alph*)$]
+  \item No pienso luego no existo.
+  \item Como todo algoritmo de \textit{backtracking} pruebo todas las instancias armando un árbol de recursión \textit{masivo bro.}
+
+        La función devuelve la máxima cantidad de pilas que puedo apilar respetando los soportes. La variable
+        $S$ tiene el valor del mínimo soporte en la instancia $i$. La idea es que la caja $i+1-$ésima sea soportable
+        por \textit{el cuello de botella} $S$ para poder apilarse. El $S$ se actualiza solo cuando se agrega una caja.
+        $$
+          \pC(i, S) =
+          \llave{ccl}{
+            0 & \text{si} & i+1 > N \\
+            \pC(i+1, S)& \text{si} & S < w_{i+1} \\
+            \maximo
+            \matriz{c}{
+              1 + \pC(i+1, \minimo(s_{i+1}, S - w_{i+1})), \\
+              \pC(i+1, S),
+            }
+            & \multicolumn{2}{l}{\text{si no} }
+          }
+        $$
+        Llamo a la función con $\pC(0,+\infinito)$, el piso debería poder soportar cualquier caja, además ese
+        caso cae siempre en el caso de poner una caja nueva.
+
+        Esta función recursiva tiene 2 llamadas recursiva por cada llamada a la función (\textit{give or take}) tiene una complejidad temporal o running time:
+        $$
+          \cajaResultado{
+            T(n) \en O(2^n)
+          }
+        $$
+        Se le podrían podar las ramas cuando $S<0$, pero eso no afectaría el valor de la complejidad.
+
+  \item
+        ¿Cuántos estados puede devolver esta función? La $i$ es fácil, porque es solo la cantidad de cajás, es decir $i \en [1 \ldots N]$.
+
+        \medskip
+
+        ¿Cuáles valores podría tomar, el soporte cuello de botella $S$?
+
+        Esto no es lo más intuitivo del mundo (\textit{imho} pensar y llegar a esta cota es impedible en un parcial).
+
+        Cosas esperables:
+        \begin{itemize}
+          \item De $S$ me importa lo que uso, no su valor máximo.
+          \item Si el suelo tiene $S_{suelo} =\infinito$ quiero encontrar una cota superior menor para $S$.
+          \item Lo que puedo usar de $S$ en caso óptimo es $\sum_{i=1}^N w_i$.
+          \item Una caja $i$ tiene su propiedad $e_i = w_i + s_i$. Es el valor máximo que puede ejercer sobre la caja de abajo $i-1$.
+          \item $e_{max} = \maximo\limits_{1 \leq i \leq N} \big( w_i + s_i \big)$. De poder elegir el orden,
+                la caja con $e_{max}$ sería la candidata para estar en el piso \item Si el suelo fuese una caja con $S = \infinito$,
+                el siguiente "suelo" sería la caja con $e_{max}$.
+        \end{itemize}
+
+        Viendo la función $\pC$, observamos que $S$ es el resultado de calcular un mínimo. Ese mínimo
+        es lo necesario para bancar al sistema, y para bancar al \textit{\blue{sistema}} (lo que esté \ul{abajo de la caja $j$})
+        $S_{\textit{\blue{sis}}}$ tiene que ser suficientemente poronga como para aguantar a la \ul{caja $j$ y todo lo que tiene $\ob{\text{arriba}}{i>j}$},
+        por lo que tiene que cumplir que $S_{\textit{\blue{sis}}} \geq  w_j + \ob{s_j.}{\geq W_{i>j}}$
+        Debería ocurrir algo así:
+        $$
+          \textstyle
+          S_{\textit{\blue{sis}}} \geq \maximo\limits_{j \leq i \leq N} \big( w_i + s_i \big).
+        $$
+        y ya que estamos debería ocurrir que $s_j \geq \sumatoria{i > j}{N} w_i$, y así teniendo otra posible cota:
+        $$
+          \textstyle
+          S_{\textit{\blue{sis}}} \geq \sumatoria{i > j}{N} w_i
+        $$
+        Dado que \textit{que el sobrante de soporte no agrega nuevos estados} me quedo con el mínimo de esas dos expresiones $S_{opt}$.
+        Sin pérdida de generalidad para $[\red{1}, N]$ los valores útiles de $S$ estarán acotados por:
+        $$
+          \textstyle
+          S_{opt} = \minimo\big(\maximo\limits_{\red{1} \leq i \leq N} ( w_i + s_i ), \sumatoria{i=\red{1}}{N} w_i\big)
+        $$
+
+        \bigskip
+
+        ¿Cómo se relacionan los estados entre sí?
+        \begin{itemize}
+          \item El índice complicado es el de $S$.
+
+          \item Voy a llenar de abajo para arriba (\textit{outer loop}) la variable \texttt{i}. Luego de izquierda a derecha (\textit{inner loop}) o al revés,
+                no importa, la variable \texttt{s}.
+
+          \item Caso base en $i = N+1$ como en la función recursiva.
+
+          \item De la forma en que lleno voy a tener el objetivo en $M[1, S_{opt}]$.
+        \end{itemize}
+
+        El vector de pesos \texttt{W}, vector de soportes \texttt{S}.
+
+        $$
+          \begin{tikzpicture}[
+              rect/.style={
+                  rectangle, draw=gray, text=black,
+                  minimum width=45pt, minimum height=45pt,
+                  outer sep=0pt, inner sep=1pt, font={\small},
+                  text height=1.5ex, text depth=0.5ex
+                },
+              arista_roja/.style={-latex, red, bend left=10pt, line width=1pt},
+              arista_verde/.style={-latex, OliveGreen, line width=2pt},
+              recuadro_rojo/.style={rectangle, line width=1pt, draw=red, minimum width=45pt, minimum height=45pt},
+              recuadro_naranja/.style={rectangle, line width=1.5pt, draw=orange, minimum width=45pt, minimum height=45pt},
+              llenado/.style={-Latex, gray, thick, dashed},
+              coordenadas/.style={fill=lightgray, opacity=.12, ultra thin},
+              scale=0.5,
+            ]
+
+            \matrix (A) [
+            matrix of nodes,
+            nodes={rect, execute at begin node=$, execute at end node=$},
+            column sep=1pt, row sep=1pt,
+            ] {
+            {} & {} & {} & {} & {} & {} & M[1,S_{opt}] \\
+            {} & {} & {} & {} & {} & {} & {} \\
+            {} & {} & {} & {} & {} & M[i,s] & {} \\
+            {} & {} & {} & {} & {} & {} & {} \\
+            {} & {} & {} & {} & {} & {} & {} \\
+            };
+
+            \foreach \i in {1,...,7} {
+                \draw[coordenadas] (A-4-\i.north west) rectangle (A-4-\i.south east);
+                \ifnum \i<6
+                  \draw[coordenadas] (A-\i-2.north west) rectangle (A-\i-2.south east);
+                  \draw[coordenadas] (A-\i-6.north west) rectangle (A-\i-6.south east);
+                \fi
+              }
+
+            \node[recuadro_naranja] (optimo) at (A-3-6) {};
+            \node[recuadro_rojo] (keep) at (A-4-2) {\texttt{keep}};
+            \node[recuadro_rojo] (skip) at (A-4-6) {\texttt{skip}};
+            \node[rectangle, line width=2pt, fill=OliveGreen!10, draw=OliveGreen, text=OliveGreen, rounded corners] (maximo) at (A-3-5.west) {$\maximo$};
+
+            \node[above of=A-1-2] (S) {\tiny \texttt{mín}$\matriz{c}{\texttt{S[i],}\\ \texttt{s-W[i]}}$};
+            \node[left=0.3cm of A-4-1] {$i+1$};
+            \node[above of=A-1-6] {$s$};
+
+            \draw[arista_roja, bend left=10pt] (keep.north) to (maximo.west);
+            \draw[arista_roja, bend left=50pt] (skip.west) to (maximo.south);
+            \draw[arista_verde] (maximo.east) to (optimo.west);
+
+            \draw[llenado] (A.south west) -- (A.north west) node[midway, left]{$\substack{\text{caja}\\i\text{-ésima}\\\texttt{i} \en [1,N]}$};
+            \draw[llenado] (A.south west) -- (A.south east) node[midway, below]{soporte $\texttt{s} \en [0,S_{opt}]$};
+
+          \end{tikzpicture}
+        $$
+
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion pilaCauta(N,W[1..N],S[1..N])
+    S$_{opt}$ $\ot$ min(max(W[i]+S[i]),sum(W))  // El detalle de eso, pajilla.
+    M[1..N+1,0..S$_{opt}$] $\ot$ 0              // Inicializo con 0 cajas. M es de $(N+1)\times(S_{opt}+1)$
+    para i$\ot$N..1
+        para s $\ot$0..S$_{opt}$
+            skip $\ot$ M[i+1, s]
+            si s-W[i] $\geq$ 0 // Borde ok?
+                keep $\ot$ 1+M[i+1,min(S[i],s-W[i])]
+            sino 
+                keep $\ot -\infinito$ 
+            M[i,s] $\ot$ max(skip,keep)
+    ret M[1,S$_{opt}$] \end{lstlisting}
+        \end{tcolorbox}
+
+        La complejidad temporal o \textit{running time} de este algoritmo:
+        $$
+          T(n) \en O(N \cdot S_{opt})
+        $$
+        Es una complejidad pseudopolinomial, una mejora respecto a la función recursiva con complejidad exponencial. La complejidad espacial:
+        $$
+          S(n) \en O(N \cdot S_{opt})
+        $$
+
+        Se puede bajar la complejidad espacial a $O(S_{opt})$. Esta forma no es la más eficientes pero me parece más intuitiva.
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion pilaCauta(N,W,S)
+    new[0..S$_{opt}$] $\ot$ 0
+    old[0..S$_{opt}$] $\ot$ 0            // inicializo con casos base
+    para i $\ot$ N..1
+       para s $\ot$ 0..S$_{opt}$
+           skip $\ot$ old[s]
+           si s-W[i] $\geq$ 0          // Borde ok?
+               keep $\ot$ 1+old[min(S[i],s-W[i])]
+           sino 
+               keep $\ot -\infinito$ 
+           new[s] $\ot$ max(skip,keep)
+        old $\ot$ new // old apunta a new. Con alguna implementación que no haga copias, ponele.
+    ret new[S$_{opt}$] \end{lstlisting}
+        \end{tcolorbox}
+        Para mejorar eso un poco más y que baje un poco la complejidad temporal evitando las copias de los arreglos hago
+        mismo encare que ya sé hizo en otros ejercicios.
+        Dada la dependencia de los estados, puedo ir pisando \red{de manera correcta} los elementos de un arreglo unidimensional
+        y llegar al resultado buscado con una complejidad espacial óptima:
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion pilaCauta(N,W,S)
+    A[0..S$_{opt}$] $\ot$ 0                     // inicializo con casos base caja (N+1)-esima
+    para i $\ot$ N..1
+       para s $\ot$ S$_{opt}$..0                // Orden clave para el pisado
+           skip $\ot$ A[s]
+           si s-W[i] $\geq$ 0         // Borde ok?
+               keep $\ot$ 1+A[min(S[i],s-W[i])]
+           sino 
+               keep $\ot -\infinito$ 
+           A[s] $\ot$ max(skip,keep)
+    ret A[S$_{opt}$] \end{lstlisting}
+        \end{tcolorbox}
+        La complejidad espacial de los últimos dos algoritmos es:
+        $$
+          S(n) \en O(S_{opt})
+        $$
+
+        \bigskip
+
+        \textit{Top-down} $(\downarrow)$ vs. \textit{Bottom-up} $(\uparrow)$:
+        \begin{itemize}
+          \item[$(\downarrow)$] \textit{Top-Down} está bueno si los estados están dispersos, porque calcula los estados que existen a partir
+                de valores de los vectores \texttt{S: soporte} y \texttt{W: pesos}.
+
+          \item[$(\uparrow)$] Si tuviese una distribución uniforme de estados, preferiría usar \textit{Bottom-up} que va a calcular todos
+                los valores desde el más grande al más chico, y \textit{en promedio va a calcular pocas cosas al pedo}.
+
+          \item[$(\uparrow)$] \textit{Bottom Up} Es más fácil de optimizar el uso de memoria como se vio al final.
+        \end{itemize}
+
+        En conclusión va depender del \textit{input}. En los talleres de \textit{Codeforces, Top-down} no funciona nunca. Quizás por la variedad
+        de los tests, no sé. El sabor que queda es que \textit{Top-Down} es una \poo.
+
+    \item Ehm, me acordé de que tengo que hacer algo, después la hago. \Hacer
+\end{enumerate}

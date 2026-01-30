@@ -1,0 +1,80 @@
+\begin{enunciado}{\ejercicio[Intersección Máxima]}
+
+  \textit{Intersección Máxima}
+
+  Sea $G$ un grafo conexo. Demostrar por el contrarrecíproco que todo par de caminos simples
+  de longitud máxima de $G$ tienen un vértice en común.
+
+  \textbf{Ayuda:} Suponer que hay dos caminos
+  disjuntos en vértices de igual longitud y definir explícitamente un camino que sea más largo que
+  ellos.
+\end{enunciado}
+
+\parrafoDestacado{
+  \textit{Camino simple} es un \ul{camino}, un \textit{recorrido} que no pasa 2 veces por el mismo
+  vértice, según \hyperlink{teoria-3:recorridos}{definición acá \click}.
+}
+
+Quiero mostrar que:
+\begin{center}
+  $\ub{G ~\text{conexo}}{p}$, entonces $\ub{\text{todo par de caminos de longitud máxima de $G$ se chocan}}{q}$.
+\end{center}
+
+\textit{Por contrarecíproco $(\lnot q \entonces \lnot p)$}:
+\begin{center}
+  Si existen 2 caminos de longitud máxima disjuntos, entonces $G$ \ul{no} es conexo.
+\end{center}
+
+Tengo el escenario:
+
+Dos caminos de longitud máxima $k-1$ sin vértices en común:
+$$
+  P = p_1 \cdots p_k  \ytext   Q = q_1 \cdots q_k  ~ ~ \text{ con } ~   |P| = |Q| = k-1
+$$
+$$
+  \begin{tikzpicture}[grafo style, every node/.style={nodo, minimum size=25pt}]
+    \node[] (p1) {$p_1$};
+    \node[right of = p1] (p2) {$p_2$};
+    \node[below of = p1] (q1) {$q_1$};
+    \node[right of = q1] (q2) {$q_2$};
+    \node[right=3cm of p2] (fill) {};
+    \node[right=3cm of q2] (fill2) {};
+    \node[right=3cm of fill] (pk-1) {$p_{k-1}$};
+    \node[right=3cm of fill2] (qk-1) {$q_{k-1}$};
+    \node[right of = pk-1] (pk) {$p_k$};
+    \node[right of = qk-1] (qk) {$q_k$};
+
+    \draw[arista] (p1) to (p2) to (fill.south) to (pk-1) to (pk);
+    \draw[arista] (q1) to (q2) to (fill2.north) to (qk-1) to (qk);
+    \node[compConexa, fit=(fill)(fill2)] (misterio){\magenta{No sé}};
+  \end{tikzpicture}
+$$
+
+No sé que pasa en el medio con la \ul{conectividad} del grafo, pero solo pueden pasar 2 cosas:
+
+\begin{enumerate}[label=(\arabic*)]
+  \item No existe ninguna arista entre vértices de $P$ y vértices $Q$. Entonces \ul{$G$ no es conexo}. Fin.
+
+  \item Existe alguna arista entre algún vértice de $P$ y alguno de $Q$.
+        \parrafoDestacado{
+          \textit{¿Podría definir en el medio un camino más largo que estos?}
+        }
+        Viajando por $P$ cuando estoy en el vértice $\magenta{p_i}$ encuentro la arista que va al vértice $\magenta{q_j}$
+        y de ahí voy hacia el vértice de $Q$ más alejado (de \magenta{$q_j$}) que pueda. Así voy construyendo a $C_{\maximo}$:
+        $$
+          C_{\maximo} =
+          \llave{c}{
+            p_1 p_2 \cdots \magenta{p_i q_j} \cdots q_k\\
+            \lor\\
+            p_1 p_2 \cdots \magenta{p_i q_j} \cdots q_1
+          }
+          ~\text{ con } ~
+          |C_{\maximo}| =
+          \ub{|p_1 \to p_i|}{i-1} + \ub{\magenta{e(p_i,q_j)}}{1} + \ub{\maximo\set{|q_j \to q_1|, |q_j \to q_k|}}{ \mayorIgual{\red{!}} k-i} \geq k
+        $$
+        De esa manera tendría un \textit{\red{camino más largo que los más largo}}, lo cual es un absurdo. Notando $C_{\maximo}$ tiene vértices tanto de
+        $P$ como de $Q$, concluyo que \ul{no pueden existir 2 caminos de longitud máxima disjuntos} en un grafo $G$ conexo (dado que siempre
+        podría unir los supuestos caminos máximos), por lo tanto \ul{$G$ no es conexo}. Fin.
+\end{enumerate}
+
+\fin

@@ -1,0 +1,46 @@
+\def\amistad{\green{\textit{amistad}}}
+\begin{enunciado}{\ejercicio[Modelado básico]}
+
+  \textit{Modelado básico}
+
+  Probar que en todo grupo de dos o más personas hay por lo menos dos de ellas que tienen la misma
+  cantidad de amigos en el grupo.
+\end{enunciado}
+
+La lógica de este ejercicio es idéntica a la del ejercicio \refEjercicio{ej:2}
+
+El modelado consiste en definir a los vértices como las personas y a las aristas como la amistad entre 2 personas.
+
+\begin{itemize}
+  \item ¿Puede ocurrir que haya alguien con $\ub{n-1}{\text{no cuento la}\\ \text{auto-amistad}}$ amigos y otro con $0$ amigos?
+        Esto no debería poder ocurrir.
+
+  \item Para probar por el absurdo supongo que todos tienen distintas amistades. La función $\amistad(p_i)$
+        me devuelve la cantidad de amigos que tiene la persona $p_i$. Es un \textit{isomorfismo}, para cada $p_i$, me
+        devuelve una cantidad de amigos distinta.
+        $$
+          \llave{ccc}{\rowcolor{red!5}
+            \amistad(\blue{p_1}) & = & \text{tiene} ~ n-1 ~ \text{amigos}\\
+            \amistad(p_2) & = & \text{tiene} ~ n-2 ~ \text{amigos} \\
+            & \vdots & \\
+            \amistad(p_{n-1}) & = & \text{tiene} ~ 1 ~ \text{amigo} \\ \rowcolor{red!5}
+            \amistad(\blue{p_n}) & = & \text{no tiene amigos \faIcon[regular]{sad-cry}}
+          }
+        $$
+
+        \parrafoDestacado[\atencion]{
+          Resaltado aparece el absurdo. En un grupo de $n$ personas, no puede haber una persona ($\blue{p_1}$) conectada, amiga de, \ul{$n-1$ personas} y que
+          haya una de esas $n-1$ personas (\blue{$p_n$}) que no tenga ningún amigo.
+            {\color{gray!10}A menos que \textit{¿Está ese amigo acá, ahora, entre nosotros? \faIcon{ghost}}}
+        }
+
+        Por lo tanto para que \red{las amistades sean compatibles} con los números, se
+        necesitaría que los rangos de amistades para las personas vayan según:
+        $$
+          \ub{\amistad(p) \en [0, n-2]}{\text{hay solari}}
+          ~\text{ o bien } ~
+          \ub{\amistad(p) \en [1, n-1]}{\text{no hay solari}}
+        $$
+\end{itemize}
+
+\fin

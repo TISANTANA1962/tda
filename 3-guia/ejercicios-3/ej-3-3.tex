@@ -1,0 +1,177 @@
+\tikzset{
+  grafo code/.code={
+      \node[nodo] (1) {1};
+      \node[nodo, above left of = 1] (2) {2};
+      \node[nodo, below left of = 2] (3) {3};
+      \node[nodo, below right of = 3] (4) {4};
+    },
+}
+
+\begin{enunciado}{\ejercicio[Unicidad Digrafo]}
+  \textit{Unicidad digrafo}
+
+  Un \textit{grafo orientado} es un digrafo $D$ tal que al menos uno de $v \to w$ y $w \to v$
+  no es una arista de $D$, para todo $v, w \en V(D)$. En otras palabras, un grafo orientado se obtiene a partir
+  de un grafo no orientado dando una dirección a cada arista. Demostrar en forma constructiva que
+  para cada $n$ existe un único grafo orientado cuyos vértices tienen todos grados de salida distintos.
+  \textbf{Ayuda}: Aprovechar el ejercicio \refEjercicio{ej:2} y observar que el absurdo no se produce para un único
+  grafo orientado.
+
+  \begin{enumerate}[label=(\alph*)]
+    \begin{multicols}{3}
+      \item
+      \begin{tikzpicture}[grafo style, grafo code, baseline=0]
+        \draw[arco] (1) to (2);
+        \draw[arco] (2) to (3);
+        \draw[arco] (3) to (4);
+        \draw[arco, bend left = 40pt] (4) to (1);
+        \draw[arco, bend left = 40pt] (1) to (4);
+      \end{tikzpicture}
+
+      No es un grafo orientado.
+
+      \item
+      \begin{tikzpicture}[grafo style, grafo code, baseline=0]
+        \draw[arco] (1) to (2);
+        \draw[arco] (2) to (3);
+        \draw[arco] (3) to (4);
+        \draw[arco] (4) to (1);
+      \end{tikzpicture}
+
+      Un grafo orientado.
+      \item
+      \begin{tikzpicture}[grafo style, grafo code, baseline=0]
+        \draw[arista] (1) to (2);
+        \draw[arista] (2) to (3);
+        \draw[arista] (3) to (4);
+        \draw[arista] (4) to (1);
+      \end{tikzpicture}
+
+      Un grafo no orientado.
+    \end{multicols}
+  \end{enumerate}
+\end{enunciado}
+
+A diferencia del ejercicio \refEjercicio{ej:2} en un \textit{digrafo} cada vértices tiene \textit{grado de entrada} $d_{in}$ y \textit{grado de salida}
+$d_{out}$.
+\parrafoDestacado[\red{\atencion}]{
+  Destaco que el hecho de que el grafo sea orientado, permite determinar el grafo solo hablando de los $d_{out}$ o los $d_{in}$. Es decir
+  que una vez que asigno valores de $d_{out}$ a los vértices automáticamente ya \ul{fijé} los $d_{in}$.
+}
+Parecido al ejercicio \refEjercicio{ej:2}, la idea es intentar construir un \textit{grafo orientado} $D(V, \red{E'})$ con la siguiente caracterísitica:
+$$
+  \text{Dado } G(V, E), ~\existe!~ D(V, \red{E'}), \text{ tal que }
+  \paratodo(v \en V)(\paratodo(w \en \set{V - \set{v}})(d_{out}(v) \distinto d_{out}(w)))
+$$
+\begin{itemize}
+  \item Un vértice $v$ de entre todos los $n$ vértices de $D$ puede tener un \textit{grado de salida} $d_{out}(v) \en [0, n-1]$
+
+  \item Si contruyo a partir de los $n$ vértices digrafos $D(V,E)$ donde todos los $d_{out} \en [0, n-1]$ sean distintos, puedo
+        combinar de $n!$ formas {\tiny(cantidad de funciones biyectivas $d_{out} : V \to [0, n-1])$}, en particular puedo hacer:
+        $$
+          \llamada1
+          \llave{ccc}{
+            d_{out}(v_1) & = & 0      \\
+            d_{out}(v_2) & = & 1      \\
+            \vdots & \vdots &\vdots\\
+            d_{out}(v_i) & = & n-(i+1)      \\
+            \vdots & \vdots &\vdots\\
+            d_{out}(v_j) & = & n-(j+1)      \\
+            \vdots & \vdots &\vdots\\
+            d_{out}(v_n) & = & n-1
+          }
+        $$
+
+        \textit{Sanity check} para $n = 4$:
+        $$
+          \begin{tikzpicture}[grafo style, grafo code, baseline=0]
+            \draw[arco, Cerulean] (1) to (2);
+            \draw[arco, Cerulean] (1) to (3);
+            \draw[arco, Cerulean] (1) to (4);
+          \end{tikzpicture}
+          \qquad \to \qquad
+          \begin{tikzpicture}[grafo style, grafo code, baseline=0]
+            \draw[arco, Cerulean] (1) to (2);
+            \draw[arco, Cerulean] (1) to (3);
+            \draw[arco, Cerulean] (1) to (4);
+            \draw[arco, purple] (2) to (3);
+            \draw[arco, purple] (2) to (4);
+          \end{tikzpicture}
+          \qquad \to \qquad
+          \begin{tikzpicture}[grafo style, grafo code, baseline=0]
+            \draw[arco, Cerulean] (1) to (2);
+            \draw[arco, Cerulean] (1) to (3);
+            \draw[arco, Cerulean] (1) to (4);
+            \draw[arco, purple] (2) to (3);
+            \draw[arco, purple] (2) to (4);
+            \draw[arco, orange] (3) to (4);
+          \end{tikzpicture}
+        $$
+
+  \item Voy a suponer que el digrafo $D(V,E)$ \ul{no es único}. De las $n!$ formas de combinar $n$ vértices y aristas con $d_{out}(v)$ distintos,
+        armo un digrafo \textit{"nuevo"} $D'(V,E')$.
+        \parrafoDestacado{
+          Si los vértices son indistinguibles puedo decir que dos \textit{digrafos van a ser iguales o isomorfos} si
+          existe una función biyectiva que "\textit{me mapea $D \to D'$}" de tal forma que no pueda distinguirlos.
+        }
+        $$
+          \llamada2
+          \llave{ccc}{
+            d_{out}(v_1) & = & 0      \\
+            d_{out}(v_2) & = & 1      \\
+            \vdots & \vdots &\vdots\\ \rowcolor{red!5}
+            d_{out}(v_i) & = & n-(\red{j}+1)      \\
+            \vdots & \vdots &\vdots\\\rowcolor{red!5}
+            d_{out}(v_j) & = & n-(\red{i}+1)      \\
+            \vdots & \vdots &\vdots\\
+            d_{out}(v_n) & = & n-1
+          }
+        $$
+
+        Tanto $\llamada1 \ytext \llamada2$ se pueden mapear una a otra por una función $f$ \textit{biyectiva}:
+        $$
+          \llave{rcl}{
+            f(v_1) & = & v_1      \\
+            f(v_2) & = & v_2      \\
+            \vdots & \vdots &\vdots\\ \rowcolor{red!5}
+            f(v_i) & = & v_j      \\
+            \vdots & \vdots &\vdots\\\rowcolor{red!5}
+            f(v_j) & = & v_i      \\
+            \vdots & \vdots &\vdots\\
+            f(v_n) & = & v_n
+          }
+        $$
+        Esta función equivale a permutar columnas en la \textit{matriz de adyacencia} de $D$. Dado que los $d_{out}$ son distintos para cada $v$,
+        siempre se podrá encontrar una permutación para que las matrices de $D$ y $D'$ sean iguales. Por lo tanto $D = D'$.
+
+        \textit{Sanity Check:} para $n = 4$:
+        $$
+          \begin{tikzpicture}[grafo style, grafo code, baseline=0]
+            \draw[arco, Cerulean] (1) to (2);
+            \draw[arco, Cerulean] (1) to (3);
+            \draw[arco, Cerulean] (1) to (4);
+            \draw[arco, purple] (2) to (3);
+            \draw[arco, purple] (2) to (4);
+            \draw[arco, orange] (3) to (4);
+          \end{tikzpicture}
+          \quad\Sii{isomorfos}[
+            $
+              \llave{rcl}{
+                f(1) & = & 2\\
+                f(2) & = & 3\\
+                f(3) & = & 4\\
+                f(4) & = & 1
+              }
+            $]\quad
+          \begin{tikzpicture}[grafo style, grafo code, baseline=0]
+            \draw[arco, Cerulean] (2) to (1);
+            \draw[arco, Cerulean] (2) to (3);
+            \draw[arco, Cerulean] (2) to (4);
+            \draw[arco, purple] (3) to (4);
+            \draw[arco, purple] (3) to (1);
+            \draw[arco, orange] (4) to (1);
+          \end{tikzpicture}
+        $$
+\end{itemize}
+
+\fin

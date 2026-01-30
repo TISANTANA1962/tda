@@ -1,0 +1,171 @@
+\begin{enunciado}{\ejercicio[MergeSort]}
+  (\textit{MergeSort})
+
+  Dado el algoritmo de \textit{mergesort}, implementado en el siguiente código \python:
+
+  \begin{minipage}{0.49\textwidth}
+    \codigoPython{ej-1/codigo1-1.py}
+  \end{minipage}
+  \begin{minipage}{0.47\textwidth}
+    \codigoPython{ej-1/codigo1-2.py}
+  \end{minipage}
+
+  \begin{enumerate}[label=\arabic*)]
+    \item Identificar qué líneas son el \textit{divide}, cuáles son el \textit{conquer} y cuáles son el \textit{combine}.
+
+    \item ¿En cuántos subproblemas se divide?
+
+    \item ¿De qué tamaño son estos subproblemas?
+
+    \item ¿Cuál es el costo de combinar los resultados de los subproblemas?
+
+    \item Escribir la función $T(n)$ de manera recursiva.
+
+    \item Determinar la complejidad del algoritmo utilizando el Teorema Maestro.
+  \end{enumerate}
+\end{enunciado}
+
+Descripción en leguaje natural del \textit{Merge Sort}:
+
+El algoritmo \textit{mergeSort} toma un arreglo de $n$ elementos $A[1 .. n]$, lo divide en 2 arreglos
+$B[1 .. m]$ y $C[m + 1 .. n]$ y luego se llama recursivamente a la función, hasta que ya no pueda dividirse en el \textit{caso base}.
+
+El ordenamiento se realiza en la función auxiliar \textit{merge}
+que recibe como parametros 2 arreglos y los va ordenando y \textit{mergeando}.
+
+\begin{enumerate}[label=\arabic*)]
+  \item
+        En la \texttt{línea 5} tengo el \textit{divide}.
+
+        En las \texttt{líneas 6, 7} tengo el \textit{conquer}. Es un nombre exótico para el llamado recursivo.
+
+        En la \texttt{línea 9} tengo el \textit{combine}, el \texttt{merge} me junta los resultados de las recursiones.
+        La función \texttt{merge} entera es parte del \textit{combine}.
+
+  \item Se divide en 2 \textit{subproblemas}:
+        $
+          \llave{c}{
+            \texttt{arr[:medio]}\\
+            \texttt{arr[medio:]}
+          }
+        $.
+        El parámetro $a$ del Teorema Maestro será: $a = 2$.
+
+  \item Los inputs se cortan por la mitad, así que el tamaño será $\frac{n}{2}$.
+        $
+          \llave{rcl}{
+            \lfloor \texttt{arr[:medio]} \rfloor & \to & \text{mitad izquierda} \\
+            \lceil \texttt{arr[medio:]} \rceil & \to & \text{mitad derecha} \\
+          }
+        $.
+
+        El parámetro $c$
+        del Teorema Maestro será $c = 2$.
+
+  \item El costo de combinar los subproblemas será de $O(n)$. En cada llamado a \texttt{recorro} todos,
+        \ul{en el peor de los casos}, los elementos del \texttt{input} a \texttt{merge}.
+
+        El total de operaciones: $n$ comparaciones + $n$ inserciones $\to O(n)$
+
+  \item
+        Con cada llamada a la función \textit{mergeSort} se bifurca el árbol de recursión. El costo, \textit{running time}, complejidad de cada subproblema
+        viene en este caso dado por la función $\textit{merge}$. La función para calcular el \textit{running Time}:
+        $$
+          T(n) =
+          \llave{ccl}{
+            1 & \text{ si } & n = 1 ~\lor~ n = 0  \\
+            \magenta{2} \cdot T(\frac{n}{\blue{2}}) + n & \text{ si } & n > 1
+          }
+        $$
+        El árbol de recursión, tiene $\log_2(n)$ niveles:
+        \forestset{
+        nivel/.style={label={[below left, xshift=-3mm]:{\tiny \red{ nivel: $#1 \to$}}}},
+        binary tree/.style={
+            for tree={
+                scale=0.6,
+                circle, draw, minimum size=1cm,
+                math content,
+                s sep=.3cm, l sep=.2cm,
+              },
+          }
+        }
+        $$
+          \begin{forest}
+            binary tree,
+            [n, nivel={0}
+            [n/2, nivel={1}
+            [n/4,  nivel={2}
+              [\cdots, nivel={i}
+                  [1, nivel={\log_2(n)}]
+                  [1]
+              ]
+              [\cdots
+                [1]
+                [1]
+              ]
+            ]
+            [n/4
+            [\cdots
+            [1]
+            [1]
+            ]
+            [\cdots
+            [1]
+            [1]
+            ]
+            ]
+            ]
+            [n/2
+            [n/4
+            [\cdots
+            [1]
+            [1]
+            ]
+            [\cdots
+            [1]
+            [1]
+            ]
+            ]
+            [n/4
+            [\cdots
+            [1]
+            [1]
+            ]
+            [\cdots
+            [1]
+            [1]
+            ]
+            ]
+            ]
+            ]
+          \end{forest}
+        $$
+        Sumando los nodos de un mismo nivel siempre la suma de la complejidad es: $ n $
+        $$
+          \llave{ccl}{
+            \text{nivel 0} & \to & \red{n} \\
+            \text{nivel 1} & \to & \frac{n}{2} + \frac{n}{2} = \red{n} \\
+            \text{nivel 2} & \to & \frac{n}{4} + \frac{n}{4} + \frac{n}{4} + \frac{n}{4} = \red{n}\\
+            \vdots & \vdots & \vdots
+          }
+        $$
+        Así que la complejidad si tengo $log_2(n)$ niveles debería ser:
+        $$
+          T(n)  \en \Theta(n \cdot \log(n))
+        $$
+
+        La complejidad calculada usando el \hyperlink{teoria-1:teorema-maestro}{\textit{teorema maestro} \click}:
+
+        Estoy dividiendo en 2 subproblemas, $\magenta{a} = \magenta{2}$ y el tamaño de los subproblemas se achica a la mitad, $\blue{c} = \blue{2}$,
+        respecto del problema anterior:
+
+  \item
+        Caso 2 del Teorema Maestro:
+        $$
+          \cajaResultado{
+            T(n) = \Theta(n \cdot log(n))
+          }
+        $$
+\end{enumerate}
+
+\fin

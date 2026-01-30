@@ -1,0 +1,187 @@
+\begin{enunciado}{\ejercicio[CicloCompartido]}
+
+  \textit{CicloCompartido}
+
+  Sean $P$ y $Q$ dos caminos distintos de un grafo $G$ que unen un vértice $v$ con otro $w$. Demostrar en
+  forma directa que $G$ tiene un ciclo cuyas aristas pertenecen a $P$ o $Q$.
+
+  \textbf{Ayuda:} Denotar $P = v_0,\ldots, v_p$ y $Q = w_0, \ldots, w_q$ con $v_0 = w_0 = v$ y
+  $v_p = w_q = w$. Definir explícitamente cuáles son los subcaminos de $P$ y $Q$ cuya unión forman un ciclo.
+\end{enunciado}
+
+Usando la \textbf{ayuda}:
+\def\finP{\red{fin_p}}
+\def\finQ{\red{fin_q}}
+
+Los camino $P$ y $Q$ están formados por los vértices:
+$$
+  \llave{rcl}{
+    P & = &  \ua{p_1}{v},\ldots, \ob{p_{\finP}}{w}\\
+    Q & = &  \ua{q_1}{v}, \ldots, \ub{q_{\finQ}}{w}
+  }
+$$
+Entre esos vértices, dado que forman \textit{caminos}, hay \textit{aristas}:
+$$
+  \llave{ccl}{
+    e(p_i, p_{i+1}) &\text{ con } & 0 \leq i < \finP\\
+    e(q_j, q_{j+1}) &\text{ con } & 0 \leq j < \finQ
+  }
+$$
+\begin{itemize}
+  \item Tanto $P$ como $Q$ arrancan igual en \inlinegraph{v}, terminan igual en \inlinegraph{w}.
+
+  \item En algún momento los caminos se $\blue{s}$eparan:
+        $$
+          p_i \distinto q_j ~ \text{ si } ~
+          \llaves{l}{
+            \blue{s} - 1 < i < \finP\\
+            \blue{s} - 1 < j < \finQ
+          }
+        $$
+
+  \item En algún momento los caminos se vuelven a \green{$e$}ncontrar, dado que terminan juntos:
+        $$
+          p_i = q_j ~ \text{ si } ~
+          \llaves{l}{
+            \blue{s} < \green{e_p} \leq i \leq \finP = w\\
+            \blue{s} < \green{e_q} \leq j \leq \finQ = w
+          }
+        $$
+
+  \item Algo así:
+        $$
+          \begin{tikzpicture}[grafo style, every node/.style={minimum size=10pt, font={\tiny}}, node distance=2.5cm]
+            \node[nodo, label=90:{$i=1$}, label=-90:{$j=1$}] (pq) {$v$};
+            \node[nodo, right of = pq, label=90:{$i \en [1, \blue{s}-1]$}, label=-90:{$j \en [1, \blue{s}-1]$}] (dots1) {$p_i = q_j$};
+
+            \node[nodo, above right of = dots1, label=90:{$i = \blue{s}$}] (pi) {$p_{\blue{s}}$};
+            \node[nodo, below right of = dots1, label=-90:{$j = \blue{s}$}] (qi) {$q_{\blue{s}}$};
+            \node[nodo, right of = pi, label=90:{$i \en (\blue{s}, \green{e_p} - 1)$}] (dots2) {$p_i$};
+            \node[nodo, right of = qi, label=-90:{$j \en (\blue{s}, \green{e_q} - 1)$}] (dots3) {$q_j$};
+            \node[nodo, right of = dots2, label=90:{$i = \green{e_p} - 1$}] (ep-1) {$p_{\green{e_p} - 1}$};
+            \node[nodo, right of = dots3, label=-90:{$j = \green{e_q} - 1$}] (eq-1) {$q_{\green{e_q} - 1}$};
+
+            \node[nodo, below right of = ep-1, label=90:{$i = e_p \leq \finP$}, label=-90:{$j = e_q \leq \finQ$}] (ep)  {$p_{\green{e_p}} = q_{\green{e_q}}$};
+
+            \node[nodo, right of = ep, label=90:{$i \en (e_p, \finP]$}, label=-90:{$j \en (e_q, \finQ]$}] (dots4) {$\cdots$};
+            \node[
+            draw,
+            dashed,
+            orange,
+            fit=(dots1)(pi)(qi)(ep),
+            inner sep = 17pt,
+            thin,
+            label=-90:{
+            \small
+            Ciclo:
+            $\ub{
+                p_{\blue{s} - 1} \to
+                p_{\blue{s}-1} \to
+                p_{\blue{s}} \to
+                \cdots \to
+                p_{\green{e_p} - 1} \to
+                p_{\green{e_p}}
+              }{
+                \text{ voy por $\blue{P}$}
+              }=
+              \ub{
+                q_{\green{e_q}} \to
+                q_{\green{e_q} -1} \to
+                q_{\blue{s}} \to
+                \cdots \to
+                q_{\blue{s} - 1 }
+              }{
+                \text{
+                  voy por $\magenta{Q}$
+                }
+              }
+              \igual{\red{!}} p_{\blue{s} - 1}$}
+            ] (camino1){};
+            \node[compConexa, fit=(dots4), inner sep = 17pt, orange, thin, label=90:{\textit{Rinse and repeat}}] (camino2) {};
+
+            \node[nodo, right of = dots4, label=90:{$i=\finP$}, label=-90:{$j=\finQ$}] (fin) {$w$};
+
+            \draw[arista, Cerulean]
+            (pq.north east) to
+            (dots1.north west)
+            (dots1.east) to
+            (pi.south west)
+            (pi.east) to
+            (dots2)
+            (dots2.east) to
+            (ep-1)
+            (ep-1.south east) to
+            (ep.west)
+            (ep.north east) to
+            (dots4.north west)
+            (dots4.north east) to
+            (fin.north west) ;
+
+            \draw[arista, magenta]
+            (pq.south east) to
+            (dots1.south west)
+            (dots1.east) to
+            (qi.north west)
+            (qi.east) to
+            (dots3)
+            (dots3.east) to
+            (eq-1)
+            (eq-1.north east) to
+            (ep.west)
+            (ep.south east) to
+            (dots4.south west)
+            (dots4.south east) to
+            (fin.south west);
+          \end{tikzpicture}
+        $$
+
+  \item \ul{Casos borde:} Un \textit{ciclo} por definición tiene por lo menos 3 vértices, por lo tanto tengo que
+        procurar que:
+        $$
+          \text{Caso donde $q_{\blue{s}} = q_{\green{e_q}}$}
+          \quad
+          \to
+          \quad
+          \begin{tikzpicture}[grafo style, every node/.style={minimum size=10pt, font={\tiny}}, node distance=3cm]
+            \node[nodo,label=90:{$i \en [1, \blue{s}-1]$}, label=-90:{$j \en [1, \blue{s}-1]$}] (dots1) {$p_i = q_j$};
+            \node[nodo, above right of = dots1, label=90:{$i = \blue{s}$}] (pi) {$p_{\blue{s}}$};
+            \node[nodo, below right of = pi,
+            label=90:{$i = \green{e_p} = \blue{s} + 1 \leq \finP$}, label=-90:{$j = \green{e_q} = \blue{s} \leq \finQ$}
+            ] (ep){$p_{\green{e_p}} = q_{\green{e_q}}$};
+            \draw[arista, Cerulean]
+            (dots1) to
+            (pi.south) to
+            (ep.west);
+            \draw[arista, magenta]
+            (dots1) to
+            (ep);
+          \end{tikzpicture}
+        $$
+
+        o el otro caso:
+        $$
+          \text{Caso donde $p_{\blue{s}} = p_{\green{e_p}}$}
+          \quad
+          \to
+          \quad
+          \begin{tikzpicture}[grafo style, every node/.style={minimum size=10pt, font={\tiny}}, node distance=3cm]
+            \node[nodo,label=90:{$i \en [1, \blue{s}-1]$}, label=-90:{$j \en [1, \blue{s}-1]$}] (dots1) {$p_i = q_j$};
+            \node[nodo, below right of = dots1, label=-90:{$j = \blue{s}$}] (qi) {$q_{\blue{s}}$};
+            \node[nodo, above right of = qi,
+            label=90:{$i = \green{e_p} = \blue{s} \leq \finP$}, label=-90:{$j = \green{e_q} = \blue{s} + 1 \leq \finQ$}
+            ] (ep) {$p_{\green{e_p}} = q_{\green{e_q}}$};
+            \draw[arista, Cerulean]
+            (dots1) to
+            (ep);
+            \draw[arista, magenta]
+            (dots1) to
+            (qi.north) to
+            (ep.west);
+          \end{tikzpicture}
+        $$
+
+        Donde las \magenta{aristas magenta} son del $Q$ y las \blue{azules} de $P$.
+  \item Los camino podrían separarse y juntarse muchas veces.
+\end{itemize}
+
+\fin

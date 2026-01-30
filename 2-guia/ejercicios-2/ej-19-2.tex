@@ -1,0 +1,254 @@
+\def\dSF{\textit{\green{dadosSumaF}}}
+\def\dSG{\textit{\green{dadosSumaG}}}
+\begin{enunciado}{\ejercicio[DadosSuma *No Hecho*]}
+  \textit{DadosSuma}
+
+  Se arrojan simultáneamente $n$ dados, cada uno con $k$ caras numeradas de $1$ a $k$. Queremos calcular
+  todas las maneras posibles de conseguir la suma total $s \en \naturales$ con una sola tirada. Tomamos dos
+  variantes de este problema.
+  \begin{enumerate}[label=$(\Alph*)$]
+    \item\label{ej19:item-A} Consideramos que los dados son \textbf{distinguibles}, es decir que si $n = 3$ y $k = 4$, entonces
+          existen 10 posibilidades que suman $s = 6$:
+          \begin{enumerate}[label=\arabic*)]
+            \item 4 posibilidades en las que el primer dado vale 1
+            \item 3 posibilidades en las que el primer dado vale 2
+            \item 2 posibilidades en las que el primer dado vale 3
+            \item Una posibilidad en la que el primer dado vale 4
+          \end{enumerate}
+
+    \item\label{ej19:item-B} Consideramos que los dados son \textbf{indistinguibles}, es decir que si $n = 3$ y $k = 4$, entonces
+          existen 3 posibilidades que suman $s = 6$:
+          \begin{enumerate}[label=\arabic*)]
+            \item Un dado vale 4, los otros dos valen 1
+            \item Un dado vale 3, otro 2 y otro 1
+            \item Todos los dados valen 2
+          \end{enumerate}
+  \end{enumerate}
+
+  \begin{enumerate}[label=$\alph*)$]
+    \item Definir en forma recursiva la función $f: \naturales^2 \to \naturales$ tal que $f(n,s)$ devuelve la respuesta
+          para el escenario \ref{ej19:item-A} (fijado $k$).
+
+    \item Definir en forma recursiva la función $g: \naturales^3 \to \naturales$ tal que $g(n,s,k)$ devuelve la respuesta
+          para el escenario \ref{ej19:item-B}.
+
+    \item Demostrar que $f$ y $g$ poseen la propiedad de superposición de subproblemas.
+
+    \item Definir algoritmos \textit{top-down} para calcular $f(n,s)$ y $g(n, s, k)$ indicando claramente las estructuras
+          de datos utilizadas y la complejidad resultante.
+
+    \item Escribir el (pseudo-)código de los algoritmos \textit{top-down} resultantes.
+  \end{enumerate}
+  \textbf{Nota}: Una solución correcta de este ejercicio debería indicar cómo se computa tanto $f(n,s)$ como
+  $g(n,s,k)$ en tiempo $O(nk \minimo\set{s, nk})$.
+\end{enunciado}
+
+Tirar los dados se puede modelar con un arreglo $d[1..n]$, donde cada elemento del arreglo toma un valor en $[1, \ldots, k]$.
+El tema de que sean distinguibles o no en el ejemplo del enunciado diferencia la forma de contar los resultados:
+$$
+  \ob{
+    \ub{
+      \blue{\intervalo{1,2,3}}
+      \blue{\intervalo{1,3,2}}
+      \blue{\intervalo{2,1,3}}
+      \blue{\intervalo{2,3,1}}
+      \blue{\intervalo{3,1,2}}
+      \blue{\intervalo{3,2,1}}
+    }{
+      1 \to (B)
+    }
+    \ub{
+      \green{\intervalo{4,1,1}}
+      \green{\intervalo{1,4,1}}
+      \green{\intervalo{1,1,4}}
+    }{
+      1 \to (B)
+    }
+    \ub{
+      \violet{\intervalo{2,2,2}}
+    }{
+      1 \to (B)
+    }
+  }{
+    10 \to (A)
+  }
+$$
+Si los dados son indistinguibles tengo 3 combinaciones y de no serlo 10.
+
+\begin{enumerate}[label=$\alph*)$]
+  \item Este caso es el fácil, porque no me preocupan las repeticiones.
+        Fuerza bruta para calcular que cada elemento $i$ del arreglo podría tomar cualquier valor de $k$ posible.
+        Hay que notar que para tener \textit{soluciones válidas} $s$ tiene que vivir en $\intervalo{n, n \cdot k}$.
+        \begin{itemize}
+          \item La variables $n$ representa un elemento de un arreglo, modelando uno de los $n$ dados.
+
+          \item La variables $s$ representa el valor que quiero obtener. $s$ decrece en cada llamada recursiva y
+                cuando $s = 0$ estoy en un caso base.
+
+          \item Los casos bases detectan cuando una combinación da $s$ o cuando no puede seguir esa rama ya que me pasé
+                o quizás \textit{necesitaría que el dado me tire un valor mayor a $k$}.
+        \end{itemize}
+        $$
+          \dSF(n,s) =
+          \llave{ccl}{
+            1 &\text{si} & n = 0 \land s = 0 \\
+            0 &\text{si} & n = 0 \lor s < n \lor s > n\cdot k\\
+            \sumatoria{i = 1}{k} \dSF(n - 1, s - i)  & \multicolumn{2}{l}{\text{si no}}
+          }
+        $$
+        Llamo a la función con $\dSF(n,s)$ para obtener las posibles combinetas en un lanzamiento de $n$ dados, cada uno con $k$ lados, que
+        sumen $s$.
+
+        Un ejemplo con $n = 2,\, k = 3$ y $s = 4$ de árbol de recursión:
+        \forestset{
+          binary tree/.style={
+              for tree={
+                  scale=1,
+                  line width=1pt,
+                  minimum size=1cm,
+                  rectangle, draw,
+                  math content,
+                  s sep=.4cm, l sep=1.5cm,
+                  edge={line width=0.5pt},
+                },
+              important/.style={draw=##1,line width=1.5pt,edge={##1,line width=1.5pt}},
+              transparente/.style={draw=gray!30, line width=1pt, edge={gray!30,line width=0.5pt}, color=gray!30},
+            }
+        }
+        $$
+          \begin{forest}
+            binary tree,
+            [\intervalo{0,0}, label=right:{\tiny$f(2,4)$}
+            [\intervalo{1,0},important=Cerulean, label=right:{\tiny$f(1,3)$}
+            [\intervalo{1,1}]
+            [\intervalo{1,2}]
+            [\intervalo{1,3},important=Cerulean, label=above:{\tiny$f(0,0)$}]
+            ],
+            [\intervalo{2,0},important=Cerulean, label=right:{\tiny$f(1,2)$}
+            [\intervalo{2,1}]
+            [\intervalo{2,2},important=Cerulean, label=above:{\tiny$f(0,0)$}]
+            [\intervalo{2,3}]
+            ],
+            [\intervalo{3,0},important=Cerulean, label=right:{\tiny$f(1,1)$}
+            [\intervalo{3,1},important=Cerulean, label=above:{\tiny$f(0,0)$}]
+            [\intervalo{3,2}]
+            [\intervalo{3,3}]
+            ],
+            ]
+          \end{forest}
+        $$
+        Con $k$ llamadas recursivas y un costo por subproblema de $1$ la complejidad temporal temporal será la cantidad de nodos del árbol:
+        $$
+          T(n) \en O(k^n)
+        $$
+
+  \item Necesité olvidarme del ítem anterior para poder pensar este.
+
+        La función $g$ tiene 3 parámetros, eso es para que podamos ir \textit{disminuyendo}
+        los valores que puede tomar $k$. La papa está en ordenar esos valores para \textit{evitar repeticiones}.
+
+        Estoy buscando que todas las hojas del árbol sean distintas. La estrategia es \textit{contar hasta el valor que usé}. Onda
+        \textit{armo todo lo que puedo con como máximo el 1}, listo, ahora \textit{armo todo lo que puedo con hasta máximo 2} y así.
+        Hago un árbol con un vector que representa el valor que toma un dado en cadao posición.
+        Por ejemplo si tengo $k=4$, $n=3$ y $s=6$ \textit{¿Cómo ordeno los dados para contar sin repetir?} algo así:
+
+        \forestset{
+          binary tree/.style={
+              for tree={
+                  scale=0.6,
+                  line width=1pt,
+                  minimum size=1cm,
+                  rectangle, draw,
+                  math content,
+                  s sep=.4cm, l sep=0.6cm,
+                  edge={line width=0.5pt},
+                  grow=east
+                },
+              important/.style={draw=##1,line width=1.5pt,edge={##1,line width=1.5pt}},
+              transparente/.style={draw=gray!30, line width=1pt, edge={gray!30,line width=0.5pt}, color=gray!30},
+            }
+        }
+        $$
+          \begin{forest}
+            binary tree,
+            [\intervalo{0,0,0}
+            [\intervalo{1,0,0},xshift=-3cm
+            [\intervalo{1,1,0}, xshift=-3cm
+            [\intervalo{1,1,1}, xshift=-3cm]
+            ]
+            ],
+            [\intervalo{2,0,0},important=Cerulean, xshift=2cm
+            [\intervalo{2,1,0}
+            [\intervalo{2,1,1}]
+            ]
+            [\intervalo{2,2,0},important=Cerulean
+            [\intervalo{2,2,1}]
+            [\intervalo{2,2,2},important=Cerulean]
+            ]
+            ],
+            [\intervalo{3,0,0},important=Cerulean, xshift=7cm
+            [\intervalo{3,1,0}
+            [\intervalo{3,1,1}]
+            ]
+            [\intervalo{3,2,0}, xshift=2.5cm,important=Cerulean
+            [\intervalo{3,2,1},important=Cerulean]
+            [\intervalo{3,2,2}]
+            ]
+            [\intervalo{3,3,0}
+            [\intervalo{3,3,1}]
+            [\intervalo{3,3,2}]
+            [\intervalo{3,3,3}]
+            ]
+            ],
+            [\intervalo{4,0,0},important=Cerulean, xshift=12cm
+            [\intervalo{4,1,0},important=Cerulean
+            [\intervalo{4,1,1},important=Cerulean]
+            ]
+            [\intervalo{4,2,0}, xshift=2.5cm
+            [\intervalo{4,2,1}]
+            [\intervalo{4,2,2}]
+            ]
+            [\intervalo{4,3,0}
+            [\intervalo{4,3,1}]
+            [\intervalo{4,3,2}]
+            [\intervalo{4,3,3}]
+            ]
+            [\intervalo{4,4,0}, xshift=2.5cm
+            [\intervalo{4,4,1}]
+            [\intervalo{4,4,2}]
+            [\intervalo{4,4,3}]
+            [\intervalo{4,4,4}]
+            ]
+            ],
+            ]
+          \end{forest}
+        $$
+        \begin{itemize}
+          \item $n$ representa el dado al que le estamos asignando un valor posible.
+          \item $s$ es la suma objetivo.
+          \item Caso base de éxito se dará cuando $n = s = 0$.
+          \item Caso base poda habrá cuando:
+                \begin{enumerate}[label=\faIcon{dice}]
+                  \item Los dados estén todos seleccionados y no sumen $s$, es decir $n = 0$ pero $s \distinto 0$.
+                  \item Cuando lo máximo que queda por acumular no llega a $s$, es decir $n \cdot k < s$.
+                  \item O bien cuando lo mínimo que queda por acumular se pasa de $s$, es decir $s < n$.
+                  \item De estos últimos dos se desprende que la condición limitante es $\minimo(s, n \cdot k)$
+                \end{enumerate}
+        \end{itemize}
+        $$
+          \dSG(n,s,k) =
+          \llave{ccl}{
+            1 &\text{si} & n = 0 \land s = 0 \\
+            0 &\text{si} & n = 0 \lor s < n \lor s > n\cdot k\\
+            \sumatoria{i = 1}{k} \dSG(n - 1, s - i, i)  & \multicolumn{2}{l}{\text{si no}}
+          }
+        $$
+
+        Llamando a la función con los parámetros $\dSG(n,s,k)$ se obtienen la cantidad de combinaciones buscada.
+
+  \item
+
+  \item
+
+  \item
+\end{enumerate}

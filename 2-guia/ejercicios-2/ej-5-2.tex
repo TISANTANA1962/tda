@@ -1,0 +1,187 @@
+\lstset{
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]para, cada, si, sino, if, else, true, false, mientras, not, o, y},
+  emph={[3]divisible,meto,saco,palabra},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+}
+\def\divisible{\textit{\green{divisible}}\xspace}
+\def\palabra{\textit{\green{palabra}}\xspace}
+\begin{enunciado}{\ejercicio[Palabras en cadena]}
+  \textbf{\textit{Palabras en cadena}}
+
+  Dada una cadena de letras sin espacios o puntos queremos analizar si se puede subdividir de forma
+  de obtener todas palabras válidas. Suponiendo que se tiene una función \palabra que verifica si
+  una cadena $c$ de letras es una palabra en $O(|c|)$.
+
+  \begin{enumerate}[label=$\alph*)$]
+    \item Dar una función recursiva que resuelva el problema.
+
+    \item Calcular una cota superior para la complejidad. \textbf{Ayuda:} Calcular cantidad de
+          llamadas a \palabra.
+
+    \item Demostrar que el algoritmo es correcto.
+  \end{enumerate}
+  \textbf{Ejemplo:}
+  \begin{center}
+    \textbf{TDAeslamejormateriadelDC}
+  \end{center}
+  Se puede subdividir en
+  \begin{center}
+    \textbf{TDA|es|la|mejor|materia|del|DC}
+  \end{center}
+  Mientras que
+  \begin{center}
+    \textbf{nosvemoc}
+  \end{center}
+  No tiene una subdivisión válida.
+\end{enunciado}
+
+Como siempre hay que pensar esto de forma \textit{recursiva y fuerza bruta}. Hay que devolver un \textit{booleano}.
+
+\begin{enumerate}[label=$\alph*)$]
+  \item La función $\palabra(i,j)$ se encarga de ver si la cadena de caractéres de $[i,j]$ es una palabra o no, así que no hay que pensar en eso. Hay
+        que pensar en \ul{recorrer todo lo que se pueda sin dejar títere con cabeza}.
+
+        La función $\divisible(i)$, toma un valor $i$ y devuelve un \textit{booleano} si la cadena de caracteres $A[i..n]$ es divisible en palabras.
+        Al operador disyunción me gusta pensarlo como si fuera un \textit{existe: $\existe$}, después de todo es lo mismo, pero bueh, la idea es que:
+        \begin{itemize}
+          \item Cuando corro $\divisible(i)$ y encuentro una división entre $[1 .. i]$. Genial!
+          \item Quiero ahora correr $\palabra(j>i)$ para ver si encuentro otra división entre $[1 .. i+1]$ o en $[i+1 .. j]$
+          \item Encontrar una palabra \ul{no quiere decir encontrar una división}, por ejemplo, "LARVA" tiene una palabra entre $[1..2]$
+                pero no la podés dividir ahí, porque "RVA" que yo sepa no es una palabra. Entonces tenés que tener tu \textit{rama recursiva}
+                donde no dividís a pesar de haber encontrado una palabra, así encontrando una palabra entre $[1..5]$.
+        \end{itemize}
+        Bueh, algo así.
+        \ul{Si existe división entre $i,j$}, luego necesito que también \ul{exista una división (inductivamente hablando) entre $(j+1) \ytext n$}.
+
+        $$
+          \divisible(i) =
+          \llave{ccl}{
+            \true & \text{si} &  i > n\\
+            \disyuncion{j=i}{n} \big(
+            \palabra(i,j) \land \divisible(j+1)
+            \big) & \multicolumn{2}{l}{\text{si no}}
+          }
+        $$
+
+  \item Acá viene el truco para usar en ejercicios donde la llamada recursiva está en un loop o una sumatoria o como en este caso
+        en un operador disyunción que tiene $n-i+1 \en \ub{O(n)}{\text{{\tiny ponele}}}$ términos en cada llamado recursivo, por lo tanto en cada llamada se llama $n-i+1$ veces a $\palabra$
+        que tiene un costo de $O(n)$.
+        $$
+          T(n) = \sumatoria{j = i}{n} T(i) + O(n)
+        $$
+        Busco llevar esto a una expresión manejable. Truquito $O(n) \approx \alpha \cdot n$:
+        $$
+          \begin{array}{rccl}
+              & T(n)          & \leq & \sumatoria{i = 0}{n-1} T(i) + \alpha \cdot n     \\
+            - &               &      &                                                  \\
+              & T(n-1)        & \leq & \sumatoria{i = 0}{n-2} T(i) + \alpha \cdot (n-1) \\ \hline
+              & T(n) - T(n-1) & \leq & T(n-1) + \alpha
+          \end{array}
+          \entonces
+          T(n) \leq 2T(n-1) + \alpha \entonces
+          \cajaResultado{
+            T(n) \en O(2^n)
+          }
+        $$
+        Pero si cada subproblema tiene un costo de $\palabra(n)$
+        $$
+          \cajaResultado{
+            T(n) \en O(costo(\palabra(n)) \cdot 2^n)
+          }
+        $$
+        \parrafoDestacado[\red{\faIcon{code}}]{
+          Y acá un pseudocódigo en imperativo para pasarlo a tu lenguaje favorito un poco más friendly
+            {\color{gray}\tiny(si tu lenguaje favorito es Haskell, hacete ver)} de la \ul{primera} implementación:
+        }
+
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion divisible(i)
+    si i > n
+        ret true
+    para j$\ot$i..n
+        si palabra(i,j)
+            si divisible(j+1)
+                ret true
+    ret false\end{lstlisting}
+        \end{tcolorbox}
+
+  \item Demostrar que el algoritmo es correcto en estos ejercicios no requiere ir tan a bajo nivel con \textit{triplas de Hoare} y esas \poo. Hay
+        que probar que la función recursiva funciona. La función recursiva es como en \textit{álgebra I} lo era las suceciones dadas por recursión, sucesiones
+        que para probar su recurrencia a veces uno "\textit{intuía}" la fórmula cerrada y luego probaba por inducción.
+
+        Es lo que hay que hacer acá, solo que en vez de hacer cuentas con numeritos, las \textit{"cuentas"} son con la lógica del algoritmo.
+
+        \ul{Inducción en la longitud del "\textit{string}" $n$:} Quiero probar que el siguiente predicado:
+        $$
+          \text{
+            $p(n)$: Todo \textit{string} $S,\, |S| = n$ que toma \divisible retorna \true si se puede dividir o \false si no.
+          }
+        $$
+        es verdadero.
+        \begin{itemize}
+          \item \textit{Caso base:}
+                $$
+                  \text{
+                    $p(\blue{0})$: Todo \textit{string} $S,\, |S| = \blue{0}$ que toma \divisible retorna \true si es divisible o \false si no.
+                  }
+                $$
+                No hay mucho que hacer, cae directamente en la guarda $\divisible(1)_{n = 0} \to \true$. Por definición es divisible.
+
+          \item \textit{Paso inductivo:}
+
+                Asumo que $\paratodo \blue{k} \geq 1$ la proposición:
+                $$
+                  p(\blue{k}):
+                  \ub{
+                    \text{
+                      Todo \textit{string} $S,\, |S| \leq \blue{k}$ que toma \divisible retornará \true si es divisible o \false si no.
+                    }
+                  }{
+                    \textit{\purple{hipótesis inductiva}}
+                  }
+                $$
+                es verdadera. Entonces quiero probar que
+                $$
+                  p(\blue{k+1}):
+                  \text{
+                    Todo \textit{string} $S,\, |S| \leq \blue{k+1}$ que toma \divisible retornará \true si es divisible o \false si no.
+                  }
+                $$
+                también lo sea.
+
+                \medskip
+
+                Tengo 2 posible resultados \true o \false.
+
+                \ul{\true:}
+
+                En el caso de obtener \true debe ocurrir que exista algún prefijo $S[i..j]$ tal que sea $\palabra(i,j) = \true$
+                y un sufijo $S[(j+1)..(\blue{k+1})]$ que sea divisible. Esto último debe ocurrir, porque sé que
+                \divisible funciona {\tiny(\textit{like a charm})} para $|S| \leq \blue{k}$ por \textit{\purple{hipótesis inductiva}}
+                y bueh $|S[(j+1)..(\blue{k+1})]| \leq \blue{k}$.
+
+                \medskip
+                \ul{\false:}
+
+                En el caso de obtener \false debe ocurrir que alguno, el prefijo $S[i..j]$ o el sufijo $S[(j+1)..\blue{(k+1)}]$ sea
+                \false.
+                Si $\palabra(i,j) \to \false$ listo, la conjunción es \false. Por otro lado si $\palabra(i,j) \to \true$ debe
+                ocurrir que $\divisible(j+1) \to \false$ para que la conjunción dé \false. Y al igual que antes por \textit{\purple{hipótesis inductiva}},
+                $\divisible(j+1)$ funca bien porque $|S[(j+1)..(\blue{k+1})]| \leq \blue{k}$ así que vamos a obtener ese sabroso \false.
+
+                \medskip
+
+                De esa mostrando que $p(\blue{k+1})$ resulta verdadera.
+        \end{itemize}
+
+        Por principio de inducción $p(n)$ es verdadera para cualquier $\naturales$, por lo tanto \divisible te tira la posta sobre la
+        divisibilisitatttt de un \textit{string} de longitud $n$.
+
+\end{enumerate}

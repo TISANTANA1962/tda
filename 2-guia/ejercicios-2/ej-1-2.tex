@@ -1,0 +1,341 @@
+\lstset{
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]para, cada, si, sino, if, else, true, false, mientras, not, o, y},
+  emph={[3]sumaSubset,meto,saco, print},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+}
+{\small
+  \begin{enunciado}{\ejercicio[SumaSubconjuntos BT]}
+    \textbf{\textit{SumaSubconjuntos BT}}
+
+    En este ejercicio vamos a resolver el problema de suma de subconjuntos con la técnica de \textit{backtracking}.
+    Dado un multiconjunto $C = \set{c_1 ,\ldots, c_n }$ de números naturales y un natural $k$, queremos
+    determinar si existe un subconjunto de $C$ cuya sumatoria sea $k$.
+    Vamos a suponer fuertemente
+    que $C$ está ordenado de alguna forma arbitraria pero conocida (i.e., $C$ está implementado como
+    la secuencia $c_1, \ldots, c_n$ o, análogamente, tenemos un iterador de $C$).
+    Las \textit{soluciones (candidatas)}
+    son los vectores $a = (a_1 ,\ldots, a_n)$ de valores binarios; el subconjunto $P$
+    de $C$ representado por $a$ contiene a $c_i$ si y sólo si $a_i = 1$.
+    Luego, $a$ es una solución \textit{válida} cuando $\sumatoria{i=1}{n} a_i c_i = k$.
+    Asimismo, una \textit{solución parcial} es un vector $p = (a_1 ,\ldots , a_i)$ de números binarios con
+    $0 \leq i \leq n$. Si $i < n$, las soluciones sucesoras de $p$ son $p \sumaDirecta 0$ y
+    $p \sumaDirecta 1$, donde $\sumaDirecta$ indica la concatenación.
+
+    \begin{enumerate}[label=$\alph*)$]
+      \item Escribir el conjunto de \textit{soluciones candidatas} para $C = \set{6, 12, 6}$ y $k = 12$.
+      \item Escribir el conjunto de \textit{soluciones válidas} para $C = \set{6, 12, 6}$ y $k = 12$.
+      \item Escribir el conjunto de \textit{soluciones parciales} para $C = \set{6, 12, 6}$ y $k = 12$.
+
+      \item Dibujar el árbol de \textit{backtracking} correspondiente al algoritmo descrito arriba
+            para $C = \set{6, 12, 6}$ y $k =12$, indicando claramente la relación entre las distintas componentes
+            del árbol y los conjunto de los incisos anteriores.
+      \item Sea $\mathcal{C}$ la familia de todos los multiconjuntos de números naturales.
+            Considerar la siguiente función recursiva $ss : \mathcal{C} \times \naturales \to \set{V, F}$
+            (donde $\naturales = \set{0, 1, 2,\ldots}$, $V$ indica verdadero y $F$ falso:
+            $$
+              ss(\set{c_1, \ldots, c_n}, k) =
+              \llave{rcl}{
+                k=0 &\text{si}& n = 0\\
+                ss(\set{c_1, \ldots, c_{n-1}}, k)
+                \land
+                ss(\set{c_1, \ldots, c_{n-1}}, k - c_n)
+                &\text{si}& n > 0
+              }
+            $$
+            Convencerse de que $ss(C, k) = V$ si y solo si el problema de subconjuntos tiene una solución
+            válida para la entrada $C, \,k$. Para ello, observar que hay dos posibilidades para una solución
+            válida $a = (a_1,\cdots, a_n)$ para el caso $n > 0$: o bien $a_n = 0$ o bien $a_n = 1$.
+            En el primer caso, existe un subconjunto de $\set{c_1, \cdots, c_{n-1}}$ que suma $k$;
+            en el segundo, existe un subconjunto de $\set{c_1, \cdots, c_n}$ que suma $k - c_n$.
+
+      \item Convencerse de que la siguiente es una implementación recursiva de $ss$ en un lenguaje
+            imperativo y de que retorna la solución para $C, k$ cuando se llama con $C, |C|, k$.
+            ¿Cuál es su complejidad?
+            \begin{enumerate}[label=\arabic*)]
+              \item \texttt{subset\_sum}($C, i, j$): // implementa $ss({c_1, \cdots, c_i}, j)$
+              \item Si $i = 0$, retornar $(j = 0)$
+              \item Si no, retornar \texttt{subset\_sum}$(C, i-1,j) ~\lor$ \texttt{subset\_sum}($C, i-1, j-C[i])$
+            \end{enumerate}
+      \item
+            Dibujar el árbol de llamadas recursivas para la entrada $C = \set{6, 12, 6}$ y $k = 12$, y compararlo
+            con el árbol de \textit{backtracking}.
+
+      \item Considerar la siguiente $\textit{regla de factibilidad}: p = (a_1,\ldots, a_i)$ se puede
+            extender a una solución válida solo si $\sumatoria{q=1}{i}a_q c_q \leq k$. Convencerse
+            de que la siguiente implementación incluye la regla de factibilidad.
+            \begin{enumerate}[label=\arabic*)]
+              \item \texttt{subset\_sum}$(C,i, j):$ // implementa $ss(\set{c_1, \ldots, c_i},j)$
+              \item Si $j < 0$, retornar \textbf{falso} // regla de factibilidad
+              \item Si $i = 0$, retornar $(j = 0)$
+              \item Si no, retornar $\texttt{subset\_sum}(C, i-1,j)~ \lor ~ \texttt{subset\_sum}(C, i-1,j - C[i])$
+            \end{enumerate}
+
+      \item Definir otra regla de factibilidad, mostrando que la misma es correcta; no es necesario
+            implementarla.
+
+      \item
+            Modificar la implementación para imprimir el subconjunto de C que suma k, si existe.
+            \textbf{Ayuda:} mantenga un vector con la solución parcial p al que se le agregan y sacan los
+            elementos en cada llamada recursiva; tenga en cuenta de no suponer que este vector se
+            copia en cada llamada recursiva, porque cambia la complejidad
+    \end{enumerate}
+  \end{enunciado}
+}
+
+\parrafoDestacado[\faIcon{cocktail}]{
+  Si bien el enunciado este es demasiado largo para mi gusto, explica el vocabulario de \textit{backtracking} de manera concisa.
+}
+
+\begin{enumerate}[label=$\alph*)$]
+  \item \textit{Soluciones candidatas:} Como dice en el enunciado, son los vectores con valores $0$ o $1$:
+
+        Son de la forma $a = (a_1, a_2, a_3)$ donde están toooodas las posibles combinaciones (no confundir con \textit{soluciones válidas}):
+        $$
+          \cajaResultado{
+            \set{
+              (1,1,1),\,
+              (1,1,0),\,
+              (1,0,1),\,
+              (1,0,0),\,
+              (0,1,1),\,
+              (0,1,0),\,
+              (0,0,1),\,
+              (0,0,0)
+            }
+          }
+        $$
+
+  \item \textit{Soluciones válidas:} Como dice el enunciado son de la forma $a = (a_1, a_2, a_3)$ tal que $\sumatoria{i=1}{3}a_ic_i = 12$.
+        $$
+          \cajaResultado{
+            \set{
+              (1,0,1),\,
+              (0,1,0)
+            }
+          }
+        $$
+
+  \item \textit{Soluciones parciales:} Son soluciones a ¿medio hacer?
+        Son de la forma
+        $a = (a_1)$,
+        $a = (a_1, a_2)$ o
+        $a = (a_1, a_2, a_3)$
+
+        $$
+          \set{
+            (1),\, (0),\, (1,0),\, (0,1),\, (1, 0, 1),\, (0,1,0)
+          }
+        $$
+
+  \item ¿De qué algoritmo habla el enunciado? \textit{Backtracking} para mí es \textit{fuerza bruta}. Fin.
+
+        \forestset{
+        nivel/.style={label={[below left, xshift=-9pt, yshift=-1pt]:{\red{\tiny size \texttt{input}: $#1 \to$}}}},
+        binary tree/.style={
+        for tree={
+            scale=0.9,
+            circle, draw, minimum size=1cm,
+            math content,
+            s sep=.3cm, l sep=.2cm,
+          },
+        valor/.style={label={[left=10pt, yshift=-7pt, font={\tiny}, color={gray!50!white}]:{##1}}},
+        important/.style={draw=##1,line width=1.5pt,edge={##1,line width=1.5pt}},
+        }
+        }
+        $$
+          \begin{forest}
+            binary tree,
+            [\text{\color{gray!50!white}{\grimace}}
+            [1, important=red, valor={6}
+            [1, valor={12}
+              [1, valor={6}]
+              [0]
+            ]
+            [0, important=red
+            [1, important=red]
+            [0]
+            ]
+            ]
+            [0, important=Cerulean
+            [1, important=Cerulean
+            [1]
+            [0, important=Cerulean]
+            ]
+            [0
+              [1]
+              [0]
+            ]
+            ]
+            ]
+          \end{forest}
+        $$
+        Los caminos marcados son las \textit{soluciones válidas} y cualquier camino dentro
+        serían \textit{soluciones parciales}.
+        Cualquier camino, siempre yendo para abajo es una \textit{solución candidata}.
+
+  \item\label{ej-1:item-e} Este ítem tiene como objetivo mostrar que \textit{solo} hay que ver el caso recursivo y el caso base de la función
+        para convencerse de que \ul{esto funciona}.
+
+        Cambio la notación, \textit{because} me parece más fácil para el primer ejercicio.
+        $ss \to \green{sumaSubset}$, $C = \set{c_1,\ldots, c_n}$ y escribo la función con las condiciones
+        más explícitas que como está en el enunciado.
+        $$
+          \green{sumaSubset}(C, k) =
+          \llave{ccl}{
+            V  &\text{si}& |C| = \vacio \land ~k = 0\\
+            F  &\text{si}& |C| = \vacio \land ~k \distinto 0\\
+            \green{sumaSubset}(C - \set{c_n}, k) \lor \green{sumaSubset}(C - \set{c_n}, k - c_n) & \multicolumn{2}{l}{\text{otro caso}}
+          }
+        $$
+        La función esa está tomando en cada llamado recursivo las dos únicas opciones: \ul{Usar} o \ul{no usar} $c_i$, no puede fallar
+        a menos que \ul{no exista} una combineta de los elementos de $C$ tal que la suma de $k$.
+
+        Más formal escribiendo lo que dice el enunciado:
+        $$
+          \begin{array}{rcl}
+            \sumatoria{j=1}{n-1} a_j c_j
+             & = &
+            \blue{a_1}c_1 + \cdots + \blue{a_{n-1}}c_{n-1} = k - \blue{0} \cdot c_n
+            \sii
+            \sumatoria{j=1}{\red{n}} a_j c_j = k \\
+            \sumatoria{j=1}{n-1} a_j c_j
+             & = &
+            \blue{a_1}c_1 + \cdots + \blue{a_{n-1}}c_{n-1} = k - \blue{1} \cdot c_n
+            \sii
+            \sumatoria{j=1}{\red{n}} a_j c_j = k
+          \end{array}
+        $$
+        Por lo tanto en la disyunción ($\lor$) de la función habrá una proposición verdadera (siempre que exista una solución válida claro).
+
+  \item\label{ej-1:item-f} Más feo no se puede escribir un algoritmo, no?
+
+        El algoritmo tiene un caso base cuando \texttt{i=0}, cuando terminé los elementos del conjunto $C$. Mientras
+        haya elementos, voy a ir probando con cada elemento para ver si se cumple que la suma de los elementos tomados es igual a \texttt{j}.
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion sumaSubset(C,i,j) $\to$ bool
+    si i=0
+        ret j=0
+    sino
+        ret sumaSubset(C,i-1,j) o sumaSubset(C,i-1,j-C[i]) \end{lstlisting}
+        \end{tcolorbox}
+
+        El algoritmo tiene una complejidad dada por la función costo:
+        $$
+          T(n) =
+          \llave{ccl}{
+            1 & \text{si}& n = 0\\
+            2T(n-1) + 1 & \text{si} & n > 0
+          }
+          \entonces
+          \cajaResultado{
+            T(n) \en O(2^n)
+          }
+        $$
+        Árbol de 2 ramas con un costo por subproblema de $O(1)$, lo cual equivale a contar cada uno de los nodos del árbol.
+
+  \item
+        \forestset{
+        binary tree/.style={
+        for tree={
+            scale=0.8,
+            rectangle, draw, minimum size=1cm,
+            math content,
+            s sep=.3cm, l sep=.3cm,
+          },
+        valor/.style={label={[left=7pt, yshift=-7pt, font={\tiny}, color={gray!50!white}]:{##1}}},
+        important/.style={draw=##1,line width=1.5pt,edge={##1,line width=1.5pt}},
+        }
+        }
+
+        $$
+          \begin{forest}
+            binary tree,
+            [{ss(C,3,12)}
+            [{ss(C,2,12)}, important=red
+            [{ss(C,1,12)}
+              [{ss(C,0,12)}]
+              [{ss(C,0,6)}]
+            ]
+            [{ss(C,1,6)}, important=red
+            [{ss(C,0,6)}]
+            [{ss(C,0,0)}, important=red]
+            ]
+            ]
+            [{ss(C,2,6)}, important=Cerulean
+            [{ss(C,1,6)}, important=Cerulean
+            [{ss(C,0,0)}, important=Cerulean]
+            [{ss(C,0,-12)}]
+            ]
+            [{ss(C,1,-6)}
+              [{ss(C,0,-6)}]
+              [{ss(C,0,-12)}]
+            ]
+            ]
+            ]
+          \end{forest}
+        $$
+
+        Son lo mismo, porque este árbol \ul{no tiene ninguna poda}. Es un árbol de fuerza bruta que pasa por todas las \textit{soluciones candidatas}.
+
+  \item Esa \textit{regla de factibilidad} se puede traducir a lenguaje natural como:
+        \parrafoDestacado{
+          Tengo \magenta{algo} y si todavía con este \magenta{algo} no me pasé de $k$ tengo chances de que este \magenta{algo} sea una solución válida.
+        }
+
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion sumaSubset(C,i,j) $\to$ bool
+    si j<0              // Me pasé del objetivo?
+        ret false
+    si i=0
+        ret j=0
+    sino
+        ret sumaSubset(C,i-1,j) o sumaSubset(C,i-1,j-C[i]) \end{lstlisting}
+        \end{tcolorbox}
+
+        Cualquier llamada recursiva a $\green{sumaSubset}$ que tenga en su tercer argumento algo negativo
+        \red{¡No continuará haciendo llamadas recursivas la recursión!}, eso corta una \textit{subrama} del
+        árbol, es decir que \textit{se podó el árbol \red{\faIcon{cut}} \green{\faIcon{tree}} get it?}
+
+  \item
+        No sé me ocurre nada interesante.
+        \begin{itemize}
+          \item Debe existir algún elemento  $c_i \en C$ tal que $c_i < k$
+        \end{itemize}
+
+  \item La función recibe un conjunto, la cantidad de elementos, y el objetivo: $C$, $i$, $j$ respectivamente.
+        Paso por \textit{referencia} un vector \texttt{p} en el cual voy a ir poniendo y sacando elementos, formando así
+        las \textit{soluciones factibles}. Lo imprimo si la solución termina siendo una \textit{solución válida}
+
+        La forma en que se arma el vector solución es probando por fuerza bruta cada elemento. Si el llamado recursivo retorna \textit{false}
+        previamente se elimina el \texttt{C[i]} que se estaba probando.
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion sumaSubset(C,i,j,p) // p es el vector solución pasado por referencia a la función
+    p.meto(C[i])
+    si j = 0  // Es válida?
+        print p
+        ret true
+
+    si i < 0 o j < 0
+        ret false
+
+    si sumaSubset(C,i-1,j-C[i],p) // con C[i]
+        p.saco(C[i])            // backtracking. Vuelvo a línea temporal donde nunca agarré el C[i]
+        ret true
+
+    p.saco(C[i])             // backtracking. Vuelvo a línea temporal donde nunca agarré el C[i]
+    si sumaSubset(C,i-1,j,p) // sin C[i]
+        ret true
+
+    sino
+        ret false \end{lstlisting}
+        \end{tcolorbox}
+\end{enumerate}

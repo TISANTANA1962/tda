@@ -1,0 +1,295 @@
+\hypertarget{teoria-1:asintotico}{\textit{Repaso complejidad:}}
+
+\begin{enumerate}[label=\tiny\purple{\faIcon{calculator}}]
+  \item
+        \textit{Big O Notation, la favorita de todos (cota superior)}
+        $$
+          O(g(n)) = \set{
+            f(n) : \existe c > 0, n_0 > 0 \text{ tal que } 0 \leq f(n) \leq c \cdot g(n) \paratodo n \geq n_0
+          }
+        $$
+        \parrafoDestacado[\atencion]{
+          En criollo $f(n) = O(g(n))$ quiere decir que $f(n)$ \ul{no crece más rápido} $g(n)$ en forma asintótica.
+        }
+
+  \item
+        \textit{Big Omega Notation (cota inferior)}
+        $$
+          \Omega(g(n)) = \set{
+            f(n) : \existe c > 0, n_0 > 0 \text{ tal que } 0 \leq c \cdot g(n) \leq f(n) \paratodo n \geq n_0
+          }
+        $$
+        \parrafoDestacado[\atencion]{
+          En criollo $f(n) = \Omega(g(n))$ quiere decir que $f(n)$ crece \ul{por lo menos} igual de rápido que $g(n)$ en forma asintótica.
+        }
+
+  \item \textit{Big Theta Notation (cota inferior y superior)}
+
+        $$
+          \Theta(g(n)) = \set{
+            f(n) : \existe c_1, c_2 > 0, n_0 > 0 \text{ tal que } 0 \leq c_1 \cdot g(n) \leq f(n) \leq c_2 \cdot g(n) \paratodo n \geq n_0
+          }
+        $$
+        \parrafoDestacado[\atencion]{
+          En criollo $f(n) = \Theta(g(n))$ quiere decir que $f(n)$ y $g(n)$ \ul{crecen igual} en forma asintótica.
+        }
+        Una relación para tener en cuenta:
+        $$
+          \cajaResultado{
+            f(n) = \Theta(g(n)) \sisolosi \big(f(n) = O(g(n)) ~\land~ f(n) = \Omega(g(n))\big)
+          }
+        $$
+        \textit{Estos cosos me parece maravillosos}
+        $$
+          \cajaResultado{
+            \begin{array}{rcl}
+              f(n) & = & O(g(n))      \sisolosi \limite{n}{\infinito} \frac{f(n)}{g(n)} < \infinito            \\
+              f(n) & = & \Omega(g(n)) \sisolosi \limite{n}{\infinito} \frac{f(n)}{g(n)} > 0                    \\
+              f(n) & = & \Theta(g(n)) \sisolosi 0 < \limite{n}{\infinito} \frac{f(n)}{g(n)} \leq k < \infinito
+            \end{array}
+          }
+        $$
+\end{enumerate}
+
+\textit{¡Divide y reinarás!}
+\begin{enumerate}[label=\tiny\purple{\faIcon{snowman}}]
+  \item Un problema de \texttt{divide and conquer} de tamaño $n$ tiene un "costo":
+        $$
+          T(n)
+        $$
+        Calcular el costo suele ser algo complicado, en lo cual hay que considerar:
+        \begin{enumerate}[label=\faIcon{calculator}$_{\arabic*}$]
+          \item El problema se divide en $\magenta{a}$ subproblemas de tamaño máximo $\frac{n}{\blue{b}}$,
+                siempre que $\frac{n}{\blue{b}} > n_0$.
+                Este $n_0$ será un valor fijado por el usuario o un valor que sea compatible con el subproblema.
+
+          \item El costo de hacer el \texttt{divide} y \texttt{combine}. Estos dos bloques caracterizan las dos papas
+                más grandes del $T(n)$.
+
+          \item El costo de los $\magenta{a}$ subproblemas:
+                $$
+                  \textstyle
+                  \magenta{a} \cdot T(\frac{n}{\blue{b}})
+                $$
+        \end{enumerate}
+
+        Como calcular esto es la mismísima \poo misma, se hacen unas aproximaciones
+        falopa para dar un \textit{{\tiny un}educated guess}, entre las cuales están:
+        \begin{itemize}
+          \item Arranco utilizando una función que nadie pidió pero bueh, $g(n)$:
+                $$
+                  g(n) \geq T(n)
+                $$
+          \item Hardcodeo $n_0 = 1$ y si no te gusta, porque te parece berreta:
+                $$
+                  \textstyle
+                  T(\frac{n}{n_0}) = T'(n)
+                $$
+                y listo, uso $T'(n)$ como si fuera la otra.
+
+          \item Cota polinómica: $c' \cdot n^d$ un monomio de grado $d$, se toma como una cota superior al costo de dividir
+                en subproblemas y combinar los resultados para un problema de tamaño $n$.
+        \end{itemize}
+        Con esto me armo $g(n)$:
+        $$
+          g(n) =
+          \llave{rcl}{
+            c = \maximo\set{c', T(1)} & \text{si} & n = 1 \\
+            \magenta{a} \cdot g(\frac{n}{\blue{b}}) + c\cdot n^d & \text{si} & n > 1
+          }
+        $$
+        Sin perdida de generalidad elijo un $n \igual{$\llamada1$} \blue{b}^k$ y ahora voy a calcular la cota:
+        $$
+          \begin{array}{rcl}
+            T(n) & \leq              & g(n)  =  \magenta{a} \cdot g(\frac{n}{\blue{b}}) + b \cdot n^d                                                       \\
+                 & \Sii{$\llamada1$} &
+            g(\blue{b}^k) = \magenta{a} \cdot g(\blue{b}^{k-1}) + b \cdot \blue{b}^{k \cdot d}                                                              \\
+                 & \Sii{\red{!}}     &
+            g(\blue{b}^k) = \magenta{a} \cdot \Big( \magenta{a} \cdot g(\blue{b}^{k-2}) + b \cdot \blue{b}^{k \cdot d} \Big) + b \cdot \blue{b}^{k \cdot d} \\
+                 & \sii              &
+            g(\blue{b}^k) = \magenta{a}^2 \cdot g(\blue{b}^{k-2}) + \magenta{a} \cdot b \cdot \blue{b}^{k \cdot d} + b \cdot \blue{b}^{k \cdot d}           \\
+                 & \Sii{\red{!}}     &
+            g(\blue{b}^k) =
+            \magenta{a}^3 \cdot g(\blue{b}^{k-3}) +
+            \magenta{a}^2 \cdot b \cdot \blue{b}^{k \cdot d} +
+            \magenta{a} \cdot b \cdot \blue{b}^{k \cdot d} +
+            b \cdot \blue{b}^{k \cdot d}                                                                                                                    \\
+                 & \Sii{\red{!}}     & \cdots                                                                                                               \\
+                 & \Sii{\red{!}}     &
+            g(\blue{b}^k) =  \magenta{a}^j \cdot g(c^{k-j}) + b \cdot \sumatoria{i = 0}{j - 1} a^i c^{(k - i) \cdot d} \quad \llamada2
+          \end{array}
+        $$
+        La expresión en $\llamada2$ llega al caso base $g(1) = b$ cuando $k = j \to g(\blue{b}^0)$ y el término se puede \textit{absorber}
+        en la sumatoria:
+        $$
+          \begin{array}{rcl}
+            T(n)\leq  g(\blue{b}^k)  =              \magenta{a}^j \cdot g(\blue{b}^{k-j}) + b \cdot \sumatoria{i = 0}{j - 1} \magenta{a}^i \blue{b}^{(k - i) \cdot d}
+             & \Sii{$j = k$}                                                 &
+            g(\blue{b}^k) =  \magenta{a}^k \cdot \oa{g(1)}{b} + b \cdot \sumatoria{i = 0}{k - 1} \magenta{a}^i \blue{b}^{(k - i) \cdot d} \\
+             & \Sii{\red{!}}                                                 &
+            g(\blue{b}^k) =  b\cdot \blue{b}^{kd} \cdot \sumatoria{i = 0}{k} \magenta{a}^i \blue{b}^{-di}                                 \\
+             & \Sii{si $n=\blue{b}^k$}[$\Rightarrow k = \log_{\blue{b}}(n)$] &
+            \textstyle
+            g(n) =  b \cdot n^d \cdot \sumatoria{i = 0}{\log_{\blue{b}}(n)} \magenta{a}^i \blue{b}^{-di}
+          \end{array}
+        $$
+        El resultado es una expresión para una cota superior de $T(n)$ sin una expresión recursiva:
+        $$
+          \cajaResultado{
+            \textstyle
+            T(n)\leq
+            \ub{
+              b \cdot n^d
+            }{
+              \text{costo de dividir}\\
+              \text{y combinar}\\
+              \text{un problema}
+            } \cdot \sumatoria{i = 0}{\log_{\blue{b}}(n)} \magenta{a}^i \blue{b}^{-di}
+          }
+        $$
+        \textit{Caso con $a = 1$ y $d = 0$}: División en 1 subproblema y costo de dividir y combinar un problema es $b$:
+        $$
+          b \cdot n^d = b
+          \entonces
+          T(n) \leq
+          b \cdot \sumatoria{i=0}{\log_{\blue{b}}(n)} \blue{1}^i  \blue{b}^{0 \cdot i} =
+          b \cdot \log_{\blue{b}}(n) \en O(\log_{\blue{b}}(n))
+        $$
+
+        \textit{Caso con $d = 1$}: Costo de dividir y combinar un problema es lineal, $b \cdot n$:
+        $$
+          \textstyle
+          b \cdot n^1 = b \cdot n
+          \entonces
+          T(n) \leq
+          b \cdot n \sumatoria{i = 0}{\log_{\blue{b}}(n)} (\frac{\magenta{a}}{\blue{b}})^i
+        $$
+        Esa sumatoria es convergente para $\frac{\magenta{a}}{\blue{b}} < 1$:
+        $$
+          T(n) = O(n)
+        $$
+        Si $\frac{\magenta{a}}{\blue{b}} > 1$ uso la expresión para la serie geométrica:
+        $$
+          \textstyle
+          T(n) \leq bn \frac{(\frac{\magenta{a}}{\blue{b}})^{\scriptscriptstyle \log_{\blue{b}}(n + 1)} - 1}{\frac{\magenta{a}}{\blue{b}} - 1}
+          =
+          O\big(
+          n \cdot (\frac{\magenta{a}}{\blue{b}})^{\log_{\blue{b}}n}
+          \big)
+          \igual{\red{!!}}
+          O\big(
+          \magenta{a}^{\log_{\blue{b}}n}
+          \big)
+          \igual{\red{!!}}
+          O\Big(
+          \magenta{a}^{
+            \frac{\log_{\magenta{a}}(n)}{\log_{\magenta{a}}(\blue{b})}
+          }
+          \Big)
+          \igual{\red{!!}}
+          O\Big(
+          n^{
+            \frac{1}{\log_{\magenta{a}}(\blue{b})}
+          }
+          \Big)
+          \igual{\red{!!}}
+          O\big(
+          n^{
+            \log_{\blue{b}}(\magenta{a})
+          }
+          \big)
+        $$
+        Todos los pasos \red{!!} son propiedades y cambios de base de logaritmos.
+        $$
+          T(n) =
+          O\big(
+          n^{
+            \log_{\blue{b}}(\magenta{a})
+          }
+          \big)
+        $$
+
+  \item \hypertarget{teoria-1:teorema-maestro}{\textit{Teorema Maestro}}
+        $$
+          T(n) =
+          \llave{rcl}{
+            \magenta{a} \cdot T(\frac{n}{\blue{b}}) + f(n) & \text{si} & n > 1 \\
+            1 & \text{si} & n=1
+          }
+        $$
+        \textit{Estimación según $f(n)$}:
+        \begin{enumerate}[label=\faIcon{gamepad}$_{\arabic*}$]
+          \item
+                Si
+                $$
+                  \begin{array}{c}
+                    f(n) = O(n^{\log_{\blue{b}}(\magenta{a}) - \varepsilon})
+                    \text{ para algún }
+                    \varepsilon > 0
+                    \entonces
+                    \cajaResultado{
+                      T(n) = \Theta
+                      \big(
+                      n^{\log_{\blue{b}}(\magenta{a})}
+                      \big)
+                    }
+                  \end{array}
+                $$
+
+          \item Si
+                $$
+                  \begin{array}{c}
+                    f(n) = \Theta(n^{\log_{\blue{b}}(\magenta{a})} (\log(n))^k)
+                    \text{ para algún } k \geq 0
+                    \entonces
+                    \cajaResultado{
+                      T(n) =
+                      \Theta
+                      \big(
+                      n^{\log_{\blue{b}}(\magenta{a})} \cdot (\log(n))^{k+1}
+                      \big)
+                    }
+                  \end{array}
+                $$
+
+          \item
+                Si
+                {\small
+                $$
+                  \begin{array}{c}
+                    f(n) = \Omega(n^{\log_{\blue{b}}(\magenta{a}) + \varepsilon})
+                    \text{ para algún }
+                    \varepsilon > 0 \ytext \magenta{a} f(\frac{n}{\blue{b}}) \leq c f(n)
+                    \text{ para algún } c \en (0,1)
+                    \entonces
+                    \cajaResultado{
+                      T(n) = \Theta(f(n))
+                    }
+                  \end{array}
+                $$
+                }
+        \end{enumerate}
+
+  \item \textit{Máximas. IMHO:}
+        \begin{enumerate}[label=\red{\faIcon{atom}}$_{(\arabic*)}$]
+
+          \item El Teorema Maestro es medio verga. Retrasó meses mi comprensión sobre el cálculo de la complejidad.
+
+          \item Lo calculable \red{sin} Teorema Maestro se tiene que calcular \red{sin} Teorema Maestro.
+
+          \item ¡No optimices las cosas! Siempre fuerza bruta primero.
+
+          \item No hagas un programa compilable ¡No codeés!
+
+          \item Codear en el teclado es distinto a \textit{codear} en papel. Si el parcial es en papel
+                no podés probar mil cosas hasta que alguna, de pedo pase tus patéticos tests.
+
+          \item Si estás pensando en \textit{sintaxis}: \red{¡Salí de ahí, Maravilla!}
+
+          \item Leer y escribir pseudocódigo debe ser algo más natural que leer y escribir \python
+
+          \item El pseudocódigo es muy flexible, además de ser tu mejor amigo. {\color{gray!20}Sí, por lo menos tenés un amigo.}
+
+          \item ¿Te dije algo sobre \textit{no optimizar las putas cosas}? Solo hacelas funcionar.
+        \end{enumerate}
+\end{enumerate}

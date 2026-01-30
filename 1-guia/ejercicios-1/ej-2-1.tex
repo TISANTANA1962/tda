@@ -1,0 +1,75 @@
+\begin{enunciado}{\ejercicio[BusquedaBinaria]}
+  \textit{BusquedaBinaria}
+
+  Dado el algoritmo de \textit{búsqueda binaria}, implementado en el siguiente código \python:
+  \codigoPython{ej-2/codigo1-1.py}
+
+  \begin{enumerate}[label=\arabic*)]
+    \item Identificar qué líneas son el \textit{divide}, cuáles son el \textit{conquer} y cuáles son el \textit{combine}.
+
+    \item ¿En cuántos subproblemas se divide?
+
+    \item ¿De qué tamaño son estos subproblemas?
+
+    \item ¿Cuál es el costo de combinar los resultados de los subproblemas?
+
+    \item Escribir la función $T(n)$ de manera recursiva.
+
+    \item Determinar la complejidad del algoritmo utilizando el Teorema Maestro.
+  \end{enumerate}
+\end{enunciado}
+
+\begin{enumerate}[label=\arabic*)]
+  \item
+        \begin{itemize}
+          \item \textit{Divide:} Cuando divido al \texttt{input} a la mitad en la \ul{línea 4} y también
+                en la comparación de la línea 7, donde se decide por cual mitad seguir.
+
+          \item \textit{Conquer:} Llamada de recursión en las \ul{líneas 8 y 10}.
+
+          \item \textit{Combine:} En este algoritmo no hay \textit{combine}.
+        \end{itemize}
+
+  \item El árbol de recursión solo tiene una rama, porque hay solo una llamada recursiva en cada llamada.
+        Cada nodo tendrá la mitad del tamaño del input anterior.
+
+  \item El tamaño de cada subproblema será de $\frac{n}{\blue{2}} > n_0 = 1$.
+
+  \item En este algoritmo no hay un \textit{combine} de unir los resultados como en el \texttt{merge sort}.
+        La complejidad de devolver \texttt{true} o \texttt{false} será $O(1)$. Hay solo unas comparaciones y
+        el cálculo de \texttt{medio}, todo eso es independiente de $n$, todo $O(1)$
+
+  \item $$
+          T(n) =
+          \llave{rcl}{
+            1 &\text{si}& n \leq 1 \\
+            T(\frac{n}{2}) + 1 &\text{si}& n > 1
+          }
+        $$
+        Esa función recursiva equivale a contar la cantidad de nodos que tendrá el árbol de recursiones: Cada nodo
+        tiene un costo 1 (o O(1), eh lo meesmo.) Por lo tanto sumo todo:
+        $$
+          T(n) \en \Theta(\log_2(n))
+        $$
+
+  \item
+        El \textit{Teorema Maestro} me estima la complejidad total de T(n) según el
+        valor de $f(n)$.
+
+        En este caso $f(n) \en O(1)$ y como $\magenta{a} = 1$ y $\blue{b} = 2$:
+        $$
+          f(n) \en O(n^{\log_{\blue{b}}(\magenta{a})} \cdot \log^k(n))
+          \Entonces{$\magenta{a} = 1,\, \blue{b} = 1$}[$k = 0$]
+          f(n) \en O(1)
+        $$
+        Estoy en el caso 2 del teorema:
+        $$
+          T(n) \en \Theta(n^{\log_{\blue{b}}(\magenta{a})} \cdot \log^{k+1}(n)
+          \Entonces{$\magenta{a} = 1,\, \blue{b} = 1$}[$k = 0$]
+          \cajaResultado{
+            T(n) \en \Theta(\log(n))
+          }
+        $$
+\end{enumerate}
+
+\fin

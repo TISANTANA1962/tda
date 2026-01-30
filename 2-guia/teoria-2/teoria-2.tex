@@ -1,0 +1,81 @@
+\begin{enumerate}[label=\tiny\purple{\faIcon{calculator}}]
+
+  \item \textit{Fuerza Bruta}:
+
+        Busca todas las combinaciones. Si hay solución la encuentra, porque
+        encuentra TODO.
+
+  \item \textit{Backtracking}:
+
+        \textit{Backtracking} es fuerza bruta con \ul{podas}. Una \ul{poda}
+        detecta que la rama de recursión no puede ser una \magenta{solución factible}
+        entonces corta los cálculos y continúa por la otra rama recursiva
+        en caso de que satisfaga la guarda de la poda.
+
+  \item  \textit{Programación dinámica}: Es \textit{backtracking} sin calcular 2 veces la misma cosa.
+
+        Viene en 2 sabores \textit{Memoization = Top-Down}, \textit{Tabulation = Bottom-Up}.
+        \begin{itemize}
+          \item \textit{Top-down} sale inmediatamente con una función recursiva bien hecha.
+          \item \textit{Bottom-up} casi siempre más eficiente en memoria.
+        \end{itemize}
+        \textit{Complejidad temporal de un algoritmo dinámico:}
+        $$
+          O\big(\textbf{(cantidad de estados)}
+          \times
+          \textbf{(costo de resolver internamente cada estado)}.
+          \big)
+        $$
+
+        \textit{Complejidad espacial de un algoritmo dinámico:}
+        $$
+          O\big( \textbf{(cantidad de estados)} \big)
+        $$
+
+        Un \textit{estado} es lo que vale la función para unas entradas en particular. Los valores que se usan
+        para conseguir el estado son las \textit{variables de estado}.
+
+  \item \textit{Receta para para ejercicio de progamación dinámica:}
+        \begin{enumerate}[label=\faIcon{mortar-pestle}$_{\arabic*)}$]
+          \item Definir función recursiva $f$ de fuerza bruta como siempre.
+
+          \item Explicar lo que hace la función $f$, lo que hacen sus variables. Tratar de no usar más
+                de dos parámetros para definir un estado.
+
+          \item ¿Para que variables de estado la función devuelve lo que quiero?
+
+          \item Probar que $f$ cumple con la propiedad de superposición de problemas:
+                \parrafoDestacado{
+                  La superposición va a aparecer cuando la función $f$ haga muchas más llamadas que resultados,
+                  es decir llamás a $f(i)$ 20 veces con $i = 1$, la función devuelve \ul{siempre lo mismo}.
+                  Entonces si las llamadas de $f$ están en $\Omega(\textit{algo})$ y los posibles estados son
+                  O(\textit{algo mucho menor}) es que hay \ul{superposición de estados} o subproblemas.
+                }
+
+          \item Memoization, \textit{top-down} sale muy fácil si tenés la función recursiva
+
+          \item Tabulation, \textit{bottom-up} entender como se relaciona un estado con el siguiente,
+                cómo es la dependencia de las variables de estados y estados entre sí.
+
+          \item Decidir cuál variables es el \texttt{outer loop} y cual el \texttt{inner loop} y llenar
+                la matriz. Esto si se tiene lo anterior es mecánico.
+
+          \item Determinar complejidad del algoritmo. Una vez hecho lo anterior es siempre lo mismo.
+        \end{enumerate}
+
+  \item \textit{Greedy:}
+        \begin{itemize}
+          \item \textit{Exchange Argument:}
+
+                \begin{enumerate}[label=\roman*)]
+                  \item Considero una solución $\blue{O}$ptima que no sea la $\green{G}$\textit{reedy}.
+
+                  \item Hago un cambio en $\blue{O} \to \purple{O'}$ de manera que quede $\purple{O'}$\textit{más parecida a la $\green{G}$reedy}
+
+                  \item Me fijo lo que tengo y pruebo que efectivamente $\purple{O'}$ es \red{mejor} que $\blue{O}$, y como $\purple{O'}$
+                        es más parecida a la $\green{G}$\textit{reedy} \ul{llego a una contradicción}.
+
+                  \item Concluyo entonces que para que la solución sea óptima tiene que ser construída de forma \textit{\green{$G$}reeeeedy}
+                \end{enumerate}
+        \end{itemize}
+\end{enumerate}

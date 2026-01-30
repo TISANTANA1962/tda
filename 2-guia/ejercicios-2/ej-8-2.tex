@@ -1,0 +1,40 @@
+\begin{enunciado}{\ejercicio[Cadenas de Adición]}
+  \textbf{\textit{Cadenas de Adición}}
+
+  Dado un entero $n$ decimos que $C = \set{x_1,\ldots,x_k}$ es una cadena de adición si cumple lo siguiente
+  \begin{itemize}
+    \item $1 = x_1 < x_2 < \cdots < x_k = n$
+    \item Para cada $2 \leq j \leq n$ existe $k_1, k_2 < j$ tal que $x_{k_1} + x_{k_2} = x_j$
+  \end{itemize}
+
+  \begin{enumerate}[label=$\alph*)$]
+    \item Encontrar un algoritmo de backtracking que encuentre, si existe, la cadena de adición de longitud mínima.
+
+    \item Proponer, si no agregaron en el inciso anterior, al menos una poda por optimalidad y otra por factibilidad.
+  \end{enumerate}
+\end{enunciado}
+
+Ejemplos:
+$$
+  \begin{array}{rcl}
+    n = 7  & \to & 1 \to 2 (1+1)\to 3 (2+1) \to 6 (3+3) \to 7 (6+1)               \\
+    n = 15 & \to & 1 \to 2 (1+1)\to 3 (2+1)\to 6 (3+3) \to 12 (6+6) \to 15 (12+3)
+  \end{array}
+$$
+
+\begin{enumerate}[label=$\alph*)$]
+  \item
+        Inicio el algoritmo con $(\set{1,2}, n-2)$
+        $$
+          \textit{\green{cadenaAdicion}}(C,n) =
+          \llave{cll}{
+            (C, |C|)    & \text{si}& \maximo\limits_{c \en C}(C) = n \\
+            (\vacio, +\infinito)    & \text{si}& \maximo\limits_{c \en C}(C) > n \lor |C| > n\\
+            \minimo\limits_{c_1,c_2 \en C }\big(
+            \textit{\green{cadenaAdicion}}(C \union (c_1 + c_2), n) \big) & \multicolumn{2}{l}{\text{si no}}
+          }
+        $$
+
+  \item Una poda de optimalidad sería que el $c = c_1 + c_2$ que estoy agregando cumpla que $c > \maximo\limits_{c' \en C}(C)$.
+
+\end{enumerate}

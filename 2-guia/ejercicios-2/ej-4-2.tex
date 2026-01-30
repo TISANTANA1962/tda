@@ -1,0 +1,179 @@
+\def\nodosDiecisiete{
+  \node[nodo=black] (1) {$1$};
+  \node[nodo=black, below of=1] (2) {$2$};
+  \node[nodo=black, below of=2] (3) {$3$};
+  \node[nodo=black, below of=3] (4) {$4$};
+
+  \draw[thin, rounded corners = 5pt]
+  (4.south west) rectangle
+  (1.north east) node [above left] {$A$};
+
+  \node[nodo=black, right=2cm of 1] (1b) {$1$};
+  \node[nodo=black, below of=1b] (2b) {$2$};
+  \node[nodo=black, below of=2b] (3b) {$3$};
+  \node[nodo=black, below of=3b] (4b) {$4$};
+
+  \draw[thin, rounded corners = 5pt]
+  (4b.south west)
+  rectangle
+  (1b.north east) node [above right] {$B$};
+}
+\tikzset{
+plot style/.style={
+baseline=-1cm,
+scale = 0.5,
+node distance=1cm,
+nodo/.style={circle, draw, color=##1, minimum size = 6pt, inner sep = 1pt, outer sep = 5pt, font={\tiny}},
+arista/.style={-{Latex[length=3pt]}, ultra thin, bend left=1, color=##1},
+}
+}
+\begin{enunciado}{\ejercicio[RutaMinima]}
+  \textbf{\textit{RutaMinima}}
+
+  Dada una matriz $D$ de $n \times n$ números naturales, queremos encontrar una permutación $\pi$
+  de $\set{1,\ldots, n}$ que minimice $D_{\pi(n)\pi(1)} + \sumatoria{i=1}{n-1}D_{\pi(i)\pi(i+1)}$.
+  Por ejemplo, si
+  $$
+    D =
+    \matriz{cccc}{
+      0 & 1 & 10 & 10 \\
+      10 & 0 & 3 & 15 \\
+      21 & 17 & 0 & 2 \\
+      3 & 22 & 30 & 0
+    },
+  $$
+  entonces $\pi(i) = i$ es una solución óptima.
+  \begin{enumerate}[label=$\alph*)$]
+    \item Diseñar un algoritmo de \textit{backtracking} para resolver el problema, indicando claramente
+          cómo se codifica una solución candidata, cuáles soluciones son válidas y qué valor tienen,
+          qué es una solución parcial y cómo se extiende cada solución parcial.
+
+    \item Calcular la complejidad temporal y espacial del mismo.
+
+    \item Proponer una poda por optimalidad y mostrar que es correcta.
+  \end{enumerate}
+\end{enunciado}
+
+\begin{enumerate}[label=$\alph*)$]
+  \item Lo primero que hay que hacer es entender qué cosa piden. Luego resolver por \textit{fuerza bruta}, \textit{no trates de sacar un truco, ni de encontrar
+          hack fantasma, ni fórmula cerrada ni un choto. Fuerza bruta y recursión}:
+
+        Las \textit{soluciones candidatas} van a ser todas las funciones \ul{biyectivas}:
+        $$
+          \pi: \set{1,\ldots, n} \to \set{1, \ldots, n}.
+        $$
+        En otras palabras hay que encontrar todas las permutaciones del conjunto $\set{1, \ldots, n}$. Y qué mejor forma de hacer eso que
+        por \textit{fuerza bruta}. Para un conjunto de $n$ elementos puedo encontrar un total de $n!$ funciones. Por ejemplo, $n=3$:
+        \forestset{
+          binary tree/.style={
+              for tree={
+                  scale=0.9,
+                  line width=1pt,
+                  minimum size=1cm,
+                  rectangle, draw,
+                  math content,
+                  s sep=.4cm, l sep=0.6cm,
+                  edge={line width=0.5pt},
+                },
+              important/.style={draw=##1,line width=1.5pt,edge={##1,line width=1.5pt}},
+            }
+        }
+        $$
+          \begin{forest}
+            binary tree,
+            [\intervalo{\vacio},
+            [\intervalo{1},
+                [\intervalo{1,2}
+                    [\intervalo{1,2,3}]],
+                [\intervalo{1,3}
+                    [\intervalo{1,3,2}]]
+              ],
+            [\intervalo{2},important=red
+            [\intervalo{2,1},important=red
+            [\intervalo{2,1,3},important=red]],
+            [\intervalo{2,3}
+                [\intervalo{2,3,1}]]
+            ],
+            [\intervalo{3},important=Cerulean
+            [\intervalo{3,1}
+            [\intervalo{3,1,2}]],
+            [\intervalo{3,2}  ,important=Cerulean
+            [\intervalo{3,2,1},important=Cerulean]],
+            ]
+            ]
+          \end{forest}
+        $$
+        Las hojas del árbol son los intervalos \textit{candidatos} a ser la solución al problema.
+        Por ejemplo las ramas marcadas en rojo y azul representa a las permutaciones candidatas:
+        $$
+          \llave{rcl}{
+            \red{\pi}(1) & = &  2\\
+            \red{\pi}(2) & = &  1\\
+            \red{\pi}(3) & = &  3
+          }
+          \ytext
+          \llave{rcl}{
+            \blue{\pi}(1) & = &  3\\
+            \blue{\pi}(2) & = &  2\\
+            \blue{\pi}(3) & = &  1
+          }
+        $$
+        Las soluciones \textit{válidas} serán las soluciones candidatas $\pi$
+        que minimicen la suma de $D_{\pi(n)\pi(1)} + \sumatoria{i=1}{n-1}D_{\pi(i)\pi(i+1)}$, para las
+        ramas rojas y azules del ejemplo:
+        $$
+          \begin{array}{rcl}
+            D_{\red{\pi}(3)\red{\pi}(1)} + \sumatoria{i=1}{n-1}D_{\red{\pi}(i)\red{\pi}(i+1)}     & = & D_{32} + D_{21} + D_{13} \\
+            D_{\blue{\pi}(3)\blue{\pi}(1)} + \sumatoria{i=1}{n-1}D_{\blue{\pi}(i)\blue{\pi}(i+1)} & = & D_{13} + D_{32} + D_{21}
+          \end{array}
+        $$
+
+        El algoritmo genera los intervalos $\pi$ de forma recursiva, eligiendo todos los \ul{posibles caminos biyectivos} (no repite números),
+        devolviendo una tupla $(\pi, \sum)$. El camínimo mínimo minimizará el valor de $\sum$. Partiendo del conjunto $C = \set{1,\ldots,n}$,
+        voy a ir tomando valores de $c \en C$:
+        \begin{itemize}
+          \item Eliminándolos de $C$ para no volver a usarlos: $C - \set{c}$.
+          \item Concatenándolos a $\pi$. Uso el símbolo $\sumaDirecta$ para concatenar, dado que $\pi$ \ul{tiene un orden}.
+          \item Caso base: Cuando la permutación está completa $C = \vacio$ se devuelve $(\pi, \sum)$.
+        \end{itemize}
+        $$
+          \textstyle
+          \green{rutaMinima}(\pi,C)=
+          \llave{ccl}{
+            (\pi, D_{\pi(n)\pi(1)} + \sumatoria{i=1}{n-1}D_{\pi(i)\pi(i+1)} ) & \text{si} &  C = \vacio  \\
+          \minimo\limits_{c\en C}
+          \matriz{l}{
+            \green{rutaMinima}(\pi \sumaDirecta \intervalo{c}, C - \set{c})
+          }
+          & \multicolumn{2}{l}{\text{si no}}
+          }
+        $$
+
+  \item
+        Mirando el árbol de generación de los intervalos veo que tengo un total de $n!$ hojas. El costo de resolver cada subproblema es $O(n)$ dado que
+        tengo que sumar $n$ elementos.
+        Por lo tanto el \textit{running time} es:
+        $$
+          \cajaResultado{
+            T(n) \en O(n \cdot n!)
+          }
+        $$
+        El costo es sumar la cantidad de nodos eso es de orden $n!$, las hojas dominan.
+
+        La complejidad espacial la veo con las variables de estado, $\pi$ y $C$. Como mucho $\pi \ytext C \en O(n)$.
+        Tengo ramas de recursión de profundidad $n$ que es lo que toma generar un intervalo $\pi$ la complejidad espacial.
+        $$
+          \cajaResultado{
+            S(n) \en O(\ua{n}{\text{profundidad}\\\text{rama}:\\\text{estados}} \cdot \oa{n}{\text{costo}\\\pi}) \en O(n^2)
+          }
+        $$
+        Dependiendo la implementación, si se pasa por referencia \ul{las variables no aportarían un costo de $O(n)$}, obteniéndose
+        una complejidad espacial:
+        $$
+          \cajaResultado{
+            S(n) \en O(n)
+          }
+        $$
+
+  \item No se me ocurre nada con esta implementación \red{consultar}.
+\end{enumerate}

@@ -1,0 +1,247 @@
+\def\nodoRojo{
+  \begin{tikzpicture}[grafo style, font={\tiny}, baseline = -3, minimum size=10pt]
+    \node[nodo, BrickRed] (v3) {};
+  \end{tikzpicture}
+}
+
+\begin{enunciado}{\ejercicio[Ciclo impar]}
+
+  \textit{Ciclo impar}
+
+  Dado un grafo $G$ si existe una caminata de longitud impar
+  que empieza y termina en el mismo vértice entonces hay un ciclo (simple) impar.
+\end{enunciado}
+\def\redimpar{\textit{\red{impar}}\xspace}
+\def\redpar{\textit{\red{par}}\xspace}
+
+Definiciones de caminata, ciclo, etc, \hyperlink{teoria-3:recorridos}{acá \click}
+
+Un poco de intuición:
+\begin{itemize}
+  \item Si una caminata va y vuelve al vértice $v_{ini}$, pasando por los \ul{mismos vértices} ida y vuelta:
+        $$
+          v_{ini} \to v_2 \to \cdots \to v_{ret} \to \cdots \to v_2 \to v_{ini},
+        $$
+        siempre va a tener una longitud \redpar. Con esos nodos "\textit{alineados}" podés formar infinitas caminatas,
+        porque podría ir onda
+        \begin{tikzpicture}[grafo style, outer sep = 2pt, font={\tiny}, baseline = -3]
+          \node[nodo] (vi) {$v_i$};
+          \node[nodo, left of = vi] (vj) {$v_i$};
+          \draw[-latex, bend right = 30pt] (vi.north west) to (vj.north east);
+          \draw[-latex, bend right = 30pt] (vj.south east) to (vi.south west);
+        \end{tikzpicture}
+        ($v_i \to v_j \to v_i \to v_j$) cuantas veces quiera.
+        Pero toda caminata tendría una longitud \redpar,
+        dado que se recorren todas las aristas cantidad \redpar de veces.
+
+  \item Por lo tanto en cualquier recorrido que empiece y termine en $v_{ini}$, tengo que prestar atención
+        a los vértices $(\nodoRojo)$ que se repitan en el recorrido total con \textit{por lo menos 2 vértices distintos}
+        entre cada aparición. Bajo esas condiciones es que voy a encontrar algún ciclo.
+        $$
+          \begin{tikzpicture}[grafo style, font={\tiny}, baseline = -3, minimum size=15pt]
+            \node[nodo] (v1) {$v_{ini}$};
+            \node[nodo, right of = v1] (v2) {};
+            \node[nodo, BrickRed, right of = v2] (v3) {};
+            \node[nodo, right of = v3] (v4) {};
+            \node[nodo, BrickRed, right of = v4] (v5) {};
+
+            \node[nodo, above left of = v3] (v31) {};
+            \node[nodo, above right of = v3] (v32) {};
+
+            \node[nodo, below left of = v5] (v51) {};
+            \node[nodo, below right of = v5] (v52) {};
+            \node[nodo, below of = v5] (v53) {};
+
+            \draw[orange, thick]
+            (v1) to (v2) to (v3) to (v31) to (v32) to (v3) to (v4) to (v5) to (v51) to (v53) to (v52) to (v5) ;
+          \end{tikzpicture}
+        $$
+
+  \item Va apareciendo ahí la necesidad de que el recorrido total sea de longitud \redimpar para poder tener un
+        ciclo de longitud \redimpar también, porque la \text{ida-y-vuelta} desde un ciclo a $v_{ini}$, es decir:
+        $$
+          v_{ini} \to \cdots \to \nodoRojo \to \cdots \to v_{ini}
+        $$
+        está en la misma línea, es así que habrá una cantidad \redpar de \textit{aristas}, y bueh
+        $$
+          \ob{\redimpar}{\text{el ciclo}} + \ub{\redpar}{\text{ida-y-vuelta al} \\ \nodoRojo} =
+          \ob{\redimpar.
+          }{
+            \text{todo el} \\ \text{ recorrido}
+          }
+        $$
+\end{itemize}
+
+\bigskip
+
+Haciendo inducción en la longitud del recorrido, quiero mostrar que la proposición:
+\parrafoDestacado{
+  \textit{
+    $p(l):$ Si existe una caminata de longitud $l$ impar que empieza y
+    termina en el mismo vértice entonces hay un ciclo (simple) impar, $\paratodo l \en \naturales$.
+  }
+}
+
+\bigskip
+
+\textit{Caso base:}
+
+Quiero mostrar que la proposición:
+\parrafoDestacado{
+  \textit{
+    $p(\blue{3}):$ Si existe una caminata de longitud $\blue{l = 3}$ que empieza y
+    termina en el mismo vértice entonces hay un ciclo (simple) impar.
+  }
+}
+
+Sin importar el grafo $G$, la hipótesis dice que existe alguna caminata o recorrido de la pinta:
+$$
+  \set{v_1,v_i, v_j, v_1} ~ \text{con} ~ i \distinto j \distinto 1
+$$
+
+\begin{minipage}{0.5\textwidth}
+  \begin{itemize}
+    \item La caminata tiene longitud $\blue{l} = 3$, así que no
+          tiene mucha opción para empezar y terminar en el mismo vértice.
+
+    \item Debe tocar dos vértices distintos entre sí y de $v_1$ y luego
+          la tercera arista debe conectarse a $v_1$.
+  \end{itemize}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+  $$
+    \begin{tikzpicture} [ grafo style ]
+      \node[nodo] (v1) {$v_1$};
+      \node[nodo, above left of=v1] (v11) {};
+      \node[nodo, left of=v1] (v12) {};
+      \node[nodo, below left of=v1] (v13) {};
+
+      \node[nodo, above right of = v1] (vi) {$v_i$};
+      \node[nodo, above left of = vi] (vi1) {};
+      \node[nodo, above of=vi] (vi2) {};
+      \node[nodo, above right of=vi] (vi3) {};
+
+      \node[nodo, below of = vi] (vj) {$v_j$};
+      \node[nodo, below left of = vj] (vj1) {};
+      \node[nodo, below of=vj] (vj2) {};
+      \node[nodo, below right of=vj] (vj3) {};
+
+      \draw[] (v1) to (v11);
+      \draw[] (v1) to (v12);
+
+      \draw[] (vi) to (vi1);
+      \draw[] (vi) to (vi2);
+      \draw[] (vi) to (vi3);
+
+      \draw[] (vj) to (vj1);
+      \draw[] (vj) to (vj2);
+      \draw[] (vj) to (vj3);
+
+      \draw[] (v1) to (v13) to (v12) to (v11) to (vi1) to (vi2);
+      \draw[] (vi3) to (vj3);
+      \draw[] (vj3) to (vj2);
+
+      \draw[ultra thick, orange] (v1) to (vi) to (vj) to (v1);
+
+      \node[dotted,draw=black, fit=(vi)(vj)(v1), inner sep = 5pt, outer sep= 5pt, rounded corners] (g) {};
+    \end{tikzpicture}
+  $$
+\end{minipage}
+
+Así se muestra que la proposición $p(\blue{3})$ es verdadera.
+
+\bigskip
+
+\textit{Paso inductivo:}
+
+Asumo que la proposición para algún $\blue{k} \en \naturales$ impar
+\parrafoDestacado{
+  $
+    p($\blue{k}$):
+    \ob{
+      \textit{
+        Si existe una caminata de longitud $\blue{k}$ impar que empieza y
+        termina en}
+    }{
+      \text{\purple{hipótesis inductiva}}
+    }
+  $
+  \textit{
+    el mismo vértice entonces hay un ciclo (simple) impar
+  }.
+}
+es verdadera. Entonces quiero probar que la proposición:
+\parrafoDestacado{
+  \textit{
+    $p(\blue{k + 2}):$ Si existe una caminata de longitud $\blue{k + 2}$ impar que empieza y
+    termina en el mismo vértice entonces hay un ciclo (simple) impar.
+  }
+}
+también lo sea.
+
+Partiendo que por hipótesis tengo una caminata impar, hay 2 cosas que pueden pasar en cualquier caminata:
+\begin{itemize}
+  \item Que \ul{no} se repita ningún vértice de la \textit{caminata \redimpar}, y dado que por hipótesis empieza y termina
+        en el mismo lugar se tiene un \textit{ciclo simple de longitud \redimpar}. Fin.
+
+  \item Que \ul{sí} se repita algún vértice de la \textit{caminata impar} (además del $v_1$), ejemplito:
+        $$
+          \begin{tikzpicture} [ grafo style ]
+            \node[nodo] (v1) {$v_1$};
+            \node[nodo, above left of=v1] (v11) {};
+            \node[nodo, left of=v1] (v12) {};
+            \node[nodo, below left of=v1] (v13) {};
+
+            \node[nodo, above right of = v1] (vi) {$v_i$};
+            \node[nodo, above left of = vi] (vi1) {};
+            \node[nodo, above of=vi] (vi2) {};
+            \node[nodo, above right of=vi] (vi3) {};
+
+            \node[nodo, BrickRed, below of = vi] (vj) {~~~};
+            \node[nodo, below left of = vj] (vj1) {};
+            \node[nodo, below of=vj] (vj2) {};
+            \node[nodo, below right of=vj] (vj3) {};
+
+            \draw[] (v1) to (v11);
+            \draw[] (v1) to (v12);
+
+            \draw[] (vi) to (vi1);
+            \draw[] (vi) to (vi2);
+            \draw[] (vi) to (vi3);
+
+            \draw[] (vj) to (vj1);
+            \draw[] (vj) to (vj2);
+            \draw[] (vj) to (vj3);
+
+            \draw[] (v1) to (v13) to (v12) to (v11) to (vi1) to (vi2);
+            \draw[] (vi3) to (vj3);
+            \draw[] (vj3) to (vj2);
+
+            \draw[ultra thick, orange] (v1) to (vj) to (vi) to (vi3) to (vj3) to (vj2) to (vj);
+
+            \node[dotted,draw=black, fit=(vi)(vi3)(vj2)(vj3), inner sep = 2pt, rounded corners] (g) {};
+          \end{tikzpicture}
+        $$
+        Como en la intro los vértices que me importan son los que se repiten sin haber repetido aristas en el recorrido,
+        esos están formando ciclos.
+
+        % Si por hipótesis el recorrido es \redimpar, entonces debe haber algún ciclo \redimpar en alguno de esos vértices repetidos,
+        % esto está backupeado por la \purple{hipótesis inductiva}:
+
+        En el recorrido la longitud ida-y-vuelta desde el nodo repetido (el nodo \nodoRojo) al nodo inicial $l_{\textit{ida-y-vuelta}}$ es \redpar,
+        y dado que el recorrido total tiene longitud \redimpar igual a $\blue{k+2}$,
+        puedo restarlas, así obteniendo:
+        $$
+          \ub{\blue{k+2}}{\redimpar} - \ub{l_{\textit{ida-y-vuelta}}}{\redpar} \mayor{\red{!}}
+          \ub{\blue{k}}{\textit{recorrido} \\ \textit{podado} \\ \redimpar}
+        $$
+
+        Por \purple{hipótesis inductiva} ese \textit{recorrido podado} tiene un ciclo simple \redimpar.
+        La proposición $p(\blue{k+1})$ es verdadera.
+\end{itemize}
+
+\bigskip
+
+Por principio de inducción también lo será $p(l) \paratodo l \en \naturales$
+
+\fin

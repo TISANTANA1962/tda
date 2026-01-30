@@ -1,0 +1,86 @@
+\begin{enunciado}{\ejercicio[Dobra]}
+  \textbf{\textit{Dobra}}
+
+  Dobra se encuentra con muchas palabras en su vida, como es una persona particular la mayoría
+  de estas no le gustan. Para compensar empezó a inventar palabras más agradables. Dobra crea
+  palabras nuevas escribiendo una cadena de caracteres que considera buena, luego borra los caracteres que peor
+  le caen y los reemplaza con \_.
+
+  Luego para mejorar su vida intenta reemplazar estos guiones bajos con letras más aceptables
+  intentando crear palabras más lindas. Dobra considera una palabra como buena si no contiene 3
+  vocales consecutivas, 3 consonantes consecutivas y al menos contiene una E.
+
+  \begin{enumerate}[label=$\alph*)$]
+    \item Mostrar alguna solución candidata posible y alguna solución parcial.
+
+    \item\label{ej7:item-b} Proponer una función recursiva y estimar su complejidad. Asumir que se tiene una función
+          \green{\textit{verificar}} que toma una cadena y devuelve \true si es como Dobra quiere o \false
+          en caso contrario.
+
+    \item Probar que la función o programa es correcto.
+
+    \item Proponer al menos una poda por factibilidad.
+
+    \item Si \ref{ej7:item-b} no tiene una cota superior $O(3^n)$ para la complejidad, analizar el caso donde se separa la
+          recursión en tener o no una letra E y ver si mejora la misma.
+  \end{enumerate}
+\end{enunciado}
+
+Ejercicio de conteo.
+\begin{enumerate}[label=$\alph*)$]
+  \item Una palabra con guiones bajos que \textit{no tiene soluciones válidas},
+        porque no tendría la E, dado que de ponerla tendría 3 vocales consecutivas.:
+        $$
+          AA\_
+          \to
+          AA\underline{\blue{c}}
+          \flecha{$\paratodo \blue{c} \en \intervalo{a-z}$} \false
+        $$
+        Una palabra que se puede mejorar sería $A\_\_$, la cual tiene $21 + 21$ soluciones candidatas. Número al que llego
+        poniendo una $E$ en el primer guión y cualquier consonante en el segundo o al revés.
+        $$
+          A\_\_
+          \to
+          \ub{A\underline{\blue{B}}\_}{\text{solución}\\ \textit{parcial}}
+          \to
+          A\blue{B}\blue{E} \to \true
+        $$
+
+  \item
+        Tengo una cadena de caracteres, \textit{un string}, que tiene guiones bajos, hay que meter alguna letra ahí, entonces
+        \textit{fuerza bruta}. No sé donde están los guiones bajos, entonces pruebo todo, no sé que letra tengo que poner entonces pruebo
+        todas, \textit{fuerza bruta}! Si la letra funciona o no de eso se encargará la función \green{\textit{verificar}}:
+
+        La siguiente función es un algoritmo que reemplaza los \textit{guiones bajos}
+        por algún caracter del intervalo $\intervalo{a-z}$.
+
+        Se llama inicialmente con $i = 1$ y el caso base devuelve $0$ o $1$ una vez recorrido todo el \textit{string}.
+        $$
+          \textit{\green{betterStrings}}(i,n) =
+          \llave{ccl}{
+            1 & \text{si} & i > n \land \textit{\green{verificar}}(S)  \\
+            \textit{\green{betterStrings}}(S[i], i + 1) & \text{si} & i \leq n \land S[i] \distinto \_  \\
+            ~\sumatoria{c \en \intervalo{a-z}}{} \textit{\green{betterStrings}}(S[i] \ot c, i + 1) & \text{si} & i \leq n \land S[i] = \_ \\
+            0 & \multicolumn{2}{l}{\text{si no}}
+          }
+        $$
+        ¿Te gustó el nombre de la función?
+
+        Potencialmente tengo $n$ guiones bajos. Por cada guión bajo tengo potencialmente $26$ llamadas recursivas:
+        El costo de cada subproblema es $O(n)$ porque tengo que revisar todo el \textit{string}. Sea como sea:
+        $$
+          T(n) = 26T(n-1) + n \entonces T(n) \en O(n \cdot 26^n)
+        $$
+        Esto podría afinarse un poco más, por ejemplo argumentando que el número debería ser 25, porque estás cambiando una letra, pero dado que
+        \ul{no me pidieron que cumpla ningún número de complejidad} lo dejo así.
+
+  \item \Hacer
+
+  \item
+        \begin{itemize}
+          \item Al trabajar en $S[i]$ verifico que $S[i-1]$ y $S[i+1]$ no sean ambas vocales o consonantes, ya que ahí la llamada recursiva sería
+                de 21 caracteres o de 5 en lugar de siempre 26.
+        \end{itemize}
+
+  \item \Hacer
+\end{enumerate}

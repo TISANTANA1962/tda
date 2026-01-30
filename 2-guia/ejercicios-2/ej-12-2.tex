@@ -1,0 +1,284 @@
+\lstset{
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]para, cada, si, sino, if, else, true, false, mientras, not, o, y, null},
+  emph={[3]cc,meto,saco, max, min},
+  emph={[4]exceso, billetes},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  emphstyle={[4]{\tiny\color{purple}}},
+  morecomment={[l]{//}},
+  commentstyle={{\footnotesize\color{gray}\it}}
+}
+\def\cc{\textit{\green{cc}}\xspace}
+
+\begin{enunciado}{\ejercicio[OptiPago]}
+  \textit{OptiPago}
+
+  Tenemos un multiconjunto $B$ de valores de billetes y queremos comprar un producto de costo
+  $c$ de una máquina que no da vuelto. Para poder adquirir el producto debemos cubrir su costo
+  usando un subconjunto de nuestros billetes. El objetivo es pagar con el mínimo exceso posible a
+  fin de minimizar nuestra pérdida. Más aún, queremos gastar el menor tiempo posible poniendo
+  billetes en la máquina. Por lo tanto, entre las opciones de mínimo exceso posible, queremos una
+  con la menor cantidad de billetes. Por ejemplo, si $c = 14$ y $B = \set{2, 3, 5, 10, 20, 20}$, la solución es
+  pagar 15, con exceso 1, insertando sólo dos billetes: uno de 10 y otro de 5.
+
+  \begin{enumerate}[label=$\alph*)$]
+
+    \item\label{ej-12:item-a}
+          Considerar la siguiente estrategia por \textit{backtracking} para el problema, donde $B = \set{b_1, \ldots , b_n}$.
+          Tenemos dos posibilidades: O agregamos el billete $b_n$, gastando un billete y quedando por
+          pagar $c - b_n$, o no agregamos el billete $b_n$, gastando 0 billetes y quedando por pagar $c$.
+          Escribir una función recursiva $\cc(B, c)$ para resolver el problema, donde $\cc(B, c) = (c', q)$
+          cuando el mínimo costo mayor o igual a $c$ que es posible pagar con los billetes de $B$ es $c'$ y
+          la cantidad de billetes mínima es $q$.
+
+    \item\label{ej-12:item-b}
+          Implementar la función de \ref{ej-12:item-a} en un lenguaje de programación imperativo utilizando una
+          función recursiva con parámetros $B, i, j$ que compute $\cc(\set{b_1, \ldots ,b_i}, j)$. ¿Cuál es la complejidad del algoritmo?
+
+    \item
+          Reescribir \cc como una función recursiva $\cc_B'(i, j) = \cc(\set{b_1,\ldots , b_i}, j)$ que implemente la
+          idea anterior \textbf{dejando fijo el parámetro} $B$. A partir de esta función, determinar cuándo $\cc_B'$ tiene la propiedad de
+          \textit{superposición de subproblemas}.
+
+    \item
+          Definir una estructura de memoización para $\cc_B'$ que permita acceder a $\cc_B'(i, j)$ en $O(1)$ tiempo
+          para todo $0 \leq i \leq n \ytext 0 \leq j \leq k$.
+
+    \item
+          Adaptar el algoritmo de \ref{ej-12:item-b} para incluir la estructura de memoización.
+
+    \item
+          Indicar cuál es la llamada recursiva que resuelve nuestro problema y cuál es la complejidad del nuevo algoritmo.
+
+    \item
+          (Opcional) Escribir un algoritmo \textit{bottom-up} para calcular todos los valores de la estructura
+          de memoización y discutir cómo se puede reducir la memoria extra consumida por el algoritmo.
+
+    \item
+          (Opcional) Formalmente, en este problema de vuelto hay que computar el mínimo $(\Sigma V, |V|)$,
+          en orden lexicográfico, de entre los conjuntos $V \subset B$ tales que $\Sigma V \geq c$. Demostrar que
+          la función $\cc'$ es correcta. \textbf{Ayuda}: Demostrar por inducción que $\cc'(i, j) = (v, k)$ para el
+          mínimo $(v, k)$ tal que existe un subconjunto $V$ de $\set{b_1,\ldots, b_i}$ con $\Sigma V \geq j$.
+  \end{enumerate}
+\end{enunciado}
+
+\begin{enumerate}[label=$\alph*)$]
+  \item
+        La estrategía que ofrecen es la misma que se viene usando en todos los algoritmos de \textit{backtracking}, pruebo \red{con/sin} cada billete.
+        Cuando el \ul{costo restante} es negativo o cero, es el caso base donde paro de contar.
+
+        Si no llego a pagar todo, es decir me quedo sin billetes, devuelvo un valor para que \red{nunca} sea una respuesta posible.
+
+        La función devuelve una tupla \blue{(exceso, billetes)}. A la función mín le doy tremendo laburo: \ul{Primero busca} que sea mínimo el
+        \blue{exceso} de perdida y en caso de que distintas ramas tengan el mismo \blue{exceso} \ul{luego busca para despempatar} la mínima
+        \blue{cantidad de billetes} entre esas ramas empatadas.
+        $$
+        \cc(B,c) =
+        \llave{ccl}{
+        (-c, 0) & \text{si} & c \leq 0\\
+        (+\infinito,+\infinito) & \text{si} & B = \vacio\\
+        \minimo\limits_{1^{er} \to 2^{da}}( \cc(B \diferencia \set{b_n}, c), (0, 1) + \cc(B \diferencia \set{b_n}, c - b_n))
+        & \multicolumn{2}{l}{\text{si no}}
+        }
+        $$
+
+  \item
+        Muy parecida a la función anterior. Llamo a la función con los parámetros $\cc(B, |B|, j = c)$. Acá se ve la función que tiene mín
+        en detalle. Primero compara la primera coordenada de excesos y luego en caso de haber un empate la segunda de billetes.
+
+        La variable $i$ es el índice que se usa para recorrer $B$.
+
+        \begin{tcolorbox}
+          \begin{lstlisting}
+ funcion cc(B,i,j)
+   si j$\leq$0
+       ret (-j, 0)
+   si i=0
+       ret ($+\infinito$,$+\infinito$)
+   sino
+       skip $\ot$ cc(B, i-1, j)
+       keep $\ot$ (0,1) + cc(B, i-1, j-B[i])
+
+       si keep.exceso < skip.exceso            // comparo 1era
+           ret keep
+       sino si keep.exceso > skip.exceso        // comparo 1era
+           ret skip
+       sino                              //son iguales comparo cantidad de billetes
+           si keep.billetes < skip.billetes 
+               ret keep 
+           sino
+               ret skip\end{lstlisting}
+        \end{tcolorbox}
+        El algoritmo es exponencial. En cada llamado recursivo puede tener hasta 2 nuevas llamadas recursivas. El costo de cada subproblema es $O(1)$.
+        $$
+          \cajaResultado{
+            T(n) \en O(2^n)
+          }
+        $$
+
+  \item La orientación del ejercicio va hacia \textit{generar mejores funciones recursivas}, mejores en el sentido de que al usar índices $i$, $j$
+        en vez de conjuntos $B$ hace que sea más fácil el pasaje a \textit{programación dinámica}.
+
+        Puedo pensar que $B$ es una variable global, tengo una referencia, así que no carga la memoria ni nada \textit{innecesariamente ineficiente},
+        entonces la uso, aunque no voy a modificarla. $i$ va a ser la variable con la que recorro $B$ y $j$ es el \textit{costo objetivo}.
+        $$
+        \cc_B'(i,j) =
+        \llave{ccl}{
+        (-j, 0) & \text{si} & j \leq 0\\
+        (+\infinito,+\infinito) & \text{si} & i = 0 \\
+        \minimo\limits_{1^{er} \to 2^{da}}(\cc(i-1, j), (0, 1) + \cc(i-1,  j - B[i]))
+        & \multicolumn{2}{l}{\text{si no}}
+        }
+        $$
+
+        A partir de cuando se van a repetir estados? No sé. Depende de $B$, de que pueda combinar billetes para que le resten
+        al costo la misma cantidad. Una vez que por dos caminos haya restado la misma cantidad aparecerá en todas las combinaciones posibles un
+        estado repetido y ahí empezará la superposición.
+
+        La cantidad de estados que puede haber está \textit{acotada} por $O(|B| \cdot j)$ y la cantidad de recursiones está en $\Omega(2^n)$.
+
+  \item
+        \textit{Algo raro debe haber}
+        \parrafoDestacado[\atencion]{
+          En el enunciado aparece el valor $k$ ¿No debería ser $c$? Justamente el segundo argumento de la función $\cc_B'(i,j)$ es el \blue{exceso}
+          de la operación. No sé, yo voy a suponer que $k = c$
+        }
+
+        $$
+          \begin{tikzpicture}[
+              rect/.style={
+                  rectangle, draw=gray, text=black,
+                  minimum width=45pt, minimum height=45pt,
+                  outer sep=0pt, inner sep=1pt, font={\small},
+                  text height=1.5ex, text depth=0.5ex
+                },
+              arista_roja/.style={-latex, red, bend left=10pt, line width=1pt},
+              arista_verde/.style={-latex, OliveGreen, line width=2pt},
+              recuadro_rojo/.style={rectangle, line width=1pt, draw=red, minimum width=45pt, minimum height=45pt},
+              recuadro_naranja/.style={rectangle, line width=1.5pt, draw=orange, minimum width=45pt, minimum height=45pt},
+              llenado/.style={-Latex, gray, thick, dashed},
+              coordenadas/.style={fill=lightgray, opacity=.12, ultra thin},
+              scale=0.5,
+            ]
+
+            \matrix (A) [
+            matrix of nodes,
+            nodes={rect, execute at begin node=$, execute at end node=$},
+            column sep=1pt, row sep=1pt,
+            scale=0.5,
+            ] {
+            \texttt{M[0,0]} &   {}          & \cdots & \cdots & \cdots          & {}                                     \\
+            {}              & {}            & {}     & {}     & {}              & {}                                     \\
+            {}              & \texttt{keep} & \ddots & \cdots & \texttt{skip}   & {}                                     \\
+            {}              & {}            & \cdots & \ddots & \texttt{M[i,j]} & \vdots                                 \\
+            {}              & \cdots        & \cdots & {}     & {}              & {}                                     \\
+            \texttt{M[n,0]} & \cdots        & \cdots & \cdots & {}              & \texttt{M[n,c]} \\
+            };
+
+            \foreach \i in {1,...,6} {
+                \draw[coordenadas] (A-3-\i.north west) rectangle (A-3-\i.south east);
+                \draw[coordenadas] (A-\i-2.north west) rectangle (A-\i-2.south east);
+                \draw[coordenadas] (A-\i-5.north west) rectangle (A-\i-5.south east);
+              }
+
+            \node[recuadro_naranja] (optimo) at (A-4-5) {};
+            \node[recuadro_rojo] (keep) at (A-3-2) {};
+            \node[recuadro_rojo] (skip) at (A-3-5) {};
+
+            \node[right=0.3cm of A-3-6] {$i-1$};
+            \node[above of=A-1-2] {\texttt{j-B[i]}};
+            \node[above of=A-1-5] {$j$};
+
+            \node[rectangle, line width=2pt, fill=OliveGreen!10, draw=OliveGreen, text=OliveGreen, rounded corners] (minimo) at (A-4-4.west) {$\substack{\minimo \\ \text{tupla}}$};
+
+            \draw[arista_roja, bend left=20pt] (keep.east) to (minimo.north);
+            \draw[arista_roja, bend right=20pt] (skip.west) to (minimo.north);
+            \draw[arista_verde] (minimo.east) to (optimo.west);
+
+            \draw[llenado] (A.north west) -- (A.south west) node[midway, left]{$\substack{\text{billete}\\ i-\text{ésimo}\\ \texttt{i}\en[0, n]}$};
+            \draw[llenado] (A.south west) -- (A.south east) node[midway, below]{exceso $\texttt{j} \en [0, c]$};
+          \end{tikzpicture}
+        $$
+        \begin{itemize}
+            \item Los caso base: $i=0$, tengo 0 billete no pago un choto así que pongo $(+\infinito, +\infinito)$.
+          \item En el elemento \texttt{M[n,c]} estará la tupla con el valor buscado.
+          \item Cada elemento \texttt{M[i,j]} almacena el mínimo excedente con la cantidad mínima de billetes usada en esa rama.
+        \end{itemize}
+
+  \item
+        Misma idea que los algoritmos \textit{top-down} que hice antes
+        \begin{tcolorbox}
+          \begin{lstlisting}
+M[i..n,j..c] $\ot$ null        // inicializo
+funcion cc(B,i,j)
+    si j$\leq$0
+        ret (-j, 0)
+    si i=0
+        ret ($+\infinito$,$+\infinito$)
+    si M[i,j] not null
+        ret M[i,j]
+    sino
+        skip $\ot$ cc(B, i-1, j)
+        keep $\ot$ (0,1) + cc(B, i-1, j-B[i])
+
+        si keep.exceso < skip.exceso            // comparo 1era
+            M[i,j] $\ot$ keep
+        sino si keep.exceso > skip.exceso        // comparo 1era
+            M[i,j] $\ot$ skip
+        sino                              //son iguales comparo cantidad de billetes
+            si keep.billetes < skip.billetes 
+                M[i,j] $\ot$ keep
+            sino
+                M[i,j] $\ot$ skip\end{lstlisting}
+        \end{tcolorbox}
+
+  \item
+        Supongo que la llamada recursiva sería $\cc(n,c)$. Te tiran cada pregunta de cada manera que no sé que mierda quieren que les diga. \red{Preguntar}
+
+        El nuevo algoritmo usa memoization. La complejidad temporal de estos algoritmos se calcula como:
+        $$
+          T(n) = \orange{\texttt{cantidad\_de\_estados}} \times \magenta{\texttt{costo\_de\_estados}}
+          \to
+          \orange{n \cdot c} \times \magenta{1} \en O(n \cdot c)
+        $$
+        Donde $n$ será el tamaño del conjunto $B$ y $c$ el costo objetivo. El \textit{running time} es pseudopolinomial y antes de usar la memoization
+        era exponencial. Hubo una mejora.
+
+        Como siempre hay un compromiso con la complejidad espacial, la profundidad del árbol es $n$ y cada estado tiene los posibles
+        variables de estado $i$ y $j$:
+        $$
+          S(n) \en O(n \cdot c)
+        $$
+        La complejidad espacial en el algoritmo de \textit{backtracking} es de $O(n)$, así que acá hubo un compromiso de recursos al bajar $T$ y aumentar
+        $S$.
+
+  \item
+        Debe haber una forma más simple de hacer esto. Me salió así.
+        \begin{itemize}
+            \item El índice difícil fue el $j$.
+            \item La matriz de más arriba es lo que 
+        \end{itemize}
+        \begin{tcolorbox}
+          \begin{lstlisting}
+ M[0..n,0..c] $\ot (+\infinito, +\infinito)$ // Inicializo con el valor neutro del mínimo.
+ funcion cc(n, c)
+     para i $\ot$ 1..n                   // tengo n billetes
+         para j $\ot$ 0..c               // tengo c posibles excesos
+             // Si decido no usar el billete. Igual que en la función recursiva.
+             skip $\ot$ M[i-1,j]
+             // Si decido usar el billete. Igual que en la función recursiva.
+             si j-B[i] $\leq$ 0                 // Que no exploten los índices
+                 keep $\ot$ (-(j - B[i]), 1) // Caso base. Esto es una posible solución.
+             sino
+                 keep $\ot$ (0,1) + M[i-1, j-B[i]]
+             // Pongo minTupla que me lo ordena las tuplas skip y keep, por exceso (1era) y luego billetes (2da).
+             // Paja escribir las comparaciones. Está hecho en la función anterior.
+             M[i,j] $\ot$ minTupla(skip, keep)
+     ret M[n, c]\end{lstlisting}
+        \end{tcolorbox}
+
+  \item \Hacer
+\end{enumerate}

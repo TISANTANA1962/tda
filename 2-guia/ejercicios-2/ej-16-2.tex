@@ -1,0 +1,103 @@
+\def\tv{\green{\textit{travesíaVital}}}
+\def\posicionValida{\green{\textit{posiciónVálida}}}
+\def\vidaValida{\green{\textit{vidaVálida}}}
+\begin{enunciado}{\ejercicio[Travesía Vital]}
+  \textit{Travesía Vital}
+
+  Hay un terreno, que podemos pensarlo como una grilla de $m$ filas y $n$ columnas, con trampas
+  y pociones. Queremos llegar de la esquina superior izquierda hasta la inferior derecha, y desde
+  cada casilla sólo podemos movernos a la casilla de la derecha o a la de abajo. Cada casilla $i,j$
+  tiene un número entero $A_{i,j}$ que nos modificará el nivel de vida sumándonos el número $A_{i,j}$ (si
+  es negativo, nos va a restar $|A_{i,j}|$ de vida).
+  Queremos saber el mínimo nivel de vida con el que debemos comenzar tal que haya un camino posible de
+  modo que en todo momento nuestro nivel de vida sea al menos 1. Por ejemplo, si tenemos la grilla
+  $$
+    A =
+    \begin{bmatrix}
+      -2 & -3  & 3  \\
+      -5 & -10 & 1  \\
+      10 & 30  & -5
+    \end{bmatrix}
+  $$
+  el mínimo nivel de vida con el que podemos comenzar es 7 porque podemos realizar el camino
+  que va todo a la derecha y todo abajo.
+  \begin{enumerate}[label=$\alph*)$]
+    \item Pensar la idea de un algoritmo de \textit{backtracking} (no hace falta escribirlo).
+
+    \item\label{ej-16:item-b} Convencerse de que, excepto que estemos en los límites del terreno, la mínima vida necesaria
+          al llegar a la posición $i, j$ es el resultado de restar al mínimo entre la mínima vida necesaria
+          en $i+1,j$ y aquella en $i,j+1$, el valor $A_{i,j}$, salvo que eso fuera menor o igual que 0, en
+          cuyo caso sería 1.
+
+    \item Escribir una formulación recursiva basada en \ref{ej-16:item-b}. Explicar su semántica e indicar cuáles
+          serían los parámetros para resolver el problema.
+
+    \item Diseñar un algoritmo de PD y dar su complejidad temporal y espacial auxiliar. Comparar cómo resultaría un enforque \textit{top-down} con uno
+          \textit{bottom-up}.
+
+    \item
+          Dar un algoritmo \textit{bottom-up} cuya complejidad temporal sea $O(m \cdot n)$ y la espacial auxiliar sea $O(\minimo(m,n))$.
+  \end{enumerate}
+\end{enunciado}
+
+Buen enunciado, consignas guiadas haciendo foco en un procedimiento incremental. Contrasta fuertemente con esos ejercicios de verga
+sacados de \textit{Codeforces} los cuales solo tienen sentido para practicar cuando uno ya "\textit{se siente cómodo}" con la técnica
+\href{https://youtu.be/r1g5PoRSp1c?t=29}{...que difícil se me hace.}
+
+\begin{enumerate}[label=$\alph*)$]
+  \item ¿Pensar? Eso es la receta para entrar en una vorágine de caca recursiva. No pienso luego no existo, \textit{fuerza bruta}, como le gusta a tu hermana.
+
+  \item Me costó implementar lo de "en cuyo caso sería 1", pero tiene sentido. Poner el 1 de prepo de está diciendo que la \textit{energía inicial} será
+        lo que tenga que ser para llegar a esa celda y sobrevivir como un campeón.
+
+  \item
+        Ahí te va un primer intento fallido:
+        Matriz $A \en \reales^{m \times n}$, global.
+        $$
+          \tv(i, j)
+          =
+          \llave{ccl}{
+            1 & \text{si} & i > m \land  j > n \\
+            - A_{i,j} + \tv(i+1, j) & \text{si} & i \leq m \land  j > n \\
+            - A_{i,j} + \tv(i, j+1) & \text{si} & i > m \land  j \leq n \\
+            - A_{i,j} +
+            \minimo
+            \matriz{c}{
+              \tv(i+1, j),  \\
+              \tv(i, j+1)
+            }
+            & \text{si} & i \leq m \land  j \leq n \\
+          }
+        $$
+        Si bien está buena, está mal, ha! Esa función permite potencialmente que cualquier celda me dé una "\textit{energía acumulada}" menor a 1.
+        Así que tengo que poner algo para que en ningún momento el camino me dé menor a 1:
+        $$
+          \tv(i, j)
+          =
+          \llave{ccl}{
+            1 & \text{si} & i > m \land  j > n \\
+            \maximo(1, - A_{i,j} + \tv(i+1, j)) & \text{si} & i \leq m \land  j > n \\
+            \maximo(1, - A_{i,j} + \tv(i, j+1)) & \text{si} & i > m \land  j \leq n \\
+            \maximo
+            \matriz{c}{
+              1,
+              - A_{i,j} +
+              \minimo
+              \matriz{c}{
+                \tv(i+1, j),  \\
+                \tv(i, j+1)
+              }
+            }
+            & \text{si} & i \leq m \land  j \leq n \\
+          }
+        $$
+
+        La función devuelve el mínimo valor inicial de energía que hay que tener llegar a la posición $m,n$ sin tener nunca una suma acumulada menor a 1
+        en todo el recorrido.
+        Los parámetros $i,j$ representan las coordenadas en la matriz que se va recorriendo. Llamar a la función con $\tv(1,1)$ devuelve el valor buscado.
+
+  \item \Hacer
+
+  \item \Hacer
+\end{enumerate}
+

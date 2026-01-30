@@ -1,0 +1,237 @@
+\begin{enunciado}{\ejercicio[Triángulo Inductivo]}
+
+  \textit{Triángulo Inductivo}
+
+  Demostrar por inducción que todo grafo de $2n$ vértices con más de $n^2$ aristas tiene algún triángulo.
+
+  ¿Se puede dar una cota mejor que funcione a partir de algún $n_0$? Es decir, ¿Existe $c(n) < n^2$ tal
+  que todo grafo de $2n \geq n_0$ vértices con más de $c(n)$ aristas tenga triángulos?
+\end{enunciado}
+
+Triángulos:
+\parrafoDestacado[\atencion]{
+  \textit{
+    Dado un vértice $v$, este está conectado a $n$ vecinos formando un conjunto $N(v)$. Para que no haya ningún
+    triángulo es necesario que no exista ningúna arista $(u,w), \paratodo u, w \en N(v)$. En otras palabras,
+    \ul{
+      Los vecinos de $v$ no pueden ser vecinos entre sí.
+    }
+  }
+}
+
+\textit{Un ejemplo ejemplificante con $n = 6,\,|V| = 12$}:
+
+\begin{minipage}{0.5\textwidth}
+  \begin{enumerate}[label=\tiny \faIcon{code}$_{\arabic*})$]
+    \item Fácil de ver que no hay ningún triángulo siguiendo
+          aristas verdes.
+
+    \item Evito que vértices de igual paridad sean vecinos.
+
+    \item Agregar una arista en cualquier lugar conectaría elementos
+          de $N(i_{impar})$ con otro de $N(i_{impar})$ y lo mismo con $N(i_{par})$. Generando
+          un triángulo.
+
+    \item $d(v) = 6 \paratodo v \en G_6$. Se unen a $\frac{|V|}{2} = \oa{6}{n}$ vértices.
+
+    \item Hay un total de $n^2 = 36 = \frac{12 \cdot 6}{2}$ aristas.
+
+    \item El grafo $G_6$ \textit{bipartito}.
+    \item El grafo $G_6$ es un \textit{grafo junta}.
+  \end{enumerate}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+  $$
+    \begin{tikzpicture}[
+        grafo style,
+        scale=0.4,
+        node distance = 1cm,
+        minimum size = 0.6cm,
+        vecino1/.style={draw=OliveGreen, fill=OliveGreen!20},
+        vecino2/.style={draw=Peach, fill=Peach!20},
+      ]
+
+      \node[nodo,vecino1] (1) {$1$};
+      \node[nodo,vecino2, left = 4cm of 1] (2) {$2$};
+      \node[nodo,vecino1, below of = 1] (3) {$3$};
+      \node[nodo,vecino1, below of = 3] (5) {$5$};
+      \node[nodo,vecino1, below of = 5] (7) {$7$};
+      \node[nodo,vecino1, below of =7] (9) {$9$};
+      \node[nodo,vecino1, below of = 9] (11) {$11$};
+      \node[nodo,vecino2, below of = 2] (4) {$4$};
+      \node[nodo,vecino2, below of = 4] (6) {$6$};
+      \node[nodo,vecino2, below of = 6] (8) {$8$};
+      \node[nodo,vecino2, below of = 8] (10) {$10$};
+      \node[nodo,vecino2, below of = 10] (12) {$12$};
+      \node[dashed, draw=OliveGreen, fill=OliveGreen!30, fit=(1)(11), inner sep = 10pt, outer sep= 5pt, opacity=0.4, rounded corners] (vecinos1){};
+      \node[dashed, draw=Peach, fill=Peach!30, fit=(2)(12), inner sep = 10pt, outer sep= 5pt, opacity=0.4, rounded corners] (vecinos2){};
+      \node[] at (vecinos1.north) {$N(i_{par})$};
+      \node[] at (vecinos2.north) {$N(i_{impar})$};
+      \node[dotted,draw=black, fit=(1)(12), inner sep = 27pt, outer sep= 5pt, rounded corners] (g) {};
+      \node[] at (g.north) {$G_6$};
+
+      %1
+      \foreach \i in {2,4,6,8,10,12}{
+          \draw[OliveGreen, very thick] (1) to (\i);
+          \foreach \j in {3,5,7,9,11}{
+              \ifnum\i=2
+                \draw[Peach, very thick] (2) to (\j);
+              \else
+                \draw[OliveGreen, very thin] (\j) to (\i);
+              \fi
+            }
+        }
+    \end{tikzpicture}
+  $$
+\end{minipage}
+
+\medskip
+
+¿Medio bardo? Dibujé el grafo 100 veces antes de darme cuenta que era por acá. Bueh, así se puede pensar un grafo de $2n$ vértices con
+$n^2$ aristas sin formar ningún triángulo.
+
+Con esta intuición en mente arranco la demo, en la cual voy a tener que probar por absurdo apoyándome en la \purple{hipótesis inductiva}.
+
+\bigskip
+
+Quiero demostrar la siguiente proposición:
+\parrafoDestacado{
+  \textit{
+    $p(n):$ Todo grafo de $2n$ vértices con más de $n^2$ aristas tiene algún triángulo $\paratodo n \en \naturales$.
+  }
+}
+
+\textit{Caso base:}
+
+Quiero mostrar que la proposición:
+\parrafoDestacado{
+  \textit{
+    $p(\blue{2}):$ Todo grafo de $2\cdot \blue{2}$ vértices con más de $\blue{2}^2$ aristas tiene algún triángulo.
+  }
+}
+es verdadera.
+
+Tengo 4 vértices. Solo puedo forman un único grafo con $\blue{2}^2$ aristas sin triángulo:
+$$
+  \begin{tikzpicture} [grafo style]
+    \node[nodo] (v1) {$v_1$};
+    \node[nodo, right of=v1] (v2) {$v_2$};
+    \node[nodo, below of=v2] (v3) {$v_3$};
+    \node[nodo, left of=v3] (v4) {$v_4$};
+    \draw[] (v1) to node[midway, above]{$1$} (v2);
+    \draw[] (v2) to node[midway, right]{$2$} (v3);
+    \draw[] (v3) to node[midway, below]{$3$} (v4);
+    \draw[] (v1) to node[midway, left]{$4$} (v4);
+    \draw[dotted, red] (v2) to (v4);
+    \draw[dotted, red] (v3) to (v1);
+  \end{tikzpicture}
+$$
+Agregar cualquiera de las aristas \red{punteadas} me formaría los triángulos. Por lo tanto la proposición $p(\blue{2})$ resultó verdadera.
+
+\bigskip
+
+\textit{Paso inductivo:}
+
+Asumo que para algún $\blue{k} \en \naturales$ la proposición:
+\parrafoDestacado{
+  $p(\blue{k}):
+    \ub{
+      \textit{
+        Todo grafo de $2\blue{k}$ vértices con más de $\blue{k}^2$ aristas tiene algún triángulo,
+      }
+    }{
+      \text{\purple{hipótesis inductiva}}
+    }
+  $
+}
+es verdadera, entonces quiero probar que:
+\parrafoDestacado{
+  \textit{
+    $p(\blue{k + 1}):$ Todo grafo de $2(\blue{k + 1})$ vértices con más de $(\blue{k + 1})^2$ aristas tiene algún triángulo,
+  }
+}
+también lo sea.
+
+\textit{Por absurdo}:
+
+Supongo que tengo un grafo $G(V,E)$ con $|V| = 2(\blue{k+1})$ y $|E| \mayor{\red{!!}} (\blue{k+1})^2$ sin ningún triángulo.
+\parrafoDestacado{
+  \textit{
+    Le voy a sacar 2 vértices \red{adyacentes} ($\magenta{v} \ytext \magenta{u}$) a ese grafo $G(V,E)$ para compararlo con la \purple{HI}
+  }
+}
+\parrafoDestacado{
+\it
+¿Por qué los elijo \red{adyacentes}?
+
+Porque quiero sacar la \ul{menor} cantidad de aristas posibles. Si saco de más siempre voy a poder
+conseguir grafo sin triángulo.
+
+{\tiny(Básicamente $p \entonces q$, si $p = \false$, la implicación es \true, pero no aporta nada).}
+}
+Sacarle 2 vértices a $|V| = 2(\blue{k+1})$ me deja con $|V'| = 2\blue{k}$. Quiero calcular
+\parrafoDestacado{
+  \textit{
+    ¿Cuántas aristas tengo que sacar junto al vértice \magenta{$v$} que elimino?
+  }
+
+  \textit{
+    ¡La cantidad \red{máxima} que sé que un vértice \magenta{$v$} puede tener sin formar triángulos en el grafo!
+  }
+}
+Laburo haciendo \textit{operaciones} en un \red{grafo genérico} $G$, \textit{operaciones} que no deberían romper la generalidad que debe tener la demo.
+
+En la intro al ejercicio vi que para un vértice $\magenta{v}$ que tiene un conjunto de vecinos $N(\magenta{v})$
+es necesario que los elementos $w \en N(\magenta{v})$ no sean vecinos entre sí.
+\parrafoDestacado{
+  \textit{
+    Laburo con esos vértices $\magenta{v}$, los cuales \ul{debe} haber en cualquier grafo con $|E| > (\blue{k+1})^2$.
+    Recuerdo que asumí que \ul{no} hay triángulos y esos vértices que quiero sacar $\magenta{u}$ maximizan la cantidad de
+    aristas que puede tener un vértice \ul{sin formar triángulos}.
+  }
+}
+
+Saco el vértice \magenta{$v$} \ul{primero}, \ul{luego} el \magenta{$u$}. Ayuda mucho el grafo que grafiqué en la intro
+para ver la aristas afectadas al sacar los vértices 1 y 2:
+\begin{itemize}
+  \item El vértice \magenta{$v$} está unido a otros $\frac{2(\blue{k+1})}{2} = \ob{\blue{k + 1}}{|N(\magenta{v})|}$ vértices (incluyendo al \magenta{$u$}).
+  \item ¡Listo, ya saqué el \magenta{$v$} junto a sus $\blue{k+1}$ aristas! (tantas aristas como la mitad de vértices).
+  \item El vértice $\magenta{u}$ (ahora) está unido a otros $\ob{\frac{2(\blue{k + 1})}{2} - \ua{1}{\text{el} ~ \magenta{v} ~ \text{que}\\ \text{se fue}}}{|N(\magenta{u}) \setminus \set{\magenta{v}}|} = \blue{k}$.
+  \item En total le saco $\blue{2k+1}$ aristas a $G$.
+\end{itemize}
+
+Recuerdo que: $G(V,E)$ tiene $|E| > (\blue{k+1})^2$ y \red{no tiene triángulos}.
+
+Mi nuevo grafo podado $G'$:
+$$
+  \llamada1
+  G'(V', E') ~ \text{con} ~
+  \llave{rcl}{
+    |V'| & = & 2\blue{k} \\
+    |E'| & = & |E| - (\blue{2k + 1}) \mayor{\red{!!!}} \blue{k}^2
+  }
+$$
+\parrafoDestacado[\atencion]{
+  \textit{
+    ¿Ves al absurdo?
+  }
+}
+Partiendo de un grafo $G$ con $2(\blue{k+1})$ vértices y más de $(k+1)^2$ aristas supuestamente \red{sin} triángulos, llegué
+\ul{con el cuidado necesario de realizar operaciones que no destruirían ningún triángulo}
+a un grafo $\llamada1G'$ con $2k$ vértices y más (\red{!!!}) de $k^2$ aristas \red{sin triángulos tampoco}.
+Un minuto de silencio, porque acaba de morir la \purple{hipótesis inductiva}: Ahí está el absurdo.
+
+\bigskip
+
+Por el absurdo sale entonces que la proposición $p(\blue{k+1})$ también es verdadera, dado que no puedo tener un grafo $G$ con $2(k+1)$ vértices y
+$(k+1)^2$ aristas sin triángulos.
+
+Por el principio de inducción $p(n)$ será verdadera $\paratodo p \en \naturales$.
+
+\bigskip
+
+Sobre la pregunta de si hay una cota, creo que no, por la forma en que construyo el grafo de la intro, es eso una demo? Sé que no.
+
+No sé, ni quiero demostrarlo. Si podés demostrarlo y coso escribime y lo corrijo o agrego.
+
+\fin

@@ -1,0 +1,76 @@
+\begin{enunciado}{\ejercicio[Bipartito o Ciclo]}
+  \textit{Bipartito o Ciclo}
+
+  Sea $G$ un grafo de $n$ vértices. Demostrar que $G - v$ es bipartito para todo $v \en V(G)$ si y
+  solo si $G$ es bipartito o un ciclo impar. Demostrar la ida por el contrarrecíproco y la vuelta
+  en forma directa.
+\end{enunciado}
+
+Quiero mostrar que dado un grafo $G(V,E)$ y un vértice $v\en V$:
+\parrafoDestacado{
+  \it
+  $G(V \setminus \set{v}, E')$ es bipartito $\paratodo v \en V$ si solo si $G(V,E)$ es bipartito o un ciclo impar.
+}
+
+\begin{itemize}
+  \item[$(\Rightarrow)$] Por contrarecíproco de la ida:
+        \parrafoDestacado{
+          \it
+          Si $G(V,E)$ no es bipartito ni un ciclo impar entonces
+          existe por lo menos un $v \en V$ tal que $G(V \setminus \set{v}, E')$ no es bipartito.
+        }
+        \begin{itemize}
+          \item[\grafoBullet]
+                Si $G(V,E)$ no es bipartito y tampoco es un ciclo impar, entonces debe ser un grafo
+                que:
+                \parrafoDestacado{
+                  \it Tiene algún ciclo impar y además algún otro vértice que \ul{no} pertenezca al ciclo.
+                }
+                Ejemplitos ejemplificantes:\qquad
+                \begin{tikzpicture} [grafo style, baseline = -15, scale=0.1 ]
+                  \node[nodo] (v1) {};
+                  \node[nodo, right of=v1] (v2) {};
+                  \node[nodo, below of=v2] (v3) {};
+                  \node[nodo, left of=v3] (v4) {};
+                  \draw[very thick, BrickRed!50] (v1) to (v2);
+                  \draw[very thick, BrickRed!50] (v2) to (v4);
+                  \draw[very thick, BrickRed!50] (v1) to (v4);
+                  \draw[] (v3) to (v4);
+                  \node[above right=15pt of v3, inner sep=0, outer sep=0] (v) {$v$};
+                  \draw[-latex,arista, bend right=20pt] (v) to (v3.north);
+                \end{tikzpicture}
+                \qquad o así \qquad
+                \begin{tikzpicture} [grafo style, baseline = -15, scale=0.1 ]
+                  \node[nodo] (v1) {};
+                  \node[nodo, right of=v1] (v2) {};
+                  \node[nodo, below of=v2] (v3) {};
+                  \node[nodo, left of=v3] (v4) {};
+                  \draw[very thick, BrickRed!50] (v1) to (v2);
+                  \draw[very thick, BrickRed!50] (v2) to (v4);
+                  \draw[very thick, BrickRed!50] (v1) to (v4);
+                  \node[above right=15pt of v3, inner sep=0, outer sep=0] (v) {$v$};
+                  \draw[-latex,arista, bend right=20pt] (v) to (v3.north);
+                \end{tikzpicture}
+
+                Concluyendo, si el vértice $v$ no forma parte del ciclo impar, es el que elegiría para sacar y así \ul{no perturbar el ciclo}.
+                Por lo tanto para cualquier $G(V,E)$ que no es bipartito y tampoco es un ciclo impar, va existir algún $v \en V$
+                para obtener un grafo $G(V\setminus \set{v}, E')$ tampoco bipartito. Fin.
+        \end{itemize}
+
+  \item[$(\Leftarrow)$] Prueba directa de la vuelta:
+        \parrafoDestacado{
+          \it
+          Si $G(V,E)$ es bipartito o un ciclo impar entonces $G(V \setminus \set{v}, E')$ es bipartito $\paratodo v \en V$.
+        }
+        \begin{itemize}
+          \item[\grafoBullet]
+                Si $G(V,E)$ es bipartito, entonces no tiene un ciclo impar. Sacarle cualquier vértice $v$ a $G$ no debería formar ningún ciclo impar.
+                Es así que $G(V \setminus \set{v}, E')$ es un grafo bipartito. Se cumple entonces la implicación. Fin.
+
+          \item[\grafoBullet]
+                Si $G(V,E)$ es un ciclo impar puro. Sacarle un vértice $v$ a un ciclo impar, rompería el ciclo formando un camino simple,
+                lo cual siempre será bipartito. Fin.
+        \end{itemize}
+\end{itemize}
+
+\fin

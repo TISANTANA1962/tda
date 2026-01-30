@@ -1,0 +1,93 @@
+\lstset{
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]mientras,for,each, si, sino, if, else, true, false},
+  emph={[3]desordenSort, contar},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+}
+
+\begin{enunciado}{\ejercicio[DesordenSort]}
+
+  \textit{DesordenSort}
+
+  La cantidad de parejas en desorden de un arreglo $A[1\ldots n]$ es la cantidad de parejas de posiciones $1\leq i < j \leq n$
+  tales que $A[i] > A[j]$. Dar un algoritmo que calcule la cantidad de parejas en desorden de un arreglo
+  y cuya complejidad temporal sea estrictamente mejor que $O(n^2)$ en el peor caso.
+  \textbf{Hint}: Considerar hacer una modificación de un algoritmo de sorting.
+\end{enunciado}
+
+Tiene pinta de $\textit{mergeSort}$. Solo que debo contar cuando hago los ordenamientos.
+\begin{enumerate}[label=\footnotesize\purple{\faIcon{code}$_{\arabic*)}$}]
+  \item Hago el \textit{divide} como siempre.
+  \item El caso base agarra el arreglo de tamaño 1, donde no hay mucho que hacer.
+  \item Al igual que en \textit{mergeSort} toda la papa está en la función \textit{contar},
+        que hace lo mismo que la función \textit{merge}, pero me va a ircontando cada vez que haya elementos
+        para ordenar.
+  \item Si el elemento en la parte derecha \texttt{A[j]} es menor que el \texttt{A[i]}, \underline{también lo será} $\paratodo i \en [i,m]$,
+        donde $m$ es el índice que salió del \textit{divide}. Dado que los arreglos de la izquierda y derecha están ordenados al igual que
+        en \textit{mergeSort}.
+  \item Tengo algo así \ul{$f(n) = 2f(n/2) + \text{las parejas que ordené}$}, lo cual tiene pinta de cumplir la restricción de complejidad pedida.
+\end{enumerate}
+
+\begin{minipage}{0.5\linewidth}
+  \begin{tcolorbox}
+    \begin{lstlisting}
+funcion desordenSort(A[1..n])
+    si n = 1
+        ret 0 // nada que hacer
+
+    m $\ot$ n/2
+
+    ret desordenSort(A[1..m]) +
+       desordenSort(A[m+1..n]) +
+       contar(A[1..n], m)\end{lstlisting}
+  \end{tcolorbox}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+  \begin{tcolorbox}
+    \begin{lstlisting}
+funcion contar(A[1..n], m)
+    suma $\ot$ 0
+    i $\ot$ 1
+    j $\ot$ m+1
+    k $\ot$ 1 // Para armar la solución B
+    mientras k <= n
+        si j > n // Se terminó la mitad de la derecha?
+            B[k] $\ot$ A[i]
+            i $\ot$ i + 1
+        sino si i > m // Se terminó la mitad de la izq?
+            B[k] $\ot$ A[j]
+            j $\ot$ j + 1
+        sino si A[i] < A[j] // Pareja ordenada
+            B[k] $\ot$ A[i]
+            i $\ot$ i + 1
+        sino // Pareja desordenada
+            B[k] $\ot$ A[j]
+            suma $\ot$ suma + (m - i) + 1
+            j $\ot$ j + 1
+        k $\ot$ k + 1
+    k $\ot$ 1
+    mientras k <= n
+        A[k] $\ot$ B[k] // copio para actualizar A
+
+    ret suma \end{lstlisting}
+  \end{tcolorbox}
+\end{minipage}
+
+La complejidad de esta función es idéntica a la de \textit{mergeSort}. Hay 2 llamados recursivos de \textit{\green{desordenSort}} y en cada llamado hay una
+llamada a \textit{\green{contar}}, esta última recorre el arreglo \ul{una vez para ordenar y luego otra vez en el copiado} de la respuesta así que
+$\textit{\green{contar}(A[1..n], m)} \en O(n)$. Tengo entonces un árbol de $\log_2(n)$ niveles y cada nivel(sumando todos sus nodos) tiene en total
+un costo de $n$. El \textit{running time} del algoritmo queda:
+$$
+  T(n) = 2\cdot T(n/2) + n
+  \entonces
+  \cajaResultado{
+    T(n) \en \Theta(n \log(n))
+  }
+$$
+
+\fin

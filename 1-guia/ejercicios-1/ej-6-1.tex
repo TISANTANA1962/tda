@@ -1,0 +1,98 @@
+\def\maxMon{\textit{\green{maximaMontaña}}}
+\begin{enunciado}{\ejercicio[MáximoMontaña]}
+  \textit{MáximoMontaña}
+
+  Un arreglo de enteros se denomina montaña si está compuesto por una secuencia estrictamente creciente
+  seguida de una estrictamente decreciente. Dado un arreglo montaña de longitud $n$, dar un algoritmo que encuentre
+  el máximo del arreglo en complejidad $O(\log(n))$.
+  Por ejemplo, para un arreglo
+  $
+    [ -1,3,8,22,30,22,8,4,2,1]
+  $, el máximo está en la posición $4$ y vale $30$.
+\end{enunciado}
+
+El asunto de la complejidad me pone el \brain en modo \textit{binarySearch}, dado que
+tengo un arreglo con cierto orden y en cada \textit{iteracion/recursión} voy a estar haciendo comparaciones,
+para saber para todo seguir, operaciones que tienen una complejidad constante.
+
+\textit{Descripción en lenguaje natural del algoritmo:}
+
+El input es un arreglo \textit{montaña}. Agarro el elemento del medio del arreglo y me fijo lo que tiene a los costados.
+Si
+$$
+  \texttt{A[m-1] < A[m] < A[m+1]}
+$$
+me quedo con el arreglo $A[m+1..n]$ sino al revés.
+
+Caso base:
+
+Si el arreglo tiene un solo elemento devuelvo ese elemento.
+
+Un poco más formalizado en una función. Pongo 2 sabores. Una en la que paso el arreglo como parámetro,
+lo que es menos eficiente en la compu que pasar índices, pero \purple{es más fácil/intuitivo al principio} que laburar solo
+con los índices:
+$$
+  \maxMon(A[1..n]) =
+  \llave{ccl}{
+    A[1]                                & \text{si} & |A| = 1 \\
+    \maximo(A[1],A[2])                      & \text{si} & |A| = 2 \\
+    \maxMon(A[|A|/2+ 1..n])      & \text{si} & A[|A|/2 - 1] < A[|A|/2] < A[|A|/2 + 1] \\
+    \maxMon(A[1..|A|/2 - 1])      & \text{si} & A[\frac{1+n}{2} - 1] > A[|A|/2] > A[|A|/2 + 1] \\
+    A[|A|/2]                    & \multicolumn{2}{l}{\text{sino}}
+  }
+$$
+Versión con índices. Más eficiente, pero requieren un poco más de práctica:
+$$
+  \maxMon(i, d) =
+  \llave{ccl}{
+    A[i]                               & \text{si} & d = i \\
+    \maximo(A[i],A[d])                 & \text{si} & d - i = 1 \\
+    \maxMon(\frac{i + d}{2} + 1, d)    & \text{si} & A[\frac{i+d}{2} - 1] < A[\frac{i+d}{2}] < A[\frac{i+d}{2} + 1] \\
+    \maxMon(i, \frac{i + d}{2} - 1)    & \text{si} & A[\frac{i+d}{2} - 1] > A[\frac{i+d}{2}] > A[\frac{i+d}{2} + 1] \\
+    A[\frac{i+d}{2}]                   & \multicolumn{2}{l}{\text{sino}}
+  }
+$$
+
+\begin{tcolorbox}
+  \begin{lstlisting}[
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]si, sino, if, else, true, false},
+  emph={[3]maximaMontana},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+]
+funcion maximaMontana(i, d)            // i: índice izq, d: índice der.
+    si i=d
+        ret A[i]                // devuelvo A[i], el único elemento
+    si d-i=1                   // tamano de arreglo es 2
+        ret max(A[i],A[d])      // devuelvo máximo
+
+    m $\ot$ (i+d)/2
+
+    si (A[m-1] < A[m] < A[m+1])
+        ret maximaMontana(m+1, d)
+    si else (A[m-1] > A[m] > A[m+1])
+        ret maximaMontana(i, m-1)
+    sino
+        ret A[m]\end{lstlisting}
+\end{tcolorbox}
+
+Esta función, algoritmo, genera un árbol de una sola rama, dado que \magenta{en cada llamada solo puede llamar una vez a la otra función}
+con una longitud $\log_2(n)$, donde $n$ es el tamaño del arreglo. Nuevamente el costo de resolver cada subproblema (el $f(n)$) es constante,
+son solo un par de comparaciones.
+$$
+  \cajaResultado{
+    T(n) \en  \Theta(\log(n))
+  }
+$$
+{
+    \color{gray!20}
+    \tiny
+    A esta altura el \textit{teorema maestro} no puede chuparme tanto un huevo.
+  }
+
+\fin

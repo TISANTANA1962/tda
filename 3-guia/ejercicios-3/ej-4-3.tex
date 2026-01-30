@@ -1,0 +1,420 @@
+\begin{enunciado}{\ejercicio[ArteConexo]}
+  \textit{ArteConexo}
+
+  Un vértice $v$ de un grafo $G$ es un \textit{punto de articulación} si $G - v$ tiene más componentes conexas
+  que $G$. Por otro lado, un grafo es $biconexo$ si es conexo y no tiene puntos de articulación.
+
+  \begin{enumerate}[label=\alph*)]
+    \item Demostrar, usando inducción en la cantidad de vértices, que todo grafo de $n$ vértices que
+          tiene más de $(n-1)(n-2)/2$ aristas es conexo. Opcionalmente, puede demostrar la misma propiedad
+          usando otras técnicas de demostración.
+
+    \item Demostrar por medio de una reducción al absurdo que todo grafo de $n$ vértices que tenga
+          al menos $2 + (n-1)(n-2)/2$ aristas es biconexo.
+
+    \item ¿Se pueden dar cotas mejores que funcionen a partir de algún $n_0$? Es decir,
+          ¿Existe $c(n) < 1 + (n-1)(n-2)/2$ (resp. $c(n) < 2 + (n-1)(n-2)/2$) talque todo grafo de
+          $n \geq n_0$ vértices que tenga al menos $c(n)$ aristas sea conexo (resp. biconexo)?
+  \end{enumerate}
+\end{enunciado}
+
+\begin{enumerate}[label=\alph*)]
+  \item\label{ej-4:item-a}
+        Para arrojar un poco de intuición sobre este ejercicio:
+
+        Un \textit{grafo completo} (tiene una arista entre cualquier par de \textit{vértices}) de $\violet{n}$ vértices tiene un total de
+        aristas $|E| = m$ según:
+        $$
+          m = \frac{\violet{n} \cdot (\violet{n} - 1)}{2}.
+        $$
+        Se parece mucho a la fórmula del enunciado: $g(n) = \frac{(n-1) \cdot (n-2)}{2}$.
+        Un \textit{grafo completo} es obviamente \ul{conexo}, dado que $\paratodo v \en V,\, d(v) = n-1 \distinto 0$.
+
+        Algunos ejemplos:
+        $$
+          \llave{ccl}{
+            n & = & 3\\
+            m & = & 3\\
+            g(n) & = & 1
+          }
+          \quad
+          \to
+          \quad
+          \begin{tikzpicture}[ grafo style ]
+            \foreach \i in {1,...,3} {
+                \node[nodo] at ({120 * (\i-1)}:1.5cm) (\i) {$\i$};
+              }
+            \foreach \i in {1,...,3} {
+                \foreach \j in {1,...,3}{
+                    \ifnum\i<\j
+                      \draw[arista] (\i) to (\j);
+                    \fi
+                  }
+              }
+              \node[] (k3) {$K_3$};
+          \end{tikzpicture}
+          \quad
+          \flecha{agrego \inlinegraph{4}}[y completo]
+          \quad
+          \llave{ccl}{
+            n & = & 4\\
+            m & = & 6\\
+            g(n) & = & 3
+          }
+          \quad
+          \to
+          \quad
+          \begin{tikzpicture}[ grafo style ]
+            \foreach \i in {1,...,4} {
+                \node[nodo] at ({90 * (\i-1)}:1.5cm) (\i) {$\i$};
+              }
+            \foreach \i in {1,...,4} {
+                \foreach \j in {1,...,4}{
+                    \ifnum\i<\j
+                      \draw[arista] (\i) to (\j);
+                    \fi
+                  }
+              }
+              \node[] (k4) {$K_4$};
+          \end{tikzpicture}
+        $$
+        Para un grafo de 5 vértices agrego un vértice más y \red{no lo conecto}, obteniendo un grafo \ul{no conexo}, pero con \ul{2 componentes conexas}, una de
+        5 vértices y la otra de 1 solo vértice:
+        $$
+          \llave{ccl}{
+            n & = & 5\\
+            m & = & 10\\
+            g(n) & = & 6
+          }
+          \to
+          \quad
+          \begin{tikzpicture}[ grafo style ]
+            \foreach \i in {1,...,5} {
+                \node[nodo] at ({60 * (\i-1)}:1.5cm) (\i) {$\i$};
+              }
+            \foreach \i in {1,...,5} {
+                \foreach \j in {1,...,5}{
+                    \ifnum\i<\j
+                      \draw[arista] (\i) to (\j);
+                    \fi
+                  }
+              }
+              \node[] (k5) {$K_5$};
+          \end{tikzpicture}
+          \flecha{agrego \inlinegraph{6}}[\red{no conecto}]
+          \llave{ccl}{
+            n & = & 6\\
+            m & = & 10\\
+            g(n) & = & 10
+          }
+          \to
+          \quad
+          \begin{tikzpicture}[ grafo style ]
+            \foreach \i in {1,...,6} {
+                \node[nodo] at ({60 * (\i-1)}:1.5cm) (\i) {$\i$};
+              }
+            \foreach \i in {1,...,5} {
+                \foreach \j in {1,...,5}{
+                    \ifnum\i<\j
+                      \draw[arista] (\i) to (\j);
+                    \fi
+                  }
+              }
+
+            \path[compConexa] (1.east) -- (2.north east) -- (3.north west) --(4.west) -- (5.south) -- cycle;
+            \node[compConexa, fit=(6)]{};
+          \end{tikzpicture}
+        $$
+
+        Si conecto ahora el nuevo vértice \inlinegraph{6}
+        a un único vértice de la otra componente conexa, por ejemplo el\inlinegraph{1}, obtengo 2 cosas:
+        \begin{itemize}
+          \item \hypertarget{ej-4:casobase}{Un grafo conexo de 6 vértices}.
+          \item Un \textit{\ul{punto de articulación}} en el \inlinegraph{1}.
+        \end{itemize}
+        {\small
+        $$
+          \llave{rcl}{
+            |V| & = & 6\\
+            |E| & = & \orange{11}\\
+            g(|V|) & = & 10
+          }
+          \quad
+          \to
+          \quad
+          \begin{tikzpicture}[ grafo style ]
+            \foreach \i in {1,...,6} {
+                \node[nodo] at ({60 * (\i-1)}:1.5cm) (\i) {$\i$};
+              }
+            \foreach \i in {1,...,5} {
+                \foreach \j in {1,...,5}{
+                    \ifnum\i<\j
+                      \draw[arista] (\i) to (\j);
+                    \fi
+                  }
+              }
+            \draw[arista, orange] (6) to (1);
+          \end{tikzpicture}
+          \quad
+          \flecha{saco el}[\inlinegraph{1}]
+          \quad
+          \llave{ccl}{
+            |V| & = & 5\\
+            |E| & = & \orange{6}\\
+            g(|V|) & = & 10 \\
+            \multicolumn{3}{c}{\text{\footnotesize 2 componentes conexas}}
+          }
+          \to
+          \quad
+          \begin{tikzpicture}[ grafo style ]
+            \foreach \i in {2,...,6} {
+                \node[nodo] at ({60 * (\i-1)}:1.5cm) (\i) {$\i$};
+              }
+            \foreach \i in {2,...,5} {
+                \foreach \j in {2,...,5}{
+                    \ifnum\i<\j
+                      \draw[arista] (\i) to (\j);
+                    \fi
+                  }
+              }
+            \node[nodo, opacity=0.1] at (0:1.5cm) (1) {$1$};
+            \foreach \i in {2,...,5} {
+                \draw[arista, opacity=0.1] (1) to (\i);
+              }
+            \draw[arista, orange, opacity=0.1] (6) to (1);
+
+            \path[compConexa] (2.south east) -- (2.north east) -- (3.north west) --(4.west) -- (5.south) -- cycle;
+            \node[compConexa, fit = (6)]{};
+          \end{tikzpicture}
+        $$
+        }
+
+        \bigskip
+
+        \parrafoDestacado[\red{\atencion}]{
+          Ahora intento demostrar esas cosas del enunciado por inducción:
+        }
+        Quiero demostrar que la premisa:
+        \parrafoDestacado{
+          $p(n)$: Todo grafo de $n$ vértices que tiene más de $(n-1)(n-2)/2$ aristas es conexo.
+        }
+        es verdadera para todo $n \en \naturales$
+
+        \medskip
+
+        \textit{Caso base:}
+        {\tiny
+          \parrafoDestacado{
+            $p(\blue{1})$: Todo grafo de \blue{1} vértices que tiene más de $0$ aristas es conexo.
+          }
+          Un nodo aislado es conexo por definición.
+          \parrafoDestacado{
+            $p(\blue{2})$: Todo grafo de \blue{2} vértices que tiene más de $0$ aristas es conexo.
+          }
+          Verdadero trivialmente, es el grafo $K_2$.
+        }
+        \parrafoDestacado{
+          $p(\blue{3})$: Todo grafo de \blue{3} vértices que tiene más de $(\blue{3}-1)(\blue{3}-2)/2 = 1$ aristas es conexo.
+        }
+        $$
+          m=2
+          \llave{ccc}{
+            d(v_1) & = & 1      \\
+            d(v_2) & = & 1      \\
+            d(v_3) & = & 2
+          }
+          \quad
+          \ytext
+          \quad
+          m = 3
+          \llave{ccc}{
+            d(v_1) & = & 2      \\
+            d(v_2) & = & 2      \\
+            d(v_3) & = & 2
+          }\quad \to K_3
+        $$
+        Es un grafo conexo. Otras posibles combinaciones son \textit{isomorfismos de ese mismo grafo}.
+
+        El (Los) caso base verdadero.
+
+        \medskip
+        \textit{Paso inductivo:}
+
+        Asumo que para algún $\blue{k} \en \naturales$ la proposición:
+        \begin{center}
+          $p(\blue{k})$:
+          $\ub{
+              \text{
+                Todo grafo de $\blue{k}$ vértices que tiene más de $(\blue{k}-1)(\blue{k}-2)/2$ aristas es conexo
+              }
+            }{
+              \text{\purple{hipótesis inductiva}}
+            }$.
+        \end{center}
+        es verdadera, entonces quiero probar que la proposición
+        \parrafoDestacado{
+          $p(\blue{k+1})$: Todo grafo de $\blue{k+1}$ vértices que tiene más de $(\blue{k})(\blue{k}-1)/2$ aristas es conexo.
+        }
+        También lo sea.
+
+        Partiendo de la \purple{hipótesis inductiva} sé que un grafo $G$ con $\blue{k}$ vértices es conexo si tiene más de
+        $\frac{(\blue{k}-1)(\blue{k}-2)}{2}$.
+
+        Le agrego un vértice más, el \inlinegraph{k+1} a cualquier grafo $G$ formando un grafo $G'$ de $\blue{k+1}$ vértices.
+
+        \textit{¿Qué me dice esto de la aristas?} Absolutamente nada. Puedo agregar agregar aristas a $G'$.
+        \parrafoDestacado[\red{\atencion}]{
+          Es tentador acá \textit{querer elegir} una arista que conecte al \inlinegraph{k+1} y listo, pero eso estaría mal. Tengo
+          que buscar una forma de que funcione para \textit{cualquier grafo $G'$}.
+        }
+        Cosas que pueden pasar es que agregue aristas que no hagan al grafo conexo:
+        \begin{enumerate}[label=\faIcon{atom}]
+          \item Agrego \ul{una arista} y ahora $G'$ tiene $\frac{(\blue{k}-1)(\blue{k}-2)}{2} + 1$ aristas.
+
+                \textit{\ul{No tengo garantías de que sea un grafo conexo}}.
+
+          \item Sigo agregando \ul{de a una arista} hasta que llego a agregarle $k-2$ aristas. $G'$
+                tiene $\frac{(\blue{k}-1)(\blue{k}-2)}{2} + k - 2 = \frac{k \cdot (k-1)}{2}$ aristas.
+
+                \textit{\ul{No tengo garantías de que sea un grafo conexo}}.
+
+          \item Si la cantidad de aristas es $m = \frac{k \cdot (k-1)}{2}$ eso alcanza para tener un grafo de $k$
+                vértices \ul{completo}. Es decir que en el \textit{armado menos aleatorio de la creación} puedo tener a
+                $G'$ formado por una componente de $k$ vértices completa (por lo tanto conexa) y un \ul{vértice aislado}
+                \inlinegraph{k+1}.
+
+          \item Agregando una arista más al grafo $G'$ tendría una cantidad $m > \frac{k \cdot (k-1)}{2}$ dado que a la
+                \ul{componente conexa completa} no le entran más aristas, \ul{conecto al vértice} \inlinegraph{k+1}, formando \red{inevitablemente}
+                un grafo $G'(V',E')$ de $|V'| = \blue{k+1}$ con $|E'| > \frac{k \cdot (k-1)}{2}$.
+
+                \textit{\ul{Ahora sí puedo garantizar que es un grafo conexo}}.
+        \end{enumerate}
+        Así queda probado que la proposición con $\blue{k+1}$ es verdadera.
+
+        \bigskip
+
+        Dado que los casos base y el paso inductivo resultaron verdaderos, la proposición $p(n)$ será verdadera $\paratodo n \en \naturales$.
+
+  \item ¿Se podría demostrar parecido al anterior por inducción? Sí.
+
+        La diferencia principal con el ítem \ref{ej-4:item-a} es que hay suficientes aristas como para unir
+        al vértice\inlinegraph{k+1} a 2 vértices\inlinegraph{i},\inlinegraph{j} del grafo completo:
+
+        Ejemplito ejemplificante con $n = 6$:
+        $$
+          \llave{rcl}{
+            |V| & = & 6\\
+            |E| & = & 10 + \orange{2} = 12\\
+            g(6) & = & 2 + \frac{(6 - 1) \cdot (6 - 2)}{2} = 10
+          }
+          \to \quad
+          \begin{tikzpicture}[ grafo style ]
+            \foreach \i in {1,...,6} {
+                \node[nodo] at ({60 * (\i-1)}:1.5cm) (\i) {$\i$};
+              }
+            \foreach \i in {1,...,5} {
+                \foreach \j in {1,...,5}{
+                    \ifnum\i<\j
+                      \draw[arista] (\i) to (\j);
+                    \fi
+                  }
+              }
+            \draw[arista, orange] (6) to (1);
+            \draw[arista, orange] (6) to (5);
+          \end{tikzpicture}
+          \flecha{biconexo}
+          \llave{c}{
+            \begin{tikzpicture}[ grafo style ]
+              \foreach \i in {2,...,6} {
+                  \node[nodo] at ({60 * (\i-1)}:1.5cm) (\i) {$\i$};
+                }
+              \foreach \i in {2,...,5} {
+                  \foreach \j in {2,...,5}{
+                      \ifnum\i<\j
+                        \draw[arista] (\i) to (\j);
+                      \fi
+                    }
+                }
+              \node[nodo, opacity=0.2] at (0:1.5cm) (1) {$1$};
+              \foreach \i in {2,...,5} {
+                  \draw[arista, opacity=0.1] (1) to (\i);
+                }
+              \draw[arista, orange, opacity=0.1] (6) to (1);
+              \draw[arista, orange] (6) to (5);
+
+              \node[compConexa, fit=(6)(3)(4)]{};
+            \end{tikzpicture}
+            \\
+            \\
+            \begin{tikzpicture}[ grafo style ]
+              \foreach \i in {1,...,4,6} {
+                  \node[nodo] at ({60 * (\i-1)}:1.5cm) (\i) {$\i$};
+                }
+              \foreach \i in {1,...,4} {
+                  \foreach \j in {1,...,4}{
+                      \ifnum\i<\j
+                        \draw[arista] (\i) to (\j);
+                      \fi
+                    }
+                }
+              \node[nodo, opacity=0.1] at (240:1.5cm) (5) {$5$};
+              \foreach \i in {1,...,4} {
+                  \draw[arista, opacity=0.1] (5) to (\i);
+                }
+              \draw[arista, orange, opacity=0.1] (6) to (5);
+              \draw[arista, orange] (6) to (1);
+
+              \path[compConexa]
+              (2.east) --
+              (2.north east) --
+              (3.north west) --
+              (4.west) --
+              (4.south) --
+              (6.south) --
+              (6.east) --
+              (1.east) --
+              cycle;
+            \end{tikzpicture}
+          }
+        $$
+
+        \parrafoDestacado[\red{\atencion}]{
+          Ahora intento demostrar esas cosas del enunciado por reducción al absurdo:
+        }
+        \begin{itemize}
+          \item Partiendo de algún grafo $G(V,E)$ con $|V| = \blue{k}$ y con $|E| = m = 2 + \frac{(\blue{k}-1) \cdot (\blue{k}-2)}{2}$
+                supongo que $G$ tiene algún punto de articulación, es decir que si saco algún vértice obtengo más componentes conexas.
+
+          \item Usando el item \ref{ej-4:item-a} sé que $G$ es conexo. Le saco algún vértice, el \inlinegraph{i} y obviamente junto con el vértice todas
+                las aristas incidentes en el mismo.
+
+          \item Tengo un nuevo grafo $G'(V',E')$ con $|V'| = \blue{k-1}$ y \textit{¿Cuántas aristas $|E'| = m'$?} Ni la más pálida idea.
+                Pero seguro que es algún valor en $ m - (\blue{k - 1}) \leq m' \leq m - 1$. Tengo 2 casos:
+                \begin{enumerate}[label=\faIcon{atom}$_{\arabic*)}$]
+                  \item Si tiene $m' = m - 1$ por ítem \ref{ej-4:item-a} no puede tener más componentes conexas que antes. Fin.
+
+                  \item ¿Qué pasa si tiene menos? Le saco la mayor cantidad de aristas posibles. Hago cuentas:
+                        $$
+                          \begin{array}{rcl}
+                            m' & = & m - (\blue{k - 1})                \\
+                               & = &
+                            2 + \frac{(k-1)(k-2)}{2} -  (\blue{k - 1}) \\
+                               & = &
+                            \frac{k^2 - 5k + 8}{2} \llamada1
+                          \end{array}
+                        $$
+                        Nuevamente, por el ítem \ref{ej-4:item-a}, un grafo $G'$ con $|V| = \blue{k-1}$ es conexo si tiene más de
+                        $\frac{((\blue{k-1}) - 1) \cdot ((\blue{k-1}) - 2 )}{2} = \frac{k^2 - 5k + 6}{2} \llamada2$.
+
+                        Comparo a $\llamada1 \ytext \llamada2$ y resulta que sin importar qué vértice saque de $G$, $G'$ tiene una cantidad
+                        necesaria y suficiente de aristas como para ser conexo por resultado del \item \ref{ej-4:item-a}. Supuse que eso era
+                        falso y llegué a un absurdo.Fin.
+                \end{enumerate}
+
+        \end{itemize}
+
+  \item  Intuyo que no, dado que el cálculo lo construí a partir de grafos con cantidad máxima de aristas, \textit{grafos completos} y luego
+        agregué la cantidad mínima de aristas para igualar las cotas pedidas.
+\end{enumerate}
+
+\fin

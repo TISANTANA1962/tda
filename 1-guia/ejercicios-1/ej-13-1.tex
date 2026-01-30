@@ -1,0 +1,22 @@
+\begin{enunciado}{\ejercicio[MergeSelectivo*Hacer*]}
+  \textit{MergeSelectivo}
+
+  Dados dos arreglos de naturales, ambos ordenados de manera creciente, se desea buscar, dada una posición $i$,
+  el $i-$ésimo elemento de la unión de ambos. Dicho de otra forma, el $i-$ésimo del resultado de hacer merge ordenado
+  entre ambos arreglos. Notar que no es necesario hacer el merge completo. Se puede asumir que cada natural
+  aparece a lo sumo en uno de los arreglos, y a lo sumo una vez.
+  \begin{enumerate}[label=\arabic*)]
+    \item Implementar al función \textit{iésimoMerge} que dados los arreglos $A$ y $B$, y un valor $i$ natural, resuelva
+          el problmea planteado.
+
+    \item Calcular y justificar la complejidad del algoritmo propuesto. La complejidad temporal debe ser $O(\log^2n)$,
+          dónde $n = |A| = |B|$. \textbf{Hint:} Observar que, dado el valor de un elemento de alguno de los dos arreglos, se puede
+          averiguar en tiempo $O(\log(n))$ entre qué par de posiciones consecutivas del otro arreglo quedaría, y de allí deducir
+          cuál sería la posición en el merge.
+
+    \item \textbf{Desafío adicional:} Intente resolver el mismo problema en tiempo $O(\log n)$ (este ítem es bastante más
+          difícil).
+  \end{enumerate}
+\end{enunciado}
+
+\hacer

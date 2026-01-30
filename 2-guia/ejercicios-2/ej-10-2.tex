@@ -1,0 +1,197 @@
+\lstset{
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]en, para, cada, si, sino, if, else, true, false, mientras, not, y, o},
+  emph={[3]vacations, max, min, disponible},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+}
+\begin{enunciado}{\ejercicio[Vacations]}
+  \textit{Vacations {\footnotesize(\href{https://codeforces.com/problemset/problem/698/A}{link a codeforces, recomiendo leer el enunciado ahí \click})}}
+
+  Tomás tiene $n$ días de vacaciones, donde puede hacer actividades:
+  \begin{itemize}
+    \item Se pueden hacer 2 actividades: Gimnasio y competencias.
+    \item Cada día puede tener disponible ambas, una o ninguna.
+  \end{itemize}
+
+  Tomás cada día puede
+  \begin{itemize}
+    \item Hacer una actividad que esté disponible, siempre que no la haya hecho el día anterior.
+    \item Descansar.
+  \end{itemize}
+
+  Tomás quiere minimizar los días de descanso.
+
+  \begin{enumerate}[label=$\alph*)$]
+    \item Diseñar un algoritmo $O(n)$ que calcule la mínima cantidad de días de descanso.
+    \item Probar la correctitud y complejidad del algoritmo.
+    \item Indicar cómo se puede reconstruir la solución. Es decir, indicarle a Tomás qué hará cada día.
+  \end{enumerate}
+
+  \textbf{Ayuda:} Consideren el siguiente ejemplo:
+  \begin{itemize}
+    \item $n=4$
+    \item Días con gimnasio disponibles: 2, 3
+    \item Días con competencias disponibles: 1, 2
+  \end{itemize}
+  Puede lograr tener solo 2 días de descanso.
+\end{enunciado}
+
+Acá empiezan los enunciados que tengo que leer en $O\Big(\limite{n}{\infinito} n^{n^{n^n}}\Big)$ veces para entender.
+Así que sabé que \textit{no estás solo}.
+
+Si el enunciado está en \textit{Codeforces} leerlo de ahí ayuda.
+Ver el \textbf{input} y el \textbf{output} de algún ejemplo te puede dar una idea también.
+
+\bigskip
+
+\begin{enumerate}[label=$\alph*)$]
+  \item
+        Una vez que tengas una idea de lo que están pidiendo lo que hay que hacer es usar \textit{fuerza bruta para armar algoritmos, funciones} igual
+        que en backtracking. Que la función esté descrita con índices \textit{\ul{sin mucha abstracción}} facilita luego la parte de programación dinámica.
+
+        \bigskip
+
+        \def\vacations{\textit{\green{vacations}}\xspace}
+        \def\disponible{\textit{\green{disponible}}\xspace}
+        \def\prev{\textit{prev}\xspace}
+        \def\actividad{\textit{\blue{actividad}}\xspace}
+
+        La siguiente función recibe un arreglo \textit{dias}[1..n] con la información sobre
+        cuáles \textit{\blue{actividades}} (gimnasio, competencia o descanso) que están disponibles en el día $i$.
+        El algoritmo decide como armar un \textit{camino de recursiones} con la menor cantidad de días de descanso posibles.
+
+        La función tiene 2 variables de estado, $i$ y \prev, el día actual y la actividad del día anterior respectivamente. El caso base
+        se alcanza una vez recorrido todo el arreglo de $n \textit{dias}$. Llamo a la función con $\vacations(1, \blue{D})$,
+        conteo \textit{1-indexed} y al poner $\blue{D}$ independizo el valor de la \blue{actividad} del día siguiente a \prev.
+        {\small
+        $$
+          \vacations(i,\textit{prev}) =
+          \llave{ccl}{
+            0 & \text{si} & i > n   \\ \\
+            \minimo
+            \matriz{c}{
+              1 + \vacations(i + 1, \blue{D}), \\
+              0 + \vacations(i+1, \blue{G})
+            }
+            & \text{si} & \prev \distinto \blue{G} \land \disponible(i,\blue{G}) \land \lnot\disponible(i,\blue{C})\\ \\
+            \minimo
+            \matriz{c}{
+              1 + \vacations(i + 1, \blue{D}), \\
+              0 + \vacations(i+1, \blue{C})
+            } & \text{si} & \prev \distinto \blue{C} \land \disponible(i,\blue{C})\land \lnot\disponible(i,\blue{D})  \\ \\
+            \minimo
+            \matriz{c}{
+              1 + \vacations(i + 1, \blue{D}), \\
+              0 + \vacations(i+1, \blue{C}),\\
+              0 + \vacations(i+1, \blue{G})
+            } & \text{si} & \prev \not\en \set{\blue{C}, \blue{G}} \land \disponible(i,\blue{C}) \land \disponible(i,\blue{D})  \\\\
+            1 + \vacations(i+1, \blue{D}) & \multicolumn{2}{l}{\text{si no}}
+          }
+        $$
+        }
+        donde la función auxiliar \disponible me devuelve un \textit{booleano} según la disponibilidad de actividades de el día $i-$ésimo
+        que viene en \textit{días}, input que me dan en el ejercicio que paso por referencia o lo pienso como una variable global.
+        $$
+          \disponible(i,\actividad) =
+          \llave{rcl}{
+            \red{\textit{true}} & \text{si} & \blue{actividad} \en \textit{dias}[i] \\
+            \red{\textit{false}} & \multicolumn{2}{l}{\text{si no}}   \\
+          }
+        $$
+
+        La función \vacations tiene un \textit{running time} exponencial $\Omega(2^n)$. La variable $i$ decrece linealmente y hay
+        por lo menos 2 llamadas recursivas por cada llamada a \vacations, excepto que nunca pueda hacer ninguna \actividad entonces
+        descanso todos los días, lo cual sería $\Theta(n)$, pero supongo que no es ese caso particular tan extremo.
+
+        A medida que se va armando la recursión se pasa por $O(n)$ estados, los $n$ valores que puede tomar el problema con las variables de estado $i$
+        y $\prev$.
+
+        Claramente hay superposición de problemas, lo cual me habilita a usar \textit{programación dinámica}. Con la 
+        técnica de \blue{memoization} del enfoque \textit{top-down} puedo usar un arreglo de $n \times 3$ por ejemplo donde
+        cada elemento tiene el resultado correspondiente al estado del día $i$ y actividad previa $prev$.
+
+        Es igual a lo del ejercicio \refEjercicio{ej:9} Meto los resultados en la estructura y la uso si vuelvo a llamar a la función
+        con esas mismas \textit{variables de estado}, así evitando repetir cálculos al pedo, podando muchas llamadas recursivas.
+
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion vacations(i,prev)
+    si memo[i,prev] not null
+        ret memo[i,prev] 
+    si i>n
+        ret 0
+    si (prev not G) y disponible(i,G) y (not disponible(i,C)) 
+        memo[i,prev] $\ot$ min(1+vacations(i+1,D), 0+vacations(i+1,G))
+    si (prev not C) y disponible(i,C) y (not disponible(i,G)) 
+        memo[i,prev] $\ot$ min(1+vacations(i+1,D), 0+vacations(i+1,C))
+    si (prev not en {C,G)) y disponible(i,C) y disponible(i,G) 
+        memo[i,prev] $\ot$ min(1+vacations(i+1,D), 0+vacations(i+1,C),0+vacations(i+1,G))
+    sino
+        memo[i,prev] $\ot$ 1+vacations(i+1,D)
+
+    ret memo[i,prev] 
+
+funcion disponible(i, actividad)
+    si actividad en dias[i]
+         ret true
+    sino
+         ret false  \end{lstlisting}
+        \end{tcolorbox}
+
+  \item
+        Te debo la correctitud! \Hacer
+
+        Las variables de estado $i,prev$ varían entre $[1..n]$ y $[\blue{D}, \blue{G}, \blue{C}]$ respectivamente:
+        Puedo formar con eso un total de $3\cdot n$ estados.
+        La complejidad temporal de un algoritmo usando \textit{programación dinámica} es:
+        $$
+          T(n) = \orange{\texttt{cantidad\_de\_estados}} \times \magenta{\texttt{costo\_de\_estados}}
+          \to
+          \orange{3 \cdot n} \times \magenta{1} \en O(n)
+        $$
+        La complejidad espacial es la profundidad de la rama de recursión.
+        $$
+          S(n) \en O(n \cdot 3)
+        $$
+        Complejidad temporal o \textit{running time} del algoritmo es:
+        $$
+          \cajaResultado{
+            T(n) \en O(n)
+          }
+        $$
+        La complejidad espacial:
+        $$
+          \cajaResultado{
+            S(n) \en O(n)
+          }
+        $$
+
+  \item
+        Puedo modificar el algoritmo para que no solo me dé el mínimo de días de descanso en el día $i$ sino también
+        cuál \blue{actividad} de realizó ese día. Ese resultado lo puedo guardar en otra estructura \texttt{plan[i,prev]}
+        algo así:
+
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion vacations(i,prev)
+    ...
+        ret 0
+
+    si (prev not G) y disponible(i,G) y (not disponible(i,C)) 
+        GTemp $\ot$ 0+vacations(i+1,G)
+        DTemp $\ot$ 1+vacations(i+1,D)
+        si GTemp$\leq$DTemp
+            memo[i,prev] $\ot$ GTemp
+            plan[i,prev] $\ot$ G
+        sino
+            al revés
+    ...          \end{lstlisting}
+        \end{tcolorbox}
+
+        Los valores de \texttt{plan} me dan el plan de actividades en los $n$ días a seguir para minimizar los descansos.
+\end{enumerate}

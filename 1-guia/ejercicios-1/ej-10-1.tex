@@ -1,0 +1,60 @@
+\begin{enunciado}{\ejercicio[DistanciaMáxima]}
+
+  \textit{DistanciaMáxima}
+
+  Dado un árbol binario cualquiera, diseñar un algoritmo de dividir y conquistar que devuelva la máxima
+  distancia entre dos nodos (es decir, máxima cantidad de ejes a atravesar). El algoritmo no debe hacer recorridos
+  innecesarios sobre el árbol. \textbf{Hint}: para saber el camino más largo de un árbol, posiblemente necesite conocer
+  más que sólo los caminos más largos de sus subárboles.
+\end{enunciado}
+
+\begin{enumerate}[label=\green{\faIcon{tree}}]
+  \item En un árbol binario, cada \textit{nodo o vértice} tiene dos, uno o ningún hijo.
+
+  \item Es razonable pensar que \textit{la máxima distancia} entre 2 nodos, sea entre dos \textit{hojas} del árbol, es decir dos nodos sin hijos.
+
+  \item Como dice el \textbf{HINT} del enunciado, tengo que conoce más que las ramas más largas, dado que la distancia máxima entre nodos,
+        podría estar en la izquierda, derecha o cruzando de un lado al otro del árbol.
+\end{enumerate}
+
+Me salió esto:
+\begin{tcolorbox}
+  \begin{lstlisting}[
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]si, sino, if, else, true, false},
+  emph={[3]profundidad,distanciaMaxima},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+]
+funcion distanciaMaxima(nodo)
+    si nodo es hoja
+        ret 0
+
+    profIzq  $\ot$ profundidad(hijoIzq)
+    profDer  $\ot$ profundidad(hijoDer)
+    cruzando $\ot$ profIzq + profDer + 2
+
+    potencialMax $\ot$ max(profIzq, profDer, cruzando)
+
+    ret max(potencialMax, distanciaMaxima(hijoIzq), distanciaMaxima(hijoDer)) 
+
+funcion profundidad(nodo)
+    si nodo es hoja
+        ret 0
+    pI $\ot$ 1 + profundidad(hijoIzq)
+    pD $\ot$ 1 + profundidad(hijoDer)
+    ret max(pI, pD) \end{lstlisting}
+\end{tcolorbox}
+
+Pero no cumple con lo de \textit{no hacer recorridos innecesarios} porque tengo una complejidad de $O(n^2)$, dado que
+estoy calculando la profundidad de las ramas de cada nodo en cada llamada recursiva.
+
+Así que tengo que solucionar eso para no estar pasando tantas veces por los mismos nodos al pedo.
+
+
+
+\fin

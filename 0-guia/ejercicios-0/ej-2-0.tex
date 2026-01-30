@@ -1,0 +1,55 @@
+\begin{enunciado}{\ejercicio}
+  Encontrar una fórmula para la siguiente suma y
+  demostrarla por inducción:
+  $$
+    1 + 2 + 2^2 + 2^3 + \ldots + 2^n.
+  $$
+\end{enunciado}
+Es la geométrica:
+$$
+  \sumatoria{i = 0}{n} 2^i = \frac{2^{i + 1} - 1}{2 - 1} = 2^{i + 1} - 1
+$$
+
+Por inducción quiero probar que la siguiente proposición sea verdadera:
+$$
+  p(n) :
+  \sumatoria{i = 0}{n} 2^i =
+  \frac{2^{i + 1} - 1}{2 - 1} \quad \paratodo n \en \naturales
+$$
+
+\textit{Caso base}
+$$
+  p(\blue{1}) :
+  \sumatoria{i = 0}{\blue{1}} 2^i = 1 + 2 = 3 = 2^{\blue{1} + 1} - 1
+$$
+La proposición $p(\blue{1})$ resultó ser verdadera.
+
+\textit{Paso inductivo}
+Para algún valor $k \en \naturales$ asumo que la proposición:
+$$
+  p(\blue{k}) :
+  \ub{
+    \sumatoria{i = 0}{\blue{k}} 2^i = 2^{\blue{k} + 1} - 1
+  }{
+    \text{\purple{hipótesis inductiva}}
+  }
+$$
+es verdadera. Quiero probar entonces que:
+$$
+  p(\blue{k+1}) :
+  \sumatoria{i = 0}{\blue{k+1}} 2^i = 2^{\blue{k+1} + 1} - 1,
+$$
+también lo sea.
+
+Usando el viejo, querido y confiable truquito:
+$$
+  \sumatoria{i = 0}{\blue{k+1}} 2^i =
+  2^{k+1} + \sumatoria{i = 0}{\blue{k}} 2^i
+  \igual{\purple{HI}}
+  2^{k+1} + 2^{\blue{k} + 1} - 1 = 2^{k+2} - 1.
+$$
+Resultó que la proposición $p(k+1)$ también es verdadera.
+
+Entonces como $p(1), p(k) \text{ y } p(k+1)$ son verdaderas por el principio de inducción también lo es $p(n) \paratodo n \en \naturales$.
+
+\fin

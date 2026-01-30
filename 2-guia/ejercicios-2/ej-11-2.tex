@@ -1,0 +1,334 @@
+\lstset{
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]en, para, cada, si, sino, if, else, true, false, mientras, not, y, o},
+  emph={[3]subset_sum, max, min, disponible},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+}
+
+\def\ss{\textit{\green{ss}'$_C$}\xspace}
+\def\subs{\textit{\green{subset\_sum}}\xspace}
+\begin{enunciado}{\ejercicio[SumaDinámica]}
+  \textit{SumaDinámica}
+
+  En este ejercicio vamos a resolver el problema de suma de subconjuntos usando la técnica de programación dinámica.
+  {\small
+  \begin{enumerate}[label=$\alph*)$]
+    \item\label{ej-11:item-a} Sea $n = |C|$ la cantidad de elementos de $C$. Considerar la siguiente función recursiva
+          $\ss: \set{0,\ldots, n} \times \set{0,\ldots, k} \to \set{\red{\textit{true}},\red{\textit{false}}}$ tal que:
+          $$
+            \ss(i,j) =
+            \llave{ccl}{
+              j = 0 & \text{si} & i = 0 \\
+              \ss(i-1, j) & \text{si} & i \distinto 0  \land C[i] > j\\
+              \ss(i-1, j)  \lor \ss(i-1, j-C[i])& \multicolumn{2}{l}{\text{si no}}
+            }
+          $$
+          Convencerse de que esta es una definición equivalente de la función $ss$ del inciso \ref{ej-1:item-e} del
+          ejercicio \refEjercicio{ej:1}, observando que $ss(C,k) = \ss(n,k)$.
+          En otras palabras, convencerse de que el algoritmo del inciso \ref{ej-1:item-f} es una implementación por \textit{backtracking}
+          de la función \ss. Concluir, pues, que $O(2^n)$ llamadas recursivas de \ss son suficientes para resolver el problema.
+
+    \item Observar que, como $C$ no cambia entre llamadas recursivas, existen $O(nk)$ posibles entradas para \ss. Concluir que, si
+          $k \ll 2^n/n$, entonces necesariamente algunas instancias de \ss son calculadas muchas veces por el algoritmo del inciso
+          \ref{ej-1:item-f}. Mostrar un ejemplo donde se calcule varias veces la misma instancia.
+
+    \item Considerar la estructura de memoización (i.e., el diccionario) $M$ implementada como una matriz de
+          $(n+1) \times (k+1)$ tal que $M[i,j]$ o bien tiene un valor indefinido $\red{\perp}$ o bien tiene el valor
+          $\ss(i,j)$, para todo $0\leq i \leq n$ y $0 \leq j \leq k$. Convencerse de que el siguiente algoritmo
+          \textit{top-down} mantiene un estado válido para $M$ y computa $M[i,j] = \ss(i,j)$ cuando se invoca
+          $\ss(i,j)$.
+
+          \begin{tcolorbox}
+            \begin{lstlisting}
+M[0..n][0..k] $\ot$ $\red{\perp}$  // inicializar todos los elementos de M como indefinido o NULL.
+funcion subset_sum(C,i,j)          // implementa $ss(\set{c_1,\ldots,c_i},j) = \ss(i,j)$ usando memoización
+    si j<0
+        ret false
+    si i=0
+        ret j=0
+    si M[i,j] = $\red{\perp}$
+        M[i,j] $\ot$ subset_sum(C,i-1,j) o subset_sum(C,i-1,j-C[i])
+    ret M[i,j] \end{lstlisting}
+          \end{tcolorbox}
+
+    \item
+          Concluir que \subs$(C,n,k)$ resuelve el problema. Calcular la complejidad y compararla con el algoritmo \subs del
+          inciso \ref{ej-1:item-f} del ejercicio \refEjercicio{ej:1} ¿Cuál algoritmo es mejor cuando $k \ll 2^n$? ¿Y cuándo $k \gg 2^n$?
+
+    \item
+          Supongamos que queremos computar todos los valores de $M$. Una vez computados, por definición, obtenemos que
+          $$
+            M[i,j] \igual{def}
+            \ss(i,j) \igual{ss'}
+            \ss(i-1,j) \lor \ss(i-1, j-C[i]) \igual{def}
+            M[i-1,j] \lor M[i-1,j-C[i]]
+          $$
+          cuando $i>0$, asumiendo que $M[i-1, j-C[i]]$ es \red{\textit{false}} cuando $j - C[i] < 0$. Por otra parte, $M[0,0]$ es \red{\textit{true}}, mientras que
+          $M[0,j]$ es \red{\textit{false}} para $j>0$. A partir de esta observación, concluir que el siguiente algoritmo \textit{bottom-up} computa $M$
+          correctamente y, por lo tanto, $M[i,j]$ contiene la respuesta al problema de la suma para todo $\set{c_1, \ldots, c_i}$ y $j$.
+          \begin{tcolorbox}
+            \begin{lstlisting}
+funcion subset_sum(C,k)       // computa M[i][j] $\paratodo i \en [0,n] \ytext j \en [0,k]$
+    para j$\ot$0..k                // inicializa la primera fila de M
+        M[0,j] $\ot$ (j=0)  // boolean, wuachín.
+    para i $\ot$ 1..n
+        para j $\ot$ 0..k
+            M[i,j] $\ot$ M[i-1,j] o (j-C[i]$\geq$0 y M[i-1,j-C[i]])
+    ret M[i,j] \end{lstlisting}
+          \end{tcolorbox}
+
+    \item (Opcional) Modificar el algoritmo \textit{bottom-up} anterior para mejorar su complejidad espacial a $O(k)$.
+    \item (Opcional) Demostrar que la función recursiva del inciso \ref{ej-11:item-a} es correcta. \textbf{Ayuda}: Demostrar
+          por inducción en $i$ que existe algún subconjunto de $\set{c_1,\ldots,c_i}$ que suma $j$ si y solo si \ss$(i,j) = V$.
+  \end{enumerate}
+  }
+\end{enunciado}
+
+Me tomé la libertad de editar a mi gusto el enunciado. La pedorra edición del enunciado, complica la lectura y le agrega
+ruido a algo que de por sí ya es \textit{complicado}. Me la baja que se compliquen los ejercicios con cosas evitables.
+Hay que ponerle voluntad, gente. Esto no es un invento mío literalmente se gastan recursos cognitivos al recontra pedo
+con estos enunciados.
+
+Y lo peor es que creo que este ejercicio es, al igual que el ejercicio 1, de lo mejor de la guía.
+
+¿Por qué no es este ejecicio el primero de \textit{programación dinámica} \rollingEyes?
+En fin, mi nivel de \textit{viejoChotismo} está en fase IDDQD, IDKFA.
+
+\begin{enumerate}[label=$\alph*)$]
+  \item
+        En el ejercicio \refEjercicio{ej:1}\ref{ej-1:item-e} escribí una función análoga. Solo que pasándole parámetros distintos.
+        La implementación de este ejercicio \ss con los índices $i,j$ es \textit{mucho más mejor} para usar programación dinámica.
+
+        La función se llama con los valores \ss$(n,k)$:
+        \begin{itemize}
+          \item El caso base se da cuando $i = 0$, es decir se recorrió todo el conjunto en la variable $i$, y se devuelve el booleano $j=0$,
+                el cual si resultó \red{\textit{true}} es que se pudo encontrar el subconjunto de $C$ de suma $k$.
+
+          \item La parte del medio es para iterar en caso de que $k < n$ para llegar al caso base.
+
+          \item La tercera parte es la decisión \textit{fuerza brutezca} que recorre la posibles opciones en caja elemento de $C$, así generando
+                el árbol de recursiones.
+        \end{itemize}
+
+        El \textit{running time} de esa función es $O(2^n)$, dado que hay un laburo:
+        $$
+          T(n) = 2T(n-1) + 1 \en O(2^n)
+        $$
+
+  \item Los parámetros
+        $
+          \llave{c}{
+            i \en [0,n] \\
+            j \en [0,k]
+          }
+        $
+        así que la función tendrá los estados que esas \textit{variables de estado} puedan formar, un total de $O(n \cdot k)$.
+
+        La comparación entre estados y llamadas recursivas es el argumento con el cual se justifica el uso de la programación dinámica:
+        $$
+          k \ll 2^n / n
+          \sii
+          n \cdot k \ll 2^n
+        $$
+
+        Eso quiere decir que voy a estar llamando a \ss con \textit{parámetros idénticos} muchas veces (generando respuestas idénticas)
+        es como tener un bolillero
+        con 100 números y sacás una bolita, luego la metés nuevamente en el bolillero y volvés a sacar una bolita y si hacés eso
+        más de 100 veces, es seguro que vas a sacar una bolita repetida ¿Quién lo hubiese pensado, no? Nuevamente:
+        \parrafoDestacado[\faIcon{calculator}]{
+          Si a una función le metés en la iteración $l$ los parámetros $i$ y $j$, y después en la iteración $l + 100$
+          le volvés a meter los mismos parámetros, te va a devolver lo meeeeesmo, \textit{thus dynamic programming, moderfoca!}
+        }
+
+        Ponele que tenés el conjunto $C = \set{1,1,1,1,2,2,2,2,3,3,\ldots,1},\, |C| = n = 25 \ytext k = 20$
+
+        \forestset{
+        nivel/.style={label={[below left, xshift=-9pt, yshift=-1pt]:{\red{\tiny size \texttt{input}: $#1 \to$}}}},
+        binary tree/.style={
+            for tree={
+                scale=0.9,
+                rectangle, draw, minimum size=1cm,
+                math content,
+                s sep=.3cm, l sep=.2cm,
+              },
+            important/.style={draw=##1,line width=1.5pt,edge={##1,line width=1.5pt}},
+          }
+        }
+        $$
+          \begin{forest}
+            binary tree,
+            [{\ss(25,20)}, important=red
+            [{\ss(24,20)}, important=red
+            [{\ss(23,20)}, important=red
+            [{\ss(22,20)}, important=red[\vdots]]
+            [{\ss(22,19)}, important=red[\vdots]]
+            ]
+            [{\ss(23,19)}, important=red
+            [{\ss(22,19)}, important=Cerulean[\vdots]]
+            [{\ss(22,18)}, important=red[\vdots]]
+            ]
+            ]
+            [{\ss(24,19)}, important=red
+            [{\ss(23,19)}, important=Cerulean
+            [{\ss(22,19)}, important=Cerulean[\vdots]]
+            [{\ss(22,18)}, important=Cerulean[\vdots]]
+            ]
+            [{\ss(23,18)}, important=red
+            [{\ss(22,18)}, important=Cerulean[\vdots]]
+            [{\ss(22,17)}, important=red [\vdots]]
+            ]
+            ]
+            ]
+          \end{forest}
+        $$
+
+        \begin{itemize}
+          \item En \red{rojo} son nodos que, de una implementación, corresponden a llamar a la función con las variables de estado $i,j$
+                en cuestión por primera vez.
+
+          \item En \blue{azul} son nodos que corresponden a llamados que calcularon previamentes.
+
+          \item El árbol tendrá cantidad de nodos en el orden de $2^{25} \approx 3 \cdot 10^7$, pero solo habrá
+                $25 \cdot 20 = 500$ valores distintos entre ellos, que son las posibles combinaciones entre $i, j$.
+        \end{itemize}
+
+  \item El algoritmo llena el diccionario \texttt{M[i,j]} con valores válidos que retorna al función \subs(i,j)
+
+  \item
+        \textit{Algoritmo sin \blue{memoization}}:
+
+        El algoritmo del ejercicio \refEjercicio{ej:1} tenía una complejidad temporal exponencial de $O(2^n)$ y como el árbol tiene una profundidad
+        de $n$ tiene una $S(n) \en O(n)$.
+
+        \textit{Algoritmo con \blue{memoization}}:
+
+        Sí, el pesudocódigo llena los elementos \texttt{M[i,j]} con valores booleanos que corresponden a las llamadas con las variables \texttt{i,j}
+        y devuelve el valor \texttt{M[n,k]}.
+        La complejidad temporal de un algoritmo usando \textit{programación dinámica} es:
+        $$
+          T(n) = \orange{\texttt{cantidad\_de\_estados}} \times \magenta{\texttt{costo\_de\_estados}}
+          \to
+          \orange{n \cdot k} \times \magenta{1} \en O(n\cdot k)
+        $$
+        La complejidad espacial, las variables de estado varían entre $i,j$ varían entre $[0..n]$ y $[0..k]$ respectivamente:
+        $$
+          S(n) \en O(n \cdot k)
+        $$
+
+        ¿Qué pasa ahora cuando tengo valores límites respecto al parámetro $k$?
+
+        $k \ll 2^n$:
+
+        El que haya un $k$ chico en comparación a la cantidad de hojas del árbol, implica que va a haber mucha repetición de estados.
+        Acá es dónde donde la \blue{memoization} funcionaría mejor.
+
+        $k \gg 2^n$:
+
+        En este caso la recursión podría llegar a las hojas sin una gran repetición de estados. No obstante la \textit{complejidad espacial}
+        va a ser exponencial $\Omega(n2^n)$ en programación dinámica. Usaría \textit{backtracking} para que no se cuelgue toda la compu.
+
+  \item Lindo renglón esa verga. Para nada confuso \rollingEyes. La posta en \textit{bottom-up} es entender la relación entre los elementos $\llamada1$:
+        $$
+          \begin{tikzpicture}[
+              rect/.style={
+                  rectangle, draw=gray, text=black,
+                  minimum width=1.35cm, minimum height=1.35cm,
+                  outer sep=0pt, inner sep=1pt, font={\small},
+                  text height=1.5ex, text depth=0.5ex
+                },
+              arista_roja/.style={-latex, red, bend left=10pt, line width=1pt},
+              arista_verde/.style={-latex, OliveGreen, line width=1.5pt},
+              recuadro_rojo/.style={rectangle, line width=1pt, draw=red, minimum width=1.35cm, minimum height=1.35cm},
+              recuadro_naranja/.style={rectangle, line width=1.5pt, draw=orange, minimum width=1.35cm, minimum height=1.35cm},
+              llenado/.style={-Latex, gray, thick, dashed},
+              coordenadas/.style={fill=lightgray, opacity=.12, ultra thin},
+            ]
+
+            \matrix (A) [
+            matrix of nodes,
+            nodes={rect, execute at begin node=$, execute at end node=$},
+            column sep=1pt, row sep=1pt,
+            ] {
+            \true               & \false        & \cdots & \cdots & \cdots          & \false       \\
+            \vdots              & {}            & {}     & {}     & {}              & {}          \\
+            {}                  &{}  & {}     & {}     & {}   & {}          \\
+            {}                  & {}            & {} & {}     & \texttt{M[i,j]} & \vdots      \\
+            \vdots              & {}            & {} & {}     & \ddots          & {}          \\
+            \true & \cdots      & \cdots        & \cdots & {}     & \texttt{M[n,k]} \\
+            };
+
+            \foreach \i in {1,...,6} {
+                \draw[coordenadas] (A-3-\i.north west) rectangle (A-3-\i.south east);
+                \draw[coordenadas] (A-\i-2.north west) rectangle (A-\i-2.south east);
+                \draw[coordenadas] (A-\i-5.north west) rectangle (A-\i-5.south east);
+              }
+
+            \node[recuadro_naranja] (optimo) at (A-4-5) {};
+            \node[recuadro_rojo] (keep) at (A-3-2) {\texttt{keep}};
+            \node[recuadro_rojo] (skip) at (A-3-5) {\texttt{skip}};
+
+            \node[right=0.3cm of A-3-6] {$i-1$};
+            \node[above of=A-1-2] {\texttt{j-C[i]}};
+            \node[above of=A-1-5] {$j$};
+
+            \node[rectangle, line width=1.5pt, fill=OliveGreen!10, draw=OliveGreen, text=OliveGreen, rounded corners] (o) at (A-4-4.west) {\LARGE$\lor$};
+
+            \draw[arista_roja, bend left=20pt] (keep.east) to (o.north);
+            \draw[arista_roja, bend right=20pt] (skip.west) to (o.north);
+            \draw[arista_verde] (o.east) to (optimo.west);
+
+            \draw[llenado] (A.north west) -- (A.south west) node[midway, left]{$\substack{\text{número}\\ i-\text{ésimo}\\ \texttt{i}\en[0, n]}$};
+            \draw[llenado] (A.south west) -- (A.south east) node[midway, below]{objetivo $\texttt{j} \en [0, k]$};
+          \end{tikzpicture}
+        $$
+        Donde \texttt{keep} es cuando \red{agarro el número \texttt{C[i]}} y \texttt{skip} donde no.
+
+        El \texttt{loop externo} me mueve las filas, el \texttt{loop interno} las columnas. Lleno fila a fila, porque el estado \texttt{i}
+        \ul{siempre} depende del estado de la fila anterior \texttt{i-1}.
+
+        El ejercicio implementado con la técnica \textit{bottom-up} no solo resuelve \texttt{M[n,k]} sino que \ul{cada valor \texttt{M[i,j]}}
+        es una respuesta para el problema con valores objetivos \texttt{i,j}, es decir $M[3,5]$ es el resultado para un conjunto $|C| = 3$ y $k = 5$
+
+  \item En este ejercicio (y en muchos va a pasar lo mismo), el elemento que estoy calculando no depende de cualquier fruta sino que
+        es hay un patrón:
+        \begin{itemize}
+          \item \texttt{M[i,j]} \ul{siempre} depende de la fila \texttt{i-1}.
+          \item \texttt{M[i,j]} \ul{nunca} va a ser calculado con estados que tengan \texttt{j} entre \texttt{[j+1,k]}, porque en cada
+                cálculo o bien uso el mismo \texttt{j} o les resto un número natural, i.e. positivo.
+        \end{itemize}
+        ¡Esos datos son clave para ir \textit{tirando a la basura} valores que \ul{sé} que no voy a volver a usar para el cálculo objetivo!
+
+        Si mirás la primera columna de la matriz $\llamada1$ eso se llena con \true, porque cada valor debajo de \texttt{M[0,0]=}\true
+        es el resultado de la disjunción entre \texttt{M[0,0]} y ... una chota, porque no tengo \texttt{j<0}! Y eso debería ser razonable,
+        porque para sumar un total de \texttt{j=k=0} lo que hacés es \textit{no agarrar ningún valor} son todos \textit{skips}.
+
+        \begin{tcolorbox}
+          \begin{lstlisting}
+funcion subset_sum(C,k)
+    para j$\ot$k..0   
+        M[j] $\ot$ (j=0)  // inicializo iteración 0.
+    para i$\ot$1..n 
+        para j$\ot$k..1 // acá está la papa!
+            M[j] $\ot$ M[j] o (j-C[i]$\geq$0 y M[j-C[i]])
+    ret M[k] \end{lstlisting}
+        \end{tcolorbox}
+        El algoritmo hace lo mismo que estaba haciendo el anterior, solo que se va reescribiendo en la misma fila.
+
+        \medskip
+
+        \textit{¿Pero por qué mierda no pierdo valores importantes?} Por lo que se observó sobre las dependencias de los estados.
+        \red{Clave el orden de llenado} escribo la iteración \texttt{i}-ésima \red{empezando el pisado de la iteración anterior por} \texttt{j = k},
+        \texttt{M[j]} \ul{no se usa en el cálculo de \texttt{M[j']} con \texttt{j'<j}} como se mencionó previamente.
+
+        Y ahora ese algoritmo tiene una complejidad espacial:
+        $$
+          S(n) \en O(k)
+        $$
+
+  \item ¡Uy! Justo se largó a llover y tengo que sacar la ropa del tender, te la debo. \Hacer
+\end{enumerate}

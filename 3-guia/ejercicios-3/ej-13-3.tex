@@ -1,0 +1,172 @@
+\begin{enunciado}{\ejercicio[Grafo conexo tiene dos vértices que no son de articulación]}
+
+  \textit{Grafo conexo tiene dos vértices que no son de articulación}
+
+  Todo $G_n (n \geq 2)$ conexo tiene al menos dos vértices distintos $v_1, v_2$ tal que
+  $G \diferencia \set{v_1}$ y $G \diferencia \set{v_2}$ son conexos.
+\end{enunciado}
+
+Quiero probar que la proposición
+\parrafoDestacado{
+  \it
+  $p(n)$: Todo $G(V,E)$ con $|V| = n$ conexo tiene al menos dos vértices distintos $v_1, v_2$ tal que
+  $G \diferencia \set{v_1}$ y $G \diferencia \set{v_2}$ son conexos.
+}
+es verdadera para todo $n \en \naturales_{\geq 2}$
+
+\bigskip
+
+\textit{Caso base:}
+
+Quiero probar que la proposición
+\parrafoDestacado{
+  \it
+  $p(\blue{2})$: Todo $G(V,E)$ con $|V| = \blue{2}$ conexo tiene al menos dos vértices distintos $v_1, v_2$ tal que
+  $G \diferencia \set{v_1}$ y $G \diferencia \set{v_2}$ son conexos.
+}
+es verdadera.
+
+Dado que el un grafo de un solo vértice es trivialmente conexo la proposición $p(\blue{2})$ es verdadera.
+
+\bigskip
+
+\textit{Paso inductivo:}
+
+Asumo que para algún $\blue{k} \en \naturales_{\geq 2}$ la proposición
+\parrafoDestacado{
+  \it
+  $p(\blue{k})$:
+  $
+    \ob{
+      \textit{ Todo $G(V,E)$ con $|V| = \blue{k}$ conexo tiene al menos dos vértices distintos}
+    }{
+      $\purple{hipótesis inductiva}$
+    }
+  $
+  $v_1, v_2$ tal que
+  $G \diferencia \set{v_1}$ y $G \diferencia \set{v_2}$ son conexos.
+}
+es verdadera. Quiero probar entonces que
+\parrafoDestacado{
+  \it
+  $p(\blue{k+1})$: Todo $G(V,E)$ con $|V| = \blue{k+1}$ conexo tiene al menos dos vértices distintos $v_1, v_2$ tal que
+  $G \diferencia \set{v_1}$ y $G \diferencia \set{v_2}$ son conexos.
+}
+también lo sea.
+
+Partiendo de $G(V, E)$ con $|V| = \blue{k + 1}$ tengo estos casos
+\begin{itemize}
+  \item[\grafoBullet] Este es el caso fácil con viento a favor:
+
+        Saco un $v$ \ul{cualquiera y obtengo un subgrafo conexo}, es decir un $G_1 = G(V \setminus \set{v}, E')$,
+        y para otro vértice $u$ obtendría otro subgrafo
+        $G_2 = G(V \setminus \set{u}, E'')$. Probando así que un grafo conexo tiene por lo menos dos vértices que no son
+        de articulación.
+
+        % De ocurrir esto, entonces seguro puedo encontrar otro vértice $v_2$ en el grafo unión $G' \union \set{v_1}$ en esa componente
+        % de manera de obtener un grafo conexo, ya que estoy en un grafo con $|V| = \blue{k}$ y por \purple{hipótesis inductiva} dicho vértice existe.
+        %
+        % Si bien saqué los vértices de forma secuencial, queda claro que partiendo del $G$ original voy a poder encontrar al menos dos vértices
+        % distintos $\set{v_1, v_2} \en V_G$ tal que los grafos obtenidos sean conexos.
+        % $$
+        %   \begin{tikzpicture}[grafo style]
+        %     \node[nodo, label=above:{$v_1$}] (v) {};
+        %     \node[nodo, right of = v] (ci) {$c_i$};
+        %     \node[nodo, above of = ci] (c1) {$c_1$};
+        %     \node[nodo, below of = ci] (c2) {$c_2$};
+        %
+        %     \draw[] (v) to (c2) to (ci) to (c1) to (v) to (ci);
+        %     \node[compConexa, fit=(v)(c1)(c2), label=above:{$G(V,E)$}](g1) {};
+        %
+        %     \begin{scope}[xshift=4cm, yshift=2cm]
+        %       \node[nodo,opacity=0.2] (v) {};
+        %       \node[nodo, right of = v] (ci) {$c_i$};
+        %       \node[nodo, above of = ci] (c1) {$c_1$};
+        %       \node[nodo, below of = ci] (c2) {$c_2$};
+        %
+        %       \draw[] (c2) to (ci) to (c1) to (ci);
+        %       \node[compConexa, fit=(c1)(c2)(v), label=above:{$G(V\setminus \set{v_1},E')$}, inner sep = 10pt] (g2){};
+        %       \node[compConexa, thin, draw=blue, fit=(c1)(c2), inner sep = 5pt] (conexa) {};
+        %       \node[rectangle, draw = BrickRed, above right = 1cm of g2, anchor=west,text width=2.5cm, font=\tiny] (v2)
+        %       {Acá debe haber un \inlinegraph{v_2} que no rompa la conexidad por \purple{HI}};
+        %       \draw[-latex, bend left = 30pt] (v2.south) to (conexa.east) {};
+        %     \end{scope}
+        %
+        %     \begin{scope}[xshift=7cm, yshift=-2cm]
+        %       \node[nodo,label=above:{$v_1$}] (v) {};
+        %       \node[rectangle, rounded corners=8pt, draw=BrickRed,fill=BrickRed!5, right of = v] (ci) {$c_i\setminus \set{v_2}$};
+        %       \node[nodo,above of = ci] (c1) {$c_1$};
+        %       \node[nodo, below of = ci] (c2) {$c_2$};
+        %       \draw[] (v) to (c1)  (v) to (c2) (v) to (ci) (v) to (c1) (ci) to (c1) (ci) to (c2);
+        %       \node[compConexa, fit=(c1)(c2)(v)(ci), label=above:{$G(V\setminus \set{v_2},E'')$}, inner sep = 10pt] (g3){};
+        %     \end{scope}
+        %
+        %     \draw[-latex, bend right = 30pt] (g2.south) to (g3) {};
+        %     \draw[-latex, bend right = 20pt] (g1) to (g3) {};
+        %     \draw[-latex] (g1) to (g2);
+        %   \end{tikzpicture}
+        % $$
+        %
+        % Que bardo eso que hice, creo que confunde más que aclarar.
+        % Pero intuitivamente va por ahí, deben existir esos \textit{wuachines $v_1$} y \textit{$v_2$}, de forma tal que los subgrafos
+        % sean sean conexos. {\tiny Cuando tenga ganas veo de \textit{remasterizarlo}}.
+
+  \item[\grafoBullet]
+        Este es el caso más genérico sin viento a favor:
+
+        Saco un $v$ cualquiera de $G(V,E)$ y aparecen \ul{por lo menos} 2 componenetes conexas $\set{c_1,\ldots,c_i}$,
+        es decir que $v$ es un vértice de articulación, \textit{no lo puedo sacar para probar la proposición \red{¡Tengo que encontrar otros!}}
+
+        Armo un grafo para ver si puedo usar la \purple{hipótesis inductiva}:
+
+        Agarrando alguna de las componenetes conexas, $c_j$ que aparecieron y \ul{reconectándola} al $v$, formo
+        un grafo $G_j(V',E')$ con $|V'| \geq 2$ que ¡Cumple la \purple{hipótesis inductiva}!
+
+        $G_j(V',E')$ tiene \ul{por lo menos 2 vértices} $\set{v, u,\ldots}$, ese $u$ (\red{que no es $v$}) lo agarro para sacárselo al $G$ original:
+        $$
+          \begin{tikzpicture}[grafo style]
+            \node[nodo, label=above:{$v$}] (v) {};
+            \node[nodo, right of = v] (ci) {$c_i$};
+            \node[nodo, above of = ci] (c1) {$c_1$};
+            \node[nodo, below of = ci] (c2) {$c_x$};
+
+            \draw[] (v) to (c2) (v) to (ci) (v) to (c1);
+            \node[compConexa, fit=(v)(c1)(c2), label=above:{$G(V,E)$}](g1) {};
+
+            \begin{scope}[xshift = 4cm]
+              \node[nodo, label=above:{$v$}] (v) {};
+              \node[nodo, right of = v] (ci) {$c_j$};
+              \node[nodo, above of = ci, opacity=0.4] (c1) {$c_1$};
+              \node[nodo, below of = ci, opacity=0.4] (c2) {$c_x$};
+
+              \draw[] (v) to (ci);
+              \node[compConexa, thin, blue, fit=(v)(ci), label=left:{$G_j(V', E')$}, inner sep = 5pt] (cv) {};
+              \node[rectangle, draw = BrickRed, above right = 1cm of c1, anchor=west,text width=2.5cm, font=\tiny] (v2)
+              {Acá hay un \inlinegraph{u} que si lo saco no rompe la conexidad por \purple{HI}};
+              \draw[-latex, bend left = 30pt] (v2.south) to (cv.east) {};
+            \end{scope}
+
+            \begin{scope}[xshift = 8cm, yshift = -2cm]
+              \node[nodo, label=above:{$v$}] (v) {};
+              \node[nodo, rectangle, rounded corners=6pt, draw=BrickRed,fill=BrickRed!5,right of = v] (ci) {$c_j \setminus \set{u}$};
+              \node[nodo, above of = ci] (c1) {$c_1$};
+              \node[nodo, below of = ci] (c2) {$c_x$};
+
+              \draw[] (v) to (c2) (v) to (ci) (v) to (c1);
+              \node[compConexa, fit=(v)(c1)(c2)(ci), label=above:{$G(V\setminus\set{u},E')$}](g3) {};
+              % \node[rectangle, draw = BrickRed, above right = 1cm of c1, anchor=west,text width=2.5cm, font=\tiny] (v2)
+              % {Acá debe haber un \inlinegraph{u} distinto de $v$ que no rompa la conexidad por \purple{HI}};
+              % \draw[-latex, bend left = 30pt] (v2.south) to (cv.east) {};
+              \draw[-latex, bend right = 20pt] (cv.south east) to (g3) {};
+              \draw[-latex, bend right = 20pt] (g1) to (g3) {};
+              % \draw[-latex] (g1) to (g2);
+            \end{scope}
+          \end{tikzpicture}
+        $$
+
+        Aplicar el mismo razonamiento en otra de las componentes conexas serviría para encontrar un $w$ (\red{que no sería ni $v$ ni $u$}),
+        así probando que hay por lo menos 2 vértices que puedo sacarle a un grafo conexo de $\blue{k+1}$ vértices, de forma tal de armar 2 subgrafos conexos.
+\end{itemize}
+
+Dado que $p(2), p(k) \ytext p(\blue{k+1})$ resultaron verdaderas, también lo es $p(n) \en \naturales_{\geq 2}$ por principicio de inducción.
+\fin

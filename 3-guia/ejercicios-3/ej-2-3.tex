@@ -1,0 +1,41 @@
+\begin{enunciado}{\ejercicio[Doble Grado]}
+  \textit{Doble Grado:}
+
+  Demostrar, usando la técnica de reducción al absurdo, que todo grafo no trivial
+  tiene al menos dos vértices del mismo grado.
+
+  \textbf{Ayuda:} Prestar atención a la secuencia ordenada de los grados de los vértices.
+\end{enunciado}
+
+Este ejercicio es sobre un \textit{grafo no dirigido}. No hay $d_{in} \ytext d_{out}$ solo hay $d$ a secas.
+
+En lenguaje lógico en enunciado queda:
+$$
+  \paratodo G(V, E) ~ \text{con} ~ |V| = n \geq 2,\, \existe v, w \en V ~ \text{tal que} ~  v \distinto w \land d(v) = d(w)
+$$
+
+\begin{itemize}
+  \item Un \textit{vértice} $v \en V(G)$ con $|V| = n \geq 2$ puede tener un grado
+        $d(v) \en [0, n - 1]$.
+
+        Lo que quiere decir que los $n$ \textit{vértices} tienen para elegir estar conectados a $0, 1, \ldots, n-2$ o a $n-1$ otros
+        vértices.
+
+  \item \textit{Supongo que \ul{no} hay 2 vértices con el mismo grado}. Es decir que en un grafo con $n$ vértices puedo tener algo así:
+        $$
+          \llave{rcl}{ \rowcolor{Cerulean!5}
+            d(v_1) & = & 0      \\
+            d(v_2) & = & 1      \\
+            \vdots & \vdots &\vdots\\
+            d(v_{n-1}) & = & n-2 \\ \rowcolor{Cerulean!5}
+            d(v_n) & = & n-1
+          }
+        $$
+        Algo raro hay en la primera y última fila.
+        Mirando con atención al \textit{último vértice} veo que está conectado a \textit{todos los demás} \brain, es decir que no es posible
+        que exista \textit{el primer vértice con grado 0}.
+
+        ¡Tuki! absurdo, $d(v_1) \distinto 0$ por lo tanto será igual al grado de algún otro vértice del grafo.
+\end{itemize}
+
+\fin

@@ -1,0 +1,204 @@
+\begin{enunciado}{\ejercicio[MáximoSubsecuencia]}
+  \textit{MaximaSubsecuencia}
+
+  Dada una secuencia de $n$ enteros, se desea encontrar el máximo valor que se puede obtener sumando elementos
+  contiguos. Diseñar un algoritmo basado en la técnica de dividir y conquistar que resuelva el problema en
+  $O(n \log n)$. Por ejemplo, para la secuencia $[3,-1, 4, 8, -2, 2, -7, 5]$, este valor es $14$, que se obtiene de la
+  subsecuencia $[3, -1, 4, 8]$.
+\end{enunciado}
+
+Ejercicio que tiene una parte medio difícil de encontrar. Lo primero que pienso cuando veo la
+complejidad $O(n \cdot \log(n))$ es \textit{mergeSort}, así que será cuestión de dividir y después hacer con los
+subproblemas de complejidad $O(n)$. Al igual que en \textit{mergeSort} lo \textit{complicado de describir} no es
+la recursión sino el \textit{merge}.
+
+Por ejemplo, el arreglo \texttt{A=[-1,2,4,-1]} tiene la subsecuencia de máxima suma con  \texttt{[2,4]}, la cual cruza de una mitad a la otra de \texttt{A}.
+
+\medskip
+
+¿Cómo será la cosa en este ejercicio?
+
+\medskip
+
+\parrafoDestacado[\red{\huge\atencion}]{
+  {\normalsize
+      El problema de encontrar la subsecuencia máxima del medio es lo más falopa, pero \purple{\ul{no es lo más importante del ejercicio}}.
+      Cuándo pasa esto, voy a suponer que mágicamente tengo la función \textit{\green{findSSMaxMed}} y hago todo el resto! Después
+      retomo el asunto, de otra manera \ul{pierdo el foco, me frustro y estoy 8 horas sin tocar el tema de recursión, D\&C y todo lo que importa.}
+    }
+}
+
+El algoritmo va a \textit{atomizar el arreglo} devolviendo una secuencia con los índices y suma de la subsecuencia con esos índices.
+
+De todas me voy a quedar con la máxima que se encuentre.
+
+\textit{Versión pasando arreglo (más fácil de escribir):}
+\begin{tcolorbox}
+  \begin{lstlisting}[
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]si, sino, if, else, true, false},
+  emph={[3]maxSS, maximaSuma, findSSMaxMed},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+]
+  funcion maxSS(A[i..d])
+    if |A| = 1
+        ret [A[i]]        // devuelvo, [desde, hasta, suma = A[i]], el único elemento
+
+    m $\ot$ |A|/2
+
+    I $\ot$ maxSS(A[i,m])
+    D $\ot$ maxSS(A[m+1, d])
+    M $\ot$ findSSMaxMed(I,D) // Por lo menos un elemento de I y un elemento de D
+
+    // devuelvo la secuencia de suma (3era coordenada) máxima de entre las 3 secuencias.
+    ret maximaSuma(I, D, M)\end{lstlisting}
+\end{tcolorbox}
+
+\bigskip
+
+\textit{Versión con índices (más oscura, pero más eficiente y se pasa fácil a la compu):}
+\begin{tcolorbox}
+  \begin{lstlisting}[
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]si, sino, if, else, true, false},
+  emph={[3]maxSS, maximaSuma, findSSMaxMed},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+]
+  funcion maxSS(i, d) -> [desde, hasta, $\sum_{j=desde}^{hasta}$ A[j]]  // Primer llamado con maxSS(1, n)
+    if i = d
+        ret [i, d, A[i]]        // devuelvo, [desde, hasta, suma = A[i]], el único elemento
+
+    m $\ot$ (i+d)/2
+
+    I $\ot$ maxSS(i,m)
+    D $\ot$ maxSS(m+1, d)
+    M $\ot$ findSSMaxMed(i, m, d) // Por lo menos un elemento de I y un elemento de D
+
+    // devuelvo la secuencia de suma (3era coordenada) máxima de entre las 3 secuencias.
+    ret maximaSuma(I, D, M)\end{lstlisting}
+\end{tcolorbox}
+
+Este ejercicio al igual que \textit{mergeSort} tiene al principio (y al medio) ese ... \textit{\purple{je ne sais quoi}}, que te hace pensar:
+\parrafoDestacado{
+  \textit{¿Qué clase de \sout{mierda} brujería es esta?}.
+}
+Lo que me sirve (a mí) para salir de ese estado de locura mental es \textit{no hacer el camino de la recurrencia} con un ejemplo y tratar de entenderlo así.
+
+Sí, es anti intuitivo lo que sugiero, pero para problemas \textit{con complejidad como este} eso es muchas veces un \textit{rabbit hole}.
+Me ayuda más pensar al problema como cuando hago un ejercicio de inducción, no tanto seguir el calculo mental sino creer el paso inductivo y dale no más.
+
+Veamos al ejercicio \sout{verga} este con aire de inducción:
+
+Acá la \textit{hipótesis} sería algo así como:
+\parrafoDestacado{
+  \it
+  Si tengo un arreglo, su suma máxima \red{DEBE estar en la mitad izquierda, en la mitad derecha o en una combinación de ambas
+    (algo de la mitad izquierda y de la mitad derecha)}.
+
+  El caso en que el arreglo tiene longitud 1, fácil hay una única respuesta, ese es nuestro caso base y claramente funciona!
+
+  Listo después el llamada recursivo es nuestra \purple{hipótesis inductiva}, onda vale para $|A| = k $ entonces vale $|A| = k+1$, y
+  ni lo pruebo, sencillamente tengo \red{\faIcon{pray}fe} en la inducción/recurrencia\red{\faIcon{pray}}.
+}
+
+A todo esto ni sé que hace: \green{\textit{findSSMaxMed}}
+
+La función consigue la secuencia de suma máxima contando desde la mitad para atrás y la secuencia de suma máxima de la mitad
+para adelante. Luego me devuelve una secuencia [desde, hasta, suma]
+
+La voy a escribir para la versión con índices. La versión en la que se usa el arreglo explícitamente es más sencilla.
+
+\begin{tcolorbox}
+  \begin{lstlisting}[
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]mientras, si, sino, if, else, true, false, for, while},
+  emph={[3]maxSS, maximaSuma, findSSMaxMed},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+]
+funcion findSSMaxMed(i, m, d)
+    desde $\ot$ 0 // Indice inferior de la subsecuencia
+    hasta $\ot$ 0 // Indice inferior de la subsecuencia
+
+    // Inicializo para buscar la secuencia en la parte izquierda de atrás para adelante
+    sumaTmp $\ot$ 0
+    maxI    $\ot$ 0
+    j $\ot$ m
+    mientras (i <= j)
+        tmp  $\ot$ tmp + A[j]
+        si tmp > maxI
+            maxI $\ot$ tmp
+            desde $\ot$ j
+        j $\ot$ j - 1
+
+    // Inicializo para buscar la secuencia en la parte derecha de adelante para atrás
+    sumaTmp $\ot$ 0 //reset
+    maxD    $\ot$ 0
+    j       $\ot$ m + 1
+    mientras (j <= d)
+        sumaTmp  $\ot$ sumaTmp + A[j]
+        si sumaTmp > maxD
+            maxD $\ot$ sumaTmp
+            hasta $\ot$ j
+        j $\ot$ j + 1
+
+    ret [desde,hasta,maxI+maxD] // Devuelvo la lista [desde, hasta, suma] \end{lstlisting}
+\end{tcolorbox}
+
+Este código es súper duro. Algo más sencillo y aceptable como algoritmo podría ser:
+\begin{tcolorbox}
+  \begin{lstlisting}[
+  mathescape=true,
+  emph={[1]funcion, return, ret, retorno},
+  emph={[2]si, sino, if, else, true, false, for, while},
+  emph={[3]maxSS, maximaSuma, findSSMaxMed},
+  emphstyle={[1]\color{violet}\it},
+  emphstyle={[2]\color{red}\it},
+  emphstyle={[3]\color{OliveGreen}\it},
+  morecomment={[l]{//}},
+  commentstyle={\color{gray}\it\footnotesize}
+]
+funcion findSSMaxMed(I, D)
+  $\to$ Consigo la subsecuencia máxima de I, pero contando para atrás.
+     Me guardo el índice hasta que llegué $\to$ i
+
+  $\to$ Consigo la subsecuencia máxima de D. 
+     Me guardo el índice hasta que llegué $\to$ d
+
+  $\to$ devuelvo A[i,d] // Arreglo secuencia máxima con parte de I y de D.\end{lstlisting}
+\end{tcolorbox}
+
+Del pseudocódigo sé que la función \textit{\green{findSSMaxMed}} es $\Theta(n)$. Por lo tanto la función recursiva tiene
+una forma:
+$$
+  T(n) =
+  \llave{ccl}{
+    1 & \text{si} & n = 1\\
+    2T(n/2) + n & \text{si} & n > 1
+  }
+$$
+Árbol de 2 ramas, dado que hay dos llamados recursivos en cada ciclo. Cómo el input se reduce a la mitad en cada
+iteración el árbol tendrá $\log_2(n)$ niveles.
+
+Finalmente el \textit{running time}:
+$$
+  \cajaResultado{
+    T(n) \en \Theta(n \log(n))
+  }
+$$
+
+\fin

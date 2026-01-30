@@ -1,0 +1,144 @@
+\begin{enunciado}{\ejercicio[Árboles binarios de búsqueda óptimos]}
+  \textbf{\textit{Árboles binarios de búsqueda óptimos}}
+
+  Dado un conjunto de elementos $[n] = \set{1,\ldots, n}$, y una función $f: [n] \to \naturales$
+  que nos da la frecuencia de acceso a dichos elementos, decimos que $A$ es un árbol binario de búsqueda óptimo
+  si este minimiza el costo de todos los accesos dados por $f$.
+  \begin{enumerate}[label=$\alph*)$]
+    \item Escribir una función recursiva que devuelva el costo de acceder a todos los elementos usando $f$.
+    \item Dar una cota superior para la complejidad. \textbf{Ayuda}: Pasar de la función recursiva a una recurrencia
+          que solo dependa del tamaño de la entrada.
+    \item Probar que el algoritmo es correcto.
+  \end{enumerate}
+\end{enunciado}
+
+\parrafoDestacado{
+  Segunda clase de TDA (ex Algo III) y te dan este ejercicio. \textit{Tienen 30 minutos para pensarlo.}
+
+  Ni con 30hrs lo sacaba. En fin.
+}
+
+¿Qué es esto? ¿Qué me están pidiendo que haga? ¡Ayuda por favor!
+
+\bigskip
+
+Para un arreglo $A[1,2,3]$ con frecuencias $f[1,2,4]$, puede formar los siguiente árboles y
+calculor los costos de recorrerlos yendo a cada nodo desde la raíz $f[i]$:
+\forestset{
+  binary tree/.style={
+      for tree={
+          baseline=0,
+          scale=1,
+          line width=0.4pt,
+          minimum size=1pt,
+          rectangle, draw,
+          math content,
+          s sep=.3cm, l sep=0pt,
+          edge={line width=0.5pt},
+        },
+      important/.style={draw=##1,line width=1pt,edge={##1,line width=0.5pt}},
+    }
+}
+$$
+  \begin{array}{|c|}
+    \hline
+    \begin{forest}
+      binary tree,
+      [{f[2]=\blue{2}}
+            [{f[1]=\blue{1}} ]
+            [{f[3]=\blue{4}} ]
+        ]
+    \end{forest}
+    \Entonces{costo}[total]
+    C(A) = \blue{2} \cdot \violet{1} + \blue{1} \cdot \violet{2} + \blue{4} \cdot \violet{2}  = 14                        \\ \hline
+    \begin{forest}
+      binary tree,
+      [{f[1]=\blue{1}}
+            [{f[2]=\blue{2}} ]
+            [{f[3]=\blue{4}} ]
+        ]
+    \end{forest}
+    \Entonces{costo}[total]
+    C(A) = \blue{1} \cdot \blue{1} + \violet{2} \cdot 2 + \blue{4} \cdot \violet{2}  = 13                                 \\ \hline
+    \begin{forest}
+      binary tree,
+      [{f[3]=\blue{4}}
+            [{f[2]=\blue{2}} ]
+            [{f[1]=\blue{1}} ]
+        ]
+    \end{forest}
+    \Entonces{costo}[total]
+    C(A) = \blue{4} \cdot \violet{1} + \blue{2} \cdot \violet{2} + \blue{1} \cdot \violet{2}  = \oa{10}{\text{claramente} \\\text{el AO}} ~~~~~~\\ \hline
+  \end{array}
+$$
+Los \violet{números en violeta} son los ancestros que tiene cada nodo, definiendo que cada nodo es también ancestro de sí mismo, por eso
+la raíz tiene un (\violet{1}) ancestro también.
+
+La cuenta para calcular el costo es:
+$$
+  C(A) = \sumatoria{i = 1}{n} f[i] \cdot \#\text{ancestros\_de\_nodo}_i
+$$
+Esto nos da una idea de lo que hay que hacer. El asunto se reduce a ¿Cómo recorro el árbol de forma recursiva para encontrar el árbol
+mínimo?
+
+Acá es donde el nodo \textit{raíz} toma relevancia, es el único nodo que va a tener 1 solo ancestro, quiere decir que va a ser
+un \textit{peaje obligado} para cualquier nodo que quiera buscar. Eso \ul{no sucede con ningún otro nodo}.
+Eso nos "dice" (entre muchas comillas) que hay una asimetría en la busqueda que sucede o bien a la derecha o a la izquierda.
+Reescribo la fórmula del costo como:
+$$
+  \begin{array}{rcl}
+    C(A) =  \sumatoria{i = 1}{n} f[i] & + & \sumatoria{i=1}{r-1} f[i] \cdot \#\text{ancestros\_de\_nodo$_i$\_en\_$A_{izq}$} \\
+                                      & + & \sumatoria{i=r+1}{n} f[i] \cdot \#\text{ancestros\_de\_nodo$_i$\_en\_$A_{der}$}
+  \end{array}
+$$
+La primera sumatoria son los \textit{peajes} del nodo raíz, la segunda los de la rama izquierda y la tercera los de la derecha.
+
+Oka, queda claro como \ul{calcular el costo del árbol}, pero en el ejercicio no me dan un árbol, me dan un arreglo $A[1..n]$ con
+frecuencias $f[f_1 .. f_2]$ y yo tengo que hacer un ABBO con eso. ¿Cómo hago? ¿Cuál es el elemento raíz?
+
+Ahí entra la magia de la recursión usando la definición del costo usada más arriba:
+$$
+  \begin{array}{rcl}
+    C(A) =  \sumatoria{i = 1}{n} f[i] & + & C(A_{izq}) \\
+                                      & + & C(A_{der})
+  \end{array}
+$$
+
+\begin{enumerate}[label=$\alph*)$]
+  \item
+        Si bien no sé cuál es el nodo raíz $A[r]$ hago recursión pasando por el árbol probando cada nodo como raíz:
+        $$
+          \green{arbolOptimo}(i,j) =
+          \llave{ccl}{
+            0 & \text{si} & i > j\\
+            \sumatoria{r = i}{j} f(r) +
+            \minimo\limits_{i\leq r \leq j}
+            \matriz{c}{
+              \green{arbolOptimo}(i, r - 1)\\
+              + \\
+              \green{arbolOptimo}(r + 1, j)
+            }
+            & \multicolumn{2}{l}{\text{si no }}
+          }
+        $$
+
+  \item Usando la ayuda del enunciado. Tengo 2 llamados recursivos por llamada a la función $\green{arbolOptimo}$:
+        $$
+          T(n) \leq \sumatoria{i = 0}{n-1} 2T(i) + g(n)
+        $$
+        Mismo truco que ejercicio \refEjercicio{ej:5}. $O(n) \leq \alpha \cdot n$:
+        $$
+          \begin{array}{rrcl}
+              & T(n)          & \leq & \sumatoria{i = 0}{n-1} 2T(i) + \alpha n    \\
+            - &               &      &                                            \\
+              & T(n-1)        & \leq & \sumatoria{i = 1}{n-2} 2T(i) + \alpha(n-1) \\ \hline
+              & T(n) - T(n-1) & \leq & 2T(n-1) + \alpha
+          \end{array}
+          \entonces
+          \cajaResultado{
+            T(n) \leq 3T(n-1)  + \alpha \en O(3^n)
+          }
+        $$
+
+  \item \Hacer
+\end{enumerate}
